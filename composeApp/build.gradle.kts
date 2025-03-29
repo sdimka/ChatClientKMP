@@ -7,6 +7,11 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+
+    id("com.google.devtools.ksp") version "2.1.10-1.0.31"
+    id("de.jensklingenberg.ktorfit") version "2.4.0"
+
+    kotlin("plugin.serialization") version "2.1.20"
 }
 
 kotlin {
@@ -36,6 +41,9 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose.viewmodel.nav)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -51,6 +59,14 @@ kotlin {
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel.nav)
+
+            implementation(libs.ktorfit.lib)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktorfit.converters.call)
+            implementation(libs.ktorfit.converters.flow)
+            implementation(libs.ktor.client.serialization)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
