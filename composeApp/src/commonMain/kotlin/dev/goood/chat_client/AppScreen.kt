@@ -86,7 +86,7 @@ fun AppScreen(
         ) {
             composable(route = Screen.Login.route) {
                 LoginScreen(onLogin = {
-                    navController.navigate(Screen.Main.route)
+                    navController.navigate(Screen.Main.route) { popUpTo(0) }
                     println("Login tapped")
                 })
             }

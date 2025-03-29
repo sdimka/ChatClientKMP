@@ -9,14 +9,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dev.goood.chat_client.viewModels.LoginViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LoginScreen(
@@ -24,6 +25,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier
 ) {
 
+    val viewModel = koinViewModel<LoginViewModel>()
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
 
@@ -32,7 +34,7 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         modifier = modifier.fillMaxWidth(),
     ) {
-        Text("Login screen",
+        Text(text = viewModel.getString(),
             modifier = modifier.padding(bottom = 16.dp))
 
         OutlinedTextField(
