@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -31,6 +32,7 @@ fun LoginScreen(
     val viewModel = koinViewModel<LoginViewModel>()
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
+    val isLoading = remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -44,8 +46,10 @@ fun LoginScreen(
                 is LoginViewModel.LoginState.Error -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(it.message)
+                        isLoading.value = false
                     }
                 }
+                LoginViewModel.LoginState.Loading -> isLoading.value = true
                 null -> println("Something went wrong")
             }
         }
@@ -74,19 +78,25 @@ fun LoginScreen(
             label = { Text("Password") }
         )
 
-        Button(
-            onClick = {
-                viewModel.auth(
-                    User(
-                        email = email.value,
-                        password = password.value
+        if (isLoading.value) {
+            CircularProgressIndicator(
+                modifier = modifier.padding(top = 16.dp)
+            )
+        } else {
+            Button(
+                onClick = {
+                    viewModel.auth(
+                        User(
+                            email = email.value,
+                            password = password.value
+                        )
                     )
-                )
 //                onLogin()
-            },
-            modifier = modifier.padding(top = 16.dp),
-        ) {
-            Text(text = "Continue")
+                },
+                modifier = modifier.padding(top = 16.dp),
+            ) {
+                Text(text = "Continue")
+            }
         }
     }
 

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.model.User
 import dev.goood.chat_client.services.AuthService
-import dev.goood.chat_client.services.AuthStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -23,6 +22,7 @@ class LoginViewModel: ViewModel(), KoinComponent {
 
     fun auth(user: User) {
         viewModelScope.launch {
+            state.value = LoginState.Loading
             authService.login(user)
                 .catch { e ->
                     state.value = e.message?.let { LoginState.Error(it) }
@@ -38,6 +38,7 @@ class LoginViewModel: ViewModel(), KoinComponent {
     sealed interface LoginState {
         data class Success(val token: String): LoginState
         data class Error(val message: String): LoginState
+        data object Loading: LoginState
 
     }
 }
