@@ -1,5 +1,8 @@
 package dev.goood.chat_client
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -14,9 +17,25 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -26,9 +45,11 @@ import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
 
 
-sealed class Screen(val route: String, val title: String) {
-    data object Login: Screen("main_screen", "Login")
-    data object Main: Screen("detail_screen", "Main")
+sealed class Screen(val route: String, val title: String, val icon:  ImageVector? = null) {
+    data object Login: Screen("main_screen", "Login",)
+    data object Main: Screen("detail_screen", "Main", Icons.AutoMirrored.Filled.List)
+    data object Other: Screen("other_screen", "Other", Icons.AutoMirrored.Filled.Send)
+    data object Settings: Screen("settings_screen", "Settings", Icons.AutoMirrored.Filled.ArrowForward )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,14 +86,46 @@ fun AppScreen(
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen =  backStackEntry?.destination
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val bottomBarState = rememberSaveable { ( mutableStateOf(true)) }
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    // Control TopBar and BottomBar
+    when (navBackStackEntry?.destination?.route) {
+        Screen.Login.route -> {
+            // Show BottomBar and TopBar
+            bottomBarState.value = false
+        }
+        Screen.Main.route -> {
+            // Show BottomBar and TopBar
+            bottomBarState.value = true
+        }
+        Screen.Other.route -> {
+            // Show BottomBar and TopBar
+            bottomBarState.value = true
+        }
+        Screen.Settings.route -> {
+            // Hide BottomBar and TopBar
+            bottomBarState.value = false
+
+        }
+    }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             CupcakeAppBar(
                 currentScreen = currentScreen?.route,
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() }
             )
+        },
+        bottomBar = {
+            BottomBar(navController, bottomBarState )
         }
     ) { innerPadding ->
 
@@ -85,15 +138,70 @@ fun AppScreen(
                 .padding(innerPadding)
         ) {
             composable(route = Screen.Login.route) {
-                LoginScreen(onLogin = {
+                LoginScreen(
+                    onLoginSuccess = {
                     navController.navigate(Screen.Main.route) { popUpTo(0) }
-                    println("Login tapped")
-                })
+                },
+                    snackbarHostState = snackbarHostState)
             }
 
             composable(route = Screen.Main.route) {
                 MainScreen()
             }
+
+            composable(route = Screen.Other.route) {
+                MainScreen()
+            }
+
+            composable(route = Screen.Settings.route) {
+                MainScreen()
+            }
         }
     }
+}
+
+@Composable
+fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean>) {
+    val items = listOf(
+        Screen.Main,
+        Screen.Other,
+        Screen.Settings
+    )
+
+    AnimatedVisibility(
+        visible = bottomBarState.value,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+        content = {
+            NavigationBar {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                items.forEach { item ->
+
+                    NavigationBarItem (
+                        icon = {
+                            item.icon?.let {
+                                Icon(
+                                    imageVector = it,
+                                    contentDescription = item.title
+                                )
+                            }
+                        },
+                        label = { Text(text = item.title) },
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    )
 }

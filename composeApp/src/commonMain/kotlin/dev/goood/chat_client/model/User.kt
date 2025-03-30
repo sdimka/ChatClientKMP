@@ -15,5 +15,5 @@ data class User (
 @Serializable
 data class TokenReply (
     @SerialName("data")
-    val token: String
+    val token: String?
 )
