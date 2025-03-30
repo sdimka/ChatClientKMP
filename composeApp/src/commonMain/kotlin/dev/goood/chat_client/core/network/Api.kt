@@ -5,7 +5,7 @@ import de.jensklingenberg.ktorfit.converter.FlowConverterFactory
 import de.jensklingenberg.ktorfit.ktorfit
 import dev.goood.chat_client.Const
 import dev.goood.chat_client.model.TokenReply
-import dev.goood.chat_client.services.AuthStorage
+import dev.goood.chat_client.services.AuthService
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -25,7 +25,7 @@ import io.ktor.http.contentType
 
 class Api: KoinComponent {
 
-    private val authStorage: AuthStorage by inject()
+    private val authService: AuthService by inject()
 
     private val ktorfit =
         ktorfit {
@@ -46,7 +46,7 @@ class Api: KoinComponent {
                     install(Auth) {
                         bearer {
                             loadTokens {
-                                val accessToken = authStorage.token
+                                val accessToken = authService.getBearerToken()
                                 val refreshToken = "" // userManager.get().refreshToken
 
                                 if (accessToken != null) {
@@ -59,24 +59,11 @@ class Api: KoinComponent {
                                 val token = client.post(Const.Network.REFRESH_TOKEN_ENDPOINT) {
                                     markAsRefreshTokenRequest()
                                     contentType(ContentType.Application.Json)
-                                    setBody(authStorage.user)
-//                                    url {
-//                                        authStorage.user?.email?.let { it1 ->
-//                                            parameters.append("email",
-//                                                it1
-//                                            )
-//                                        }
-//                                        authStorage.user?.password?.let { it1 ->
-//                                            parameters.append("password",
-//                                                it1
-//                                            )
-//                                        }
-//                                    }
+                                    setBody(authService.getUser())
                                 }.body<TokenReply>()
 
-                                authStorage.token = token.token
-
                                 token.token?.let {
+                                    authService.setBearerToken(it)
                                     BearerTokens(
                                         accessToken = it,
                                         refreshToken = ""

@@ -5,7 +5,7 @@ import org.koin.core.module.dsl.bind
 import dev.goood.chat_client.getPlatform
 import dev.goood.chat_client.services.AuthService
 import dev.goood.chat_client.services.AuthServiceImpl
-import dev.goood.chat_client.services.AuthStorage
+import dev.goood.chat_client.services.LocalStorage
 import dev.goood.chat_client.viewModels.LoginViewModel
 import dev.goood.chat_client.viewModels.MainViewModel
 import org.koin.core.module.dsl.singleOf
@@ -17,7 +17,7 @@ val appModule = module {
 
     singleOf(::Api) { bind<Api>() }
 
-    singleOf(::AuthStorage) { bind<AuthStorage>() }
+    singleOf(::LocalStorage) { bind<LocalStorage>() }
     singleOf(::AuthServiceImpl) { bind<AuthService>() }
     viewModelOf(::MainViewModel)
     viewModelOf(::LoginViewModel)

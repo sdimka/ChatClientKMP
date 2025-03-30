@@ -14,7 +14,6 @@ import org.koin.core.component.inject
 class LoginViewModel: ViewModel(), KoinComponent {
 
     private val authService: AuthService by inject()
-    private val authStorage: AuthStorage by inject()
 
     val state = MutableStateFlow<LoginState?>(null)
 
@@ -29,9 +28,9 @@ class LoginViewModel: ViewModel(), KoinComponent {
                     state.value = e.message?.let { LoginState.Error(it) }
                 }
                 .collect {
-                    authStorage.token = it.token
-                    authStorage.user = user
-                    state.value = it.token?.let { it1 -> LoginState.Success(it1) }
+                    authService.setBearerToken(it.token!!)
+                    authService.setUser(user)
+                    state.value = it.token.let { it1 -> LoginState.Success(it1) }
                 }
         }
     }
