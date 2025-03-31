@@ -109,6 +109,9 @@ dependencies {
     implementation(libs.androidx.animation.android)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.lifecycle.viewmodel.android)
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.material3.android)
     debugImplementation(compose.uiTooling)
 }
 

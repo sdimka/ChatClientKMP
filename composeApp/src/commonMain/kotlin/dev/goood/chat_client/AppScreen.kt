@@ -26,11 +26,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -41,11 +43,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
+import dev.goood.chat_client.ui.SettingsScreen
+import org.koin.compose.viewmodel.koinViewModel
 
 
 sealed class Screen(val route: String, val title: String, val icon:  ImageVector? = null) {
-    data object Login: Screen("main_screen", "Login",)
-    data object Main: Screen("detail_screen", "Main", Icons.AutoMirrored.Filled.List)
+    data object Login: Screen("login_screen", "Login")
+    data object Main: Screen("main_screen", "Main", Icons.AutoMirrored.Filled.List)
     data object Other: Screen("other_screen", "Other", Icons.AutoMirrored.Filled.Send)
     data object Settings: Screen("settings_screen", "Settings", Icons.AutoMirrored.Filled.ArrowForward )
 }
@@ -61,7 +65,7 @@ fun AppTopBar(
     TopAppBar(
         title = { currentScreen?.let { Text(it) } },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = Color.White
         ),
         modifier = modifier,
         navigationIcon = {
@@ -82,6 +86,9 @@ fun AppScreen(
     navController: NavHostController = rememberNavController()
 ) {
 
+    val viewModel: AppViewModel = koinViewModel()
+    val authState by viewModel.authState.collectAsState()
+
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen =  backStackEntry?.destination
     val snackbarHostState = remember { SnackbarHostState() }
@@ -93,19 +100,15 @@ fun AppScreen(
     // Control TopBar and BottomBar
     when (navBackStackEntry?.destination?.route) {
         Screen.Login.route -> {
-            // Show BottomBar and TopBar
             bottomBarState.value = false
         }
         Screen.Main.route -> {
-            // Show BottomBar and TopBar
             bottomBarState.value = true
         }
         Screen.Other.route -> {
-            // Show BottomBar and TopBar
             bottomBarState.value = true
         }
         Screen.Settings.route -> {
-            // Hide BottomBar and TopBar
             bottomBarState.value = false
 
         }
@@ -129,7 +132,7 @@ fun AppScreen(
 
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
+            startDestination =  if (authState is AppViewModel.AuthState.Authorized) Screen.Main.route else Screen.Login.route,
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
@@ -152,7 +155,7 @@ fun AppScreen(
             }
 
             composable(route = Screen.Settings.route) {
-                MainScreen()
+                SettingsScreen()
             }
         }
     }
@@ -171,7 +174,9 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
         content = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = Color(0xFF75DDDD),
+            ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 

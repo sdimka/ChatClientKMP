@@ -1,5 +1,6 @@
 package dev.goood.chat_client.di
 
+import dev.goood.chat_client.AppViewModel
 import dev.goood.chat_client.core.network.Api
 import org.koin.core.module.dsl.bind
 import dev.goood.chat_client.getPlatform
@@ -19,6 +20,8 @@ val appModule = module {
 
     singleOf(::LocalStorage) { bind<LocalStorage>() }
     singleOf(::AuthServiceImpl) { bind<AuthService>() }
+
+    viewModelOf(::AppViewModel)
     viewModelOf(::MainViewModel)
     viewModelOf(::LoginViewModel)
     factory { getPlatform() }

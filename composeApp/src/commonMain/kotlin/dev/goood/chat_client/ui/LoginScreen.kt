@@ -11,13 +11,17 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.goood.chat_client.model.User
+import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.viewModels.LoginViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -29,37 +33,50 @@ fun LoginScreen(
     modifier: Modifier = Modifier
 ) {
 
-    val viewModel = koinViewModel<LoginViewModel>()
-    val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-    val isLoading = remember { mutableStateOf(false) }
-
+    val viewModel: LoginViewModel  = koinViewModel()
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val loginState = viewModel.state.collectAsState(initial = null)
 
-
-    LaunchedEffect(viewModel.state.value) {
-        viewModel.state.collect {
-            when (it) {
-                is LoginViewModel.LoginState.Success -> {
-                    onLoginSuccess()
-                }
-                is LoginViewModel.LoginState.Error -> {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(it.message)
-                        isLoading.value = false
-                    }
-                }
-                LoginViewModel.LoginState.Loading -> isLoading.value = true
-                null -> println("Something went wrong")
-            }
-        }
-    }
+    // ToDo: Fix
+//    LaunchedEffect(viewModel.state.value) {
+//        when (val state = loginState.value) {
+//            is LoginViewModel.LoginState.Success -> {
+//                isLoading = false // Ensure isLoading is reset
+//                onLoginSuccess()
+//            }
+//            is LoginViewModel.LoginState.Error -> {
+//                isLoading = false // Ensure isLoading is reset
+//                scope.launch {
+//                    snackbarHostState.showSnackbar(state.message)
+//                }
+//            }
+//            LoginViewModel.LoginState.Loading -> isLoading = true
+//            null -> Unit // Handle null state appropriately, maybe log or show a default message
+//        }
+//    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier.fillMaxWidth(),
     ) {
+        when (val state = loginState.value) {
+        is LoginViewModel.LoginState.Success -> {
+            isLoading = false // Ensure isLoading is reset
+            onLoginSuccess()
+        }
+        is LoginViewModel.LoginState.Error -> {
+            isLoading = false // Ensure isLoading is reset
+            scope.launch {
+                snackbarHostState.showSnackbar(state.message)
+            }
+        }
+        LoginViewModel.LoginState.Loading -> isLoading = true
+        null -> Unit // Handle null state appropriately, maybe log or show a default message
+    }
 
         Text(
             text = viewModel.getString(),
@@ -67,38 +84,35 @@ fun LoginScreen(
         )
 
         OutlinedTextField(
-            value = email.value,
-            onValueChange = { email.value = it },
+            value = email,
+            onValueChange = { email = it },
             label = { Text("Email") }
         )
 
         OutlinedTextField(
-            value = password.value,
-            onValueChange = { password.value = it },
+            value = password,
+            onValueChange = { password = it },
             label = { Text("Password") }
         )
 
-        if (isLoading.value) {
+        if (isLoading) {
             CircularProgressIndicator(
                 modifier = modifier.padding(top = 16.dp)
             )
         } else {
-            Button(
+            CButton(
+                text = "Login",
                 onClick = {
                     viewModel.auth(
                         User(
-                            email = email.value,
-                            password = password.value
+                            email = email,
+                            password = password
                         )
                     )
-//                onLogin()
                 },
+                enabled = email.isNotBlank() && password.isNotBlank(),
                 modifier = modifier.padding(top = 16.dp),
-            ) {
-                Text(text = "Continue")
-            }
+            )
         }
     }
-
-
 }
