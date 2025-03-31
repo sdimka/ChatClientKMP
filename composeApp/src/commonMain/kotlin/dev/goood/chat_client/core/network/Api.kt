@@ -20,8 +20,10 @@ import io.ktor.client.request.post
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.request.setBody
 import io.ktor.http.contentType
+
 
 class Api: KoinComponent {
 
@@ -72,6 +74,7 @@ class Api: KoinComponent {
                             }
                         }
                     }
+                    install(SSE)
                 }
             )
             converterFactories(
@@ -83,4 +86,6 @@ class Api: KoinComponent {
 
     val authApi = ktorfit.createAuthApi()
     val testApi = ktorfit.createTestApi()
+    val streamApi = StreamApi(ktorfit.httpClient, Const.Network.API_ENDPOINT)
+
 }

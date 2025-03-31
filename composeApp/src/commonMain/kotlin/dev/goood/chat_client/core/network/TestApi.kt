@@ -19,7 +19,7 @@ interface TestApi {
     @POST("api/GetTestList")
     fun getTestDataList(): Flow<MyDataList>
 
-    @Streaming
+
     @GET("/api/streamRequest")
-    suspend fun getTestDataStream(): HttpStatement
+    suspend fun getTestDataStream(): Flow<MyOtherData>
 }
