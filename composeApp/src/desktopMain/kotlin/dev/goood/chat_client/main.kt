@@ -9,7 +9,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "KotlinProject",
     ) {
-        initKoin()
         App()
     }
 }
