@@ -135,7 +135,6 @@ fun AppScreen(
             startDestination =  if (authState is AppViewModel.AuthState.Authorized) Screen.Main.route else Screen.Login.route,
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
         ) {
             composable(route = Screen.Login.route) {

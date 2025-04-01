@@ -1,51 +1,28 @@
 package dev.goood.chat_client.viewModels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dev.goood.chat_client.core.network.Api
+import dev.goood.chat_client.model.Chat
+import dev.goood.chat_client.model.ChatList
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import kotlinx.coroutines.flow.StateFlow
 
-class MainViewModel: ViewModel(), KoinComponent {
+abstract class MainViewModel: ViewModel() {
 
-    private val service: Api by inject()
-    val reqString = MutableStateFlow("")
+    abstract val state: StateFlow<State>
+    abstract val chats: MutableStateFlow<ChatList>
 
-    fun getData(): String {
-        return "Data from ViewModel"
-    }
+    abstract val addChatDialogState: MutableStateFlow<Boolean>
+    abstract val deleteChatDialogState: MutableStateFlow<Chat?>
 
-    fun getApiData() {
-        viewModelScope.launch {
-            service.testApi.getTestData()
-                .collect {
-                    print(it)
-                }
-        }
-    }
 
-    fun getApiList() {
-        viewModelScope.launch {
-            service.testApi.getTestDataList()
-                .catch {
-                    print(it.message)
-                }
-                .collect {
-                    print(it)
-                }
-        }
-    }
+    abstract fun getChats()
+    abstract fun saveNewChat(chat: Chat)
+    abstract fun deleteChat(chat: Chat)
 
-    fun getStreamString() {
-        reqString.value = ""
-        viewModelScope.launch {
-            service.streamApi.myOtherDataStream()
-                .collect { res ->
-                    reqString.value += res.message
-                }
-        }
+    sealed interface State {
+        data object Success: State
+        data class Error(val message: String): State
+        data object Loading: State
+
     }
 }

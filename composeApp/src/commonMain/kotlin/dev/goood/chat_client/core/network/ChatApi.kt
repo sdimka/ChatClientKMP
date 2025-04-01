@@ -1,0 +1,21 @@
+package dev.goood.chat_client.core.network
+
+import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.POST
+import dev.goood.chat_client.model.Chat
+import dev.goood.chat_client.model.ChatList
+import dev.goood.chat_client.model.ResultMessage
+import kotlinx.coroutines.flow.Flow
+
+interface ChatApi {
+
+    @GET("/api/GetChats")
+    fun getChats(): Flow<ChatList>
+
+    @POST("/api/NewChat")
+    fun addChat(@Body chat: Chat): Flow<Chat>
+
+    @POST("/api/DeleteChat")
+    fun deleteChat(@Body chat: Chat): Flow<ResultMessage>
+}

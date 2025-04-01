@@ -18,7 +18,6 @@ class StreamApi(private val client: HttpClient, baseUrl: String) {
             client.sse(scheme = url.protocol.name, host = url.host, port = url.port, path = "/api/streamRequest") {
 
                 incoming.collect { event ->
-                    println(event.data)
                     val deserializedData = event.data?.let {
                         Json.decodeFromString<MyOtherData>(it)
                     }

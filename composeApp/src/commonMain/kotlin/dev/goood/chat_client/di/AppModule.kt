@@ -9,6 +9,8 @@ import dev.goood.chat_client.services.AuthServiceImpl
 import dev.goood.chat_client.services.LocalStorage
 import dev.goood.chat_client.viewModels.LoginViewModel
 import dev.goood.chat_client.viewModels.MainViewModel
+import dev.goood.chat_client.viewModels.MainViewModelImpl
+import dev.goood.chat_client.viewModels.MainViewModelPreview
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModelOf
@@ -22,7 +24,20 @@ val appModule = module {
     singleOf(::AuthServiceImpl) { bind<AuthService>() }
 
     viewModelOf(::AppViewModel)
-    viewModelOf(::MainViewModel)
+    viewModelOf(::MainViewModelImpl) { bind<MainViewModel>() }
+    viewModelOf(::LoginViewModel)
+    factory { getPlatform() }
+}
+
+val appModulePreview = module {
+
+    singleOf(::Api) { bind<Api>() }
+
+    singleOf(::LocalStorage) { bind<LocalStorage>() }
+    singleOf(::AuthServiceImpl) { bind<AuthService>() }
+
+    viewModelOf(::AppViewModel)
+    viewModelOf(::MainViewModelPreview) { bind<MainViewModel>() }
     viewModelOf(::LoginViewModel)
     factory { getPlatform() }
 }
