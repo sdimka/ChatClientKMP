@@ -20,8 +20,9 @@ class MainViewModelPreview: MainViewModel() {
 
         )
     )
-    override val addChatDialogState: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val deleteChatDialogState: MutableStateFlow<Chat?> = MutableStateFlow(Chat(1,"","Some name",""))
+    override val addChatDialogState: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    override val deleteChatDialogState: MutableStateFlow<Chat?> =
+        MutableStateFlow(null) //Chat(1,"","Some name",""))
 
     override fun getChats() {
 

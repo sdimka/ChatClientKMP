@@ -43,6 +43,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
+import dev.goood.chat_client.ui.OtherScreen
 import dev.goood.chat_client.ui.SettingsScreen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -150,7 +151,7 @@ fun AppScreen(
             }
 
             composable(route = Screen.Other.route) {
-                MainScreen()
+                OtherScreen()
             }
 
             composable(route = Screen.Settings.route) {

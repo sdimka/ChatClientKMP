@@ -1,6 +1,5 @@
 package dev.goood.chat_client.viewModels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.model.Chat

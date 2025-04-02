@@ -36,7 +36,7 @@ fun CButton(
         modifier = modifier
             .height(50.dp)
             .padding(4.dp),
-        colors = ButtonDefaults.buttonColors(Color(0xFF166EB4)),
+        colors = ButtonDefaults.buttonColors(buttonBackground),
         shape = RoundedCornerShape(8.dp)
     ) {
         Text(text = text, color = Color.White, fontSize = 16.sp)

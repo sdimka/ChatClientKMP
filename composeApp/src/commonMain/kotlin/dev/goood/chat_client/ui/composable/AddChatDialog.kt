@@ -65,21 +65,28 @@ internal fun AddChatDialog(
 
                 )
 
-                OutlinedTextField(
-                    value = source,
-                    onValueChange = { source = it },
-                    label = { Text("Chat name") },
-                    modifier = modifier.padding(bottom = 10.dp)
-
+                SegmentedButtons(
+                    modifier = modifier.padding(vertical = 20.dp)
                 )
 
-                OutlinedTextField(
-                    value = model,
-                    onValueChange = { model = it },
-                    label = { Text("Chat name") },
+                DropDownMenu(
                     modifier = modifier.padding(bottom = 10.dp)
-
                 )
+//                OutlinedTextField(
+//                    value = source,
+//                    onValueChange = { source = it },
+//                    label = { Text("Chat source") },
+//                    modifier = modifier.padding(bottom = 10.dp)
+//
+//                )
+
+//                OutlinedTextField(
+//                    value = model,
+//                    onValueChange = { model = it },
+//                    label = { Text("Chat model") },
+//                    modifier = modifier.padding(bottom = 10.dp)
+//
+//                )
 
                 Row {
 
