@@ -20,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -57,24 +58,22 @@ fun ChatScreen(
         }
     }
 
-    Column(
+    Scaffold(
+        contentColor =  Color.DarkGray,
         modifier = modifier.fillMaxSize().background(Color.Red),
-    ) {
-
-        TextField(
-            value = inputValue,
-            onValueChange = { inputValue = it },
-            label = { Text("Email") }
-        )
+        bottomBar =  {
+            MessageInput(
+                viewModel = viewModel,
+            )
+        }
+    ) { innerPadding ->
 
         MessageList(
             viewModel = viewModel,
-            modifier = modifier //.padding(bottom = 20.dp)
+            modifier = modifier.padding(innerPadding)
         )
 
-        MessageInput(
-            viewModel = viewModel,
-        )
+
     }
 
 
@@ -88,7 +87,7 @@ fun MessageList(
     val state by viewModel.state.collectAsState()
 //    val messageState = state ?: return
 
-    Column(
+    Box(
         modifier = modifier.background(Color.Cyan),
 //        contentAlignment = Alignment.Center
     ) {
@@ -104,7 +103,7 @@ fun MessageList(
 //                    .asReversed()
 
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = modifier.fillMaxSize(),
                     reverseLayout = true, // 5
                 ) {
                     items(viewModel.messages.value) { message ->
