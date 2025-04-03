@@ -1,0 +1,117 @@
+package dev.goood.chat_client.viewModels
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dev.goood.chat_client.core.network.Api
+import dev.goood.chat_client.model.ChatModel
+import dev.goood.chat_client.model.ChatModelList
+import dev.goood.chat_client.model.ChatSource
+import dev.goood.chat_client.model.ChatSourceList
+import dev.goood.chat_client.model.NewChat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+
+class AddChatViewModel: ViewModel(), KoinComponent  {
+
+    private val api: Api by inject()
+
+    private var _state = MutableStateFlow<State>(State.Loading)
+    val state: StateFlow<State> = _state
+
+    private val _sourceList = MutableStateFlow<ChatSourceList>(emptyList())
+    val sourceList: StateFlow<ChatSourceList> = _sourceList
+    private val _modelList = MutableStateFlow<ChatModelList>(emptyList())
+    val modelList: StateFlow<ChatModelList> = _modelList
+    private val _chatName = MutableStateFlow("")
+    val chatName: StateFlow<String> = _chatName
+
+    private val selectedSource = MutableStateFlow<ChatSource?>(null)
+    private val selectedModel = MutableStateFlow<ChatModel?>(null)
+
+    private fun getSources() {
+        viewModelScope.launch {
+            api.chatApi.getSources()
+                .catch {
+
+                }
+                .collect{
+                    _sourceList.value = it
+                    getModels(it.first().id)
+                }
+        }
+    }
+
+    private fun getModels(sourceId: Int) {
+        viewModelScope.launch {
+            api.chatApi.getModels(sourceId)
+                .catch {
+
+                }
+                .collect{
+                    _modelList.value = it
+                }
+
+        }
+    }
+
+    fun upDate(){
+        getSources()
+    }
+
+    fun setSelectedSource(source: ChatSource) {
+        selectedSource.value = source
+        validateForm()
+    }
+
+    fun setSelectedModel(model: ChatModel) {
+        selectedModel.value = model
+        validateForm()
+    }
+
+    fun setChatName(name: String) {
+        _chatName.value = name
+        validateForm()
+    }
+
+    private fun validateForm() {
+        if (chatName.value.isNotEmpty() && selectedSource.value != null && selectedModel.value != null) {
+            _state.value = State.FormValid
+        } else {
+            _state.value = State.Error("Fill all fields")
+        }
+    }
+
+    fun createNewChat() {
+        _state.value = State.Loading
+        viewModelScope.launch {
+            val chat = NewChat(
+                id = 1,
+                name = chatName.value,
+                sourceID = selectedSource.value!!.id,
+                modelID = selectedModel.value!!.id,
+            )
+            api.chatApi.addChat(chat)
+                .catch {
+                    println(it)
+                    _state.value = State.Error(it.message ?: "Unknown error")
+                }
+                .collect {
+                    println("Chat saved")
+                    _state.value = State.Success
+                }
+
+        }
+    }
+
+    sealed interface State {
+        data object Success: State
+        data class Error(val message: String): State
+        data object Loading: State
+        data object FormValid: State
+    }
+}

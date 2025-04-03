@@ -74,18 +74,9 @@ class MainViewModelImpl: MainViewModel(), KoinComponent {
         }
     }
 
-    override fun saveNewChat(chat: Chat) {
-        viewModelScope.launch {
-            api.chatApi.addChat(chat)
-                .catch {
-                    println(it)
-                }
-                .collect {
-                    println("Chat saved")
-                    getChats()
-                }
-
-        }
+    override fun onNewChatSaved() {
+        getChats()
+        addChatDialogState.value = false
     }
 
     override fun deleteChat(chat: Chat) {

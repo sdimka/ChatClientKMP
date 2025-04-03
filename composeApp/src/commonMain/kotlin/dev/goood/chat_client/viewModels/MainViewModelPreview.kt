@@ -3,20 +3,24 @@ package dev.goood.chat_client.viewModels
 
 import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.model.ChatList
+import dev.goood.chat_client.model.ChatModel
+import dev.goood.chat_client.model.ChatSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class MainViewModelPreview: MainViewModel() {
 
     override val state: StateFlow<State> = MutableStateFlow(State.Success)
+    val chatSource = ChatSource(1, "Chat1")
+    val chatModel = ChatModel(1, "Model", "Model", "Model")
 
     override val chats: MutableStateFlow<ChatList>
     = MutableStateFlow(
         listOf(
             Chat(
-                1, "Model", "Chat1", source = "Source"),
-            Chat(2,"Model", "Chat1", source = "Source"),
-            Chat(3,"Model", "Chat1", source = "Source"),
+                1, "Chat1", source = chatSource, model = chatModel),
+            Chat(2,"Chat2", source = chatSource, model = chatModel),
+            Chat(3,"Chat3", source = chatSource, model = chatModel),
 
         )
     )
@@ -28,7 +32,7 @@ class MainViewModelPreview: MainViewModel() {
 
     }
 
-    override fun saveNewChat(chat: Chat) {
+    override fun onNewChatSaved() {
 
     }
 

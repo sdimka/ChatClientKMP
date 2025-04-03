@@ -11,6 +11,7 @@ import dev.goood.chat_client.viewModels.LoginViewModel
 import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModelImpl
 import dev.goood.chat_client.viewModels.MainViewModelPreview
+import dev.goood.chat_client.viewModels.AddChatViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModelOf
@@ -26,6 +27,7 @@ val appModule = module {
     viewModelOf(::AppViewModel)
     viewModelOf(::MainViewModelImpl) { bind<MainViewModel>() }
     viewModelOf(::LoginViewModel)
+    viewModelOf(::AddChatViewModel)
     factory { getPlatform() }
 }
 
@@ -39,5 +41,7 @@ val appModulePreview = module {
     viewModelOf(::AppViewModel)
     viewModelOf(::MainViewModelPreview) { bind<MainViewModel>() }
     viewModelOf(::LoginViewModel)
+    viewModelOf(::AddChatViewModel)
+
     factory { getPlatform() }
 }

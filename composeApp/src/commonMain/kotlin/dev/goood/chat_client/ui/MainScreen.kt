@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -121,8 +120,8 @@ fun MainScreen(
     if (dialogState) {
         AddChatDialog(
             onDismiss = { viewModel.addChatDialogState.value = false },
-            onSaved = { chat ->
-                viewModel.saveNewChat(chat)
+            onSaved = {
+                viewModel.onNewChatSaved()
                 viewModel.addChatDialogState.value = false
                       },
         )
@@ -162,18 +161,24 @@ fun ChatElement(
             Row (
                 horizontalArrangement = Arrangement.Start
             ) {
-                Text(
-                    text = chat.name,
-                    fontSize = 16.sp,
-                )
-                Text(
-                    text = chat.model,
-                    fontSize = 16.sp,
-                )
-                Text(
-                    text = chat.source,
-                    fontSize = 16.sp,
-                )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = modifier.padding(start = 10.dp)
+                ) {
+                    Text(
+                        text = chat.name,
+                        fontSize = 16.sp,
+                    )
+                    Text(
+                        text = chat.model.name,
+                        fontSize = 16.sp,
+                    )
+                }
+
+//                Text(
+//                    text = chat.source.name,
+//                    fontSize = 16.sp,
+//                )
             }
 
             Row(

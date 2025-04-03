@@ -7,12 +7,22 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Chat (
     val id: Int,
-    val model: String,
     val name: String,
-    val source: String
+    val source: ChatSource,
+    val model: ChatModel,
 )
 
 typealias ChatList = List<Chat>
+
+@Serializable
+data class NewChat (
+    val id: Int,
+    val name: String,
+    @SerialName("source_id")
+    val sourceID: Int,
+    @SerialName("model_id")
+    val modelID: Int,
+)
 
 @Serializable
 data class ChatSource (

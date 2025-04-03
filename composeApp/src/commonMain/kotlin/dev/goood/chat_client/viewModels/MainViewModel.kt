@@ -16,7 +16,7 @@ abstract class MainViewModel: ViewModel() {
 
 
     abstract fun getChats()
-    abstract fun saveNewChat(chat: Chat)
+    abstract fun onNewChatSaved()
     abstract fun deleteChat(chat: Chat)
 
     sealed interface State {

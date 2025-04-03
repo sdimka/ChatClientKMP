@@ -35,29 +35,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import dev.goood.chat_client.model.ChatModel
 
 
-data class DropdownItem(
-    val icon: ImageVector,
-    val title: String
-)
 
-val itemList = listOf(
-    DropdownItem(Icons.Default.Home, "Home"),
-    DropdownItem(Icons.Default.Person, "Person"),
-    DropdownItem(Icons.Default.ShoppingCart, "Cart"),
-    DropdownItem(Icons.Default.Settings, "Settings"),
-    DropdownItem(Icons.Default.Call, "Calls"),
-    DropdownItem(Icons.Default.Email, "Emails")
+val itemListL = listOf(
+    ChatModel(
+        id = 1,
+        name = "Model 1",
+        displayName = "Model dName",
+        description = "Some long description"
+    ),
+    ChatModel(
+        id = 2,
+        name = "Model 1",
+        displayName = "Model dName",
+        description = "Some long description"
+    ),
+    ChatModel(
+        id = 3,
+        name = "Model 1",
+        displayName = "Model dName",
+        description = "Some long description"
+    ),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropDownMenu(
+    itemList: List<ChatModel> = itemListL,
+    onSelected: (ChatModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf(DropdownItem(Icons.Default.Home, "Home")) }
+    var selectedItem by remember { mutableStateOf(ChatModel(1, "Choose model", "", "")) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -80,22 +91,24 @@ fun DropDownMenu(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 TextField(
                     modifier = Modifier
                         .menuAnchor(MenuAnchorType.PrimaryEditable, true),
-                    value = selectedItem.title,
-                    onValueChange = { },
+                    value = selectedItem.name,
+                    onValueChange = {},
                     readOnly = true,
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = selectedItem.icon,
-                            contentDescription = selectedItem.title
-                        )
-                    }
-                )
+        //                    leadingIcon = {
+        //                        Icon(
+        //                            imageVector = selectedItem.icon,
+        //                            contentDescription = selectedItem.title
+        //                        )
+        //                    }
+                    )
+
             }
 
             ExposedDropdownMenu(
@@ -111,15 +124,16 @@ fun DropDownMenu(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    imageVector = item.icon,
-                                    contentDescription = item.title
-                                )
-                                Text(item.title)
+//                                Icon(
+//                                    imageVector = item.icon,
+//                                    contentDescription = item.title
+//                                )
+                                Text(item.name)
                             }
                         },
                         onClick = {
                             selectedItem = itemList[index]
+                            onSelected(selectedItem)
                             expanded = false
                         },
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
@@ -129,7 +143,7 @@ fun DropDownMenu(
         }
 
         Text(
-            text = "${selectedItem.title} data displayed",
+            text = "${selectedItem.name}",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(top = 20.dp)
         )
