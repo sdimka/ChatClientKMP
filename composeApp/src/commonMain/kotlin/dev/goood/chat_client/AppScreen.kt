@@ -5,10 +5,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -38,9 +35,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import dev.goood.chat_client.ui.ChatScreen
 import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
 import dev.goood.chat_client.ui.OtherScreen
@@ -51,6 +51,7 @@ import org.koin.compose.viewmodel.koinViewModel
 sealed class Screen(val route: String, val title: String, val icon:  ImageVector? = null) {
     data object Login: Screen("login_screen", "Login")
     data object Main: Screen("main_screen", "Main", Icons.AutoMirrored.Filled.List)
+    data object Chat: Screen("chat_screen", "Chat", Icons.AutoMirrored.Filled.Send)
     data object Other: Screen("other_screen", "Other", Icons.AutoMirrored.Filled.Send)
     data object Settings: Screen("settings_screen", "Settings", Icons.AutoMirrored.Filled.ArrowForward )
 }
@@ -106,6 +107,9 @@ fun AppScreen(
         Screen.Main.route -> {
             bottomBarState.value = true
         }
+        Screen.Chat.route -> {
+            bottomBarState.value = false
+        }
         Screen.Other.route -> {
             bottomBarState.value = true
         }
@@ -147,7 +151,20 @@ fun AppScreen(
             }
 
             composable(route = Screen.Main.route) {
-                MainScreen()
+                MainScreen(
+                    toChat = { chat ->
+                        navController.navigate(Screen.Chat.route + "/${chat.id}") {
+                            popUpTo(navController.graph.findStartDestination().id)
+                        }
+                    }
+                )
+            }
+
+            composable(route = Screen.Chat.route + "/{chatID}",
+                arguments = listOf(navArgument("chatID") { type = NavType.IntType })) {
+                stackEntry ->
+                    val chatID = stackEntry.arguments?.getInt("chatID")
+                    ChatScreen(chatID)
             }
 
             composable(route = Screen.Other.route) {

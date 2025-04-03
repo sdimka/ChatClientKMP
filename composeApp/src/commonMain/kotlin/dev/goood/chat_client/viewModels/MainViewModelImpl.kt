@@ -69,7 +69,6 @@ class MainViewModelImpl: MainViewModel(), KoinComponent {
                 .collect {
                     chats.value = it
                     _state.value = State.Success
-                    println("Chat collected")
                 }
         }
     }

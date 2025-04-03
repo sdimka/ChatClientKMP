@@ -1,6 +1,7 @@
 package dev.goood.chat_client.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainScreen(
+    toChat: (chat: Chat) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -95,6 +97,7 @@ fun MainScreen(
                 items(viewModel.chats.value) { chat ->
                     ChatElement(
                         chat = chat,
+                        toChat = toChat,
                         onEditClick = {
 //                            viewModel.deleteChatDialogState.value = true
                         },
@@ -143,15 +146,19 @@ fun MainScreen(
 @Composable
 fun ChatElement(
     chat: Chat,
-    modifier: Modifier = Modifier,
     onEditClick: (chat: Chat) -> Unit = {},
-    onDeleteClick: (chat: Chat) -> Unit = {}
+    onDeleteClick: (chat: Chat) -> Unit = {},
+    toChat: (chat: Chat) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Card (
         colors = CardDefaults.cardColors(Color(0xFFF5F5F5)),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 5.dp)
+            .clickable(enabled = true) {
+                toChat(chat)
+            }
 
     ) {
         Row (
