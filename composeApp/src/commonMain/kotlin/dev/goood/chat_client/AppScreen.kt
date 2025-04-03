@@ -54,6 +54,22 @@ sealed class Screen(val route: String, val title: String, val icon:  ImageVector
     data object Chat: Screen("chat_screen", "Chat", Icons.AutoMirrored.Filled.Send)
     data object Other: Screen("other_screen", "Other", Icons.AutoMirrored.Filled.Send)
     data object Settings: Screen("settings_screen", "Settings", Icons.AutoMirrored.Filled.ArrowForward )
+
+    companion object {
+        fun fromRoute(route: String): Screen {
+            return when (route.substringBefore("/")) { // Extract base route
+                "login_screen" -> Login
+                "main_screen" -> Main
+                "chat_screen" -> Chat // Note: for navigation, you'll still need to provide the {chatID}
+                "other_screen" -> Other
+                "settings_screen" -> Settings
+                else -> {
+                    println("Unknown route: $route")
+                    Main
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,28 +112,34 @@ fun AppScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val bottomBarState = rememberSaveable { ( mutableStateOf(true)) }
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val scrState = backStackEntry?.destination?.route?.let {
+        Screen.fromRoute(
+            it
+        )
+    }
 
     // Control TopBar and BottomBar
-    when (navBackStackEntry?.destination?.route) {
-        Screen.Login.route -> {
+    when (scrState) {
+        Screen.Login -> {
             bottomBarState.value = false
         }
-        Screen.Main.route -> {
+        Screen.Main -> {
             bottomBarState.value = true
         }
-        Screen.Chat.route -> {
+        Screen.Chat -> {
             bottomBarState.value = false
         }
-        Screen.Other.route -> {
+        Screen.Other -> {
             bottomBarState.value = true
         }
-        Screen.Settings.route -> {
+        Screen.Settings -> {
             bottomBarState.value = false
-
+        }
+        null -> {
+            println("Other route: ${backStackEntry?.destination?.route}")
         }
     }
+
 
     Scaffold(
         snackbarHost = {

@@ -45,9 +45,6 @@ internal fun AddChatDialog(
     val modelList by viewModel.modelList.collectAsState()
     val chatName by viewModel.chatName.collectAsState()
 
-//    var source by remember { mutableStateOf<ChatSource?>(null) }
-//    var model by remember { mutableStateOf<ChatModel?>(null) }
-
     LaunchedEffect(LocalLifecycleOwner.current) {
         viewModel.upDate()
     }

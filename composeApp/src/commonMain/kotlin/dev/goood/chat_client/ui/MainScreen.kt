@@ -65,28 +65,6 @@ fun MainScreen(
                 }
             )
         }
-//        Text(
-//            text = viewModel.getData()
-//        )
-//
-//        CButton(
-//            text = "Get Data",
-//            onClick = { viewModel.getApiData() },
-//        )
-//
-//        CButton(
-//            text = "Get Data List",
-//            onClick = { viewModel.getApiList() },
-//        )
-//
-//        CButton(
-//            text = "Get Stream",
-//            onClick = { viewModel.getStreamString() },
-//        )
-//
-//        Text(
-//            text = reqString.value
-//        )
 
         if (state.value.instanceOf(MainViewModel.State.Success::class)) {
             LazyColumn(
