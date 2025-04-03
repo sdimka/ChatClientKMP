@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Phone
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.viewModels.ChatViewModel
 import io.ktor.util.reflect.instanceOf
@@ -47,24 +49,35 @@ fun ChatScreen(
     val viewModel: ChatViewModel = koinViewModel()
     val state = viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
+    var inputValue by remember { mutableStateOf("") }
+
+    LaunchedEffect(LocalLifecycleOwner.current) {
         if (chatID != null) {
             viewModel.getMessages(chatID)
         }
     }
 
     Column(
-        modifier = modifier.fillMaxSize().padding(bottom = 50.dp),
+        modifier = modifier.fillMaxSize().background(Color.Red),
     ) {
+
+        TextField(
+            value = inputValue,
+            onValueChange = { inputValue = it },
+            label = { Text("Email") }
+        )
+
         MessageList(
             viewModel = viewModel,
-            modifier = modifier.padding(bottom = 20.dp)
+            modifier = modifier //.padding(bottom = 20.dp)
         )
 
         MessageInput(
             viewModel = viewModel,
         )
     }
+
+
 }
 
 @Composable
@@ -75,9 +88,9 @@ fun MessageList(
     val state by viewModel.state.collectAsState()
 //    val messageState = state ?: return
 
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = modifier.background(Color.Cyan),
+//        contentAlignment = Alignment.Center
     ) {
         when (state) {
             is ChatViewModel.State.Loading -> {
@@ -145,7 +158,9 @@ fun MessageInput(
     }
 
     Row(
-        modifier.fillMaxWidth()
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        modifier = modifier.fillMaxWidth()
     ) {
 //        TextField(
 //            modifier = Modifier.weight(1f),
@@ -154,16 +169,18 @@ fun MessageInput(
 ////            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
 ////            keyboardActions = KeyboardActions { sendMessage() },
 //        )
-        OutlinedTextField(
+        TextField(
+            modifier = Modifier.weight(1f),
             value = inputValue,
             onValueChange = { inputValue = it },
-            label = { Text("Email") }
+            label = { Text("Message") }
         )
 
         Button(
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier.height(54.dp),
             onClick = { sendMessage() },
             enabled = inputValue.isNotBlank(),
+            shape = RoundedCornerShape(8.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Call,
