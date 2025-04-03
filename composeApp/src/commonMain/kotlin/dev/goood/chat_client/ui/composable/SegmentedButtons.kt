@@ -47,7 +47,7 @@ fun SegmentedButtons(
                 ),
                 shape = SegmentedButtonDefaults.itemShape(
                     index = index,
-                    count = choice.id
+                    count = choiceList.count()
                 )
             ) {
                 Text(choice.name)

@@ -99,7 +99,11 @@ internal fun AddChatDialog(
                     modifier = modifier.padding(bottom = 10.dp),
                 )
 
-                Row {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = modifier.padding(top = 15.dp)
+                ) {
                     CButton(
                         text = "Ok",
                         onClick = {

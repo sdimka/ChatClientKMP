@@ -68,7 +68,7 @@ fun DropDownMenu(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf(ChatModel(1, "Choose model", "", "")) }
+    var selectedItem by remember { mutableStateOf(ChatModel(1, "", "", "")) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -97,6 +97,7 @@ fun DropDownMenu(
                         .menuAnchor(MenuAnchorType.PrimaryEditable, true),
                     value = selectedItem.name,
                     onValueChange = {},
+                    label = { Text("Choose an model") },
                     readOnly = true,
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -142,11 +143,10 @@ fun DropDownMenu(
             }
         }
 
-        Text(
-            text = "${selectedItem.name}",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(top = 20.dp)
-        )
-
+//        Text(
+//            text = "${selectedItem.name}",
+//            style = MaterialTheme.typography.headlineMedium,
+//            modifier = Modifier.padding(top = 20.dp)
+//        )
     }
 }
