@@ -161,8 +161,8 @@ fun AppScreen(
             navController = navController,
             startDestination =  if (authState is AppViewModel.AuthState.Authorized) Screen.Main.route else Screen.Login.route,
             modifier = Modifier
-                .fillMaxSize()
                 .padding(innerPadding)
+                .fillMaxSize()
         ) {
             composable(route = Screen.Login.route) {
                 LoginScreen(
@@ -186,7 +186,9 @@ fun AppScreen(
                 arguments = listOf(navArgument("chatID") { type = NavType.IntType })) {
                 stackEntry ->
                     val chatID = stackEntry.arguments?.getInt("chatID")
-                    ChatScreen(chatID)
+                    ChatScreen(
+                        chatID
+                    )
             }
 
             composable(route = Screen.Other.route) {

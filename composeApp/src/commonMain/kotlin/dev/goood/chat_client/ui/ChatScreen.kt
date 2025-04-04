@@ -5,19 +5,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -33,9 +43,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.goood.chat_client.model.Message
+import dev.goood.chat_client.ui.composable.buttonBackground
+import dev.goood.chat_client.ui.composable.verticalColumnScrollbar
 import dev.goood.chat_client.viewModels.ChatViewModel
 import io.ktor.util.reflect.instanceOf
 import org.koin.compose.viewmodel.koinViewModel
@@ -58,23 +73,10 @@ fun ChatScreen(
         }
     }
 
-    Scaffold(
-        contentColor =  Color.DarkGray,
-        modifier = modifier.fillMaxSize().background(Color.Red),
-        bottomBar =  {
-            MessageInput(
-                viewModel = viewModel,
-            )
-        }
-    ) { innerPadding ->
-
         MessageList(
             viewModel = viewModel,
-            modifier = modifier.padding(innerPadding)
         )
 
-
-    }
 
 
 }
@@ -85,38 +87,75 @@ fun MessageList(
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.state.collectAsState()
+    val scrollState = rememberScrollState()
 //    val messageState = state ?: return
 
-    Box(
-        modifier = modifier.background(Color.Cyan),
-//        contentAlignment = Alignment.Center
+    val messagesList by viewModel.messages.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (state) {
-            is ChatViewModel.State.Loading -> {
-                CircularProgressIndicator()
-            }
+//        Text(
+//            text = "List",
+//            fontSize = 24.sp,
+//            fontWeight = FontWeight.Bold,
+//            modifier = Modifier.padding(top = 32.dp, bottom = 16.dp)
+//        )
 
-            is ChatViewModel.State.Success -> {
-//                val messageItems = messageState.messageListItem.items // 4
-//                    .filterIsInstance<MessageListItem.MessageItem>()
-//                    .filter { it.message.text.isNotBlank() }
-//                    .asReversed()
-
-                LazyColumn(
-                    modifier = modifier.fillMaxSize(),
-                    reverseLayout = true, // 5
-                ) {
-                    items(viewModel.messages.value) { message ->
-                        MessageElement(message) // 6
-                    }
-                }
-            }
-
-            is ChatViewModel.State.Error -> {
-                Text((state as ChatViewModel.State.Error).message)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .padding(bottom = 60.dp)
+        ) {
+            items(messagesList) { message ->
+                MessageElement(message = message)
             }
         }
+
+        Spacer(modifier = Modifier.padding(bottom = 120.dp))
     }
+
+    MessageInput(
+        viewModel = viewModel,
+    )
+//    Box(
+//        modifier = Modifier.fillMaxSize(),
+//        contentAlignment = Alignment.BottomEnd
+//    ) {
+//        Button(
+//            shape = RectangleShape,
+//            onClick = {},
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(56.dp)
+//        ) {
+//            Icon(
+//                imageVector = Icons.Default.Call,
+//                contentDescription = "",
+//                tint = Color.Black,
+//                modifier = modifier.size(15.dp),
+//            )
+//            Spacer(modifier = Modifier.weight(54f))
+//            Text("Download Friend List")
+//        }
+
+//        FloatingActionButton(
+//            onClick = {},
+//            modifier = Modifier
+//                .padding(
+//                    bottom = 70.dp,
+//                    end = 16.dp
+//                )
+//        ) {
+//            Icon(imageVector = Icons.Default.Add, contentDescription = "Add New Friend")
+//        }
+//    }
+
+//    friendsListMutableState.addAll(friendsList)
 }
 
 
@@ -124,21 +163,35 @@ fun MessageList(
 fun MessageElement(
     message: Message,
     onDeleteClick: (message: Message) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
-    Column (
-        modifier = Modifier.padding(10.dp).background(Color.Cyan),
+    Card  (
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(5.dp),
 
     ) {
-        Icon(
-            imageVector = Icons.Filled.Phone,
+        Row (
+            modifier = modifier.padding(horizontal = 5.dp).padding(top = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Phone,
 //                painter = painterResource(SharedRes.images.icon_menu_main),
-            contentDescription = "Filters icon",
-            modifier = Modifier.size(15.dp),
-            tint = Color.Black
-        )
+                contentDescription = "Filters icon",
+                modifier = modifier.size(15.dp),
+                tint = Color.Black
+            )
+
+            Text (
+                text = "${message.initiator}",
+                modifier = modifier.padding(start = 10.dp)
+            )
+        }
 
         Text(
-            text = message.content
+            text = message.content,
+            modifier = modifier.padding(horizontal = 5.dp).padding(bottom = 5.dp)
         )
 
     }
@@ -156,37 +209,37 @@ fun MessageInput(
         inputValue = ""
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = modifier.fillMaxWidth()
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomEnd
     ) {
-//        TextField(
-//            modifier = Modifier.weight(1f),
-//            value = inputValue,
-//            onValueChange = { inputValue = it },
-////            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-////            keyboardActions = KeyboardActions { sendMessage() },
-//        )
-        TextField(
-            modifier = Modifier.weight(1f),
-            value = inputValue,
-            onValueChange = { inputValue = it },
-            label = { Text("Message") }
-        )
-
-        Button(
-            modifier = Modifier.height(54.dp),
-            onClick = { sendMessage() },
-            enabled = inputValue.isNotBlank(),
-            shape = RoundedCornerShape(8.dp)
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = modifier.fillMaxWidth().background(Color.White),
         ) {
-            Icon(
-                imageVector = Icons.Default.Call,
-                contentDescription = "",
-                modifier = Modifier.size(15.dp),
-                tint = Color.Black
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                TextField(
+                    value = inputValue,
+                    onValueChange = { inputValue = it },
+                    label = { Text("Type your message...") },
+                    modifier = modifier.fillMaxWidth()
+
+                )
+            }
+            Button(
+                shape = RectangleShape,
+                onClick = {},
+                colors = ButtonDefaults.buttonColors(buttonBackground),
+                modifier = modifier
+                    .height(56.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Call,
+                    contentDescription = "",
+                    tint = Color.Black,
+                    modifier = modifier.size(15.dp),
+                )
+            }
         }
     }
 }

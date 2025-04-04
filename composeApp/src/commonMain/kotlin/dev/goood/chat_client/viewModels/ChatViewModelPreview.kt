@@ -11,22 +11,22 @@ class ChatViewModelPreview: ChatViewModel() {
     private val _state = MutableStateFlow<State>(State.Success)
     override val state: StateFlow<State> = _state
 
-    private val _messages = MutableStateFlow(
-        listOf(
-            Message(
-                id = 1,
-                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                initiator = 0,
-                role = "A"
-            ),
-            Message(
-                id = 2,
-                content = "Some reply content",
-                initiator = 1,
-                role = "A"
-            )
+    val list = listOf(
+        Message(
+            id = 1,
+            content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            initiator = 0,
+            role = "A"
+        ),
+        Message(
+            id = 2,
+            content = "Some reply content",
+            initiator = 1,
+            role = "A"
         )
     )
+
+    private val _messages = MutableStateFlow(list)
     override val messages: StateFlow<MessageList> = _messages
 
     override fun getMessages(chatId: Int) {}
