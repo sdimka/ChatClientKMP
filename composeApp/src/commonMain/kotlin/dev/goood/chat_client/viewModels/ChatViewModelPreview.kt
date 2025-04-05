@@ -10,6 +10,7 @@ class ChatViewModelPreview: ChatViewModel() {
 
     private val _state = MutableStateFlow<State>(State.Success)
     override val state: StateFlow<State> = _state
+    override val newReply: StateFlow<String> = MutableStateFlow("")
 
     val list = listOf(
         Message(
@@ -31,5 +32,5 @@ class ChatViewModelPreview: ChatViewModel() {
 
     override fun getMessages(chatId: Int) {}
 
-    override fun sendMessage(inputValue: String) {}
+    override fun sendMessage(messageText: String) {}
 }

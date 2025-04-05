@@ -1,5 +1,6 @@
 package dev.goood.chat_client.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
@@ -12,3 +13,11 @@ data class Message (
 )
 
 typealias MessageList = List<Message>
+
+
+@Serializable
+data class MessageRequest (
+    val content: String,
+    @SerialName("chat_id")
+    val chatId: Int,
+)

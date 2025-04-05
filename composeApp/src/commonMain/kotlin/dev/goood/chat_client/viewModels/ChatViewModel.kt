@@ -8,13 +8,15 @@ abstract class ChatViewModel: ViewModel() {
 
     abstract val state: StateFlow<State>
     abstract val messages: StateFlow<MessageList>
+    abstract val newReply: StateFlow<String>
     abstract fun getMessages(chatId: Int)
-    abstract fun sendMessage(inputValue: String)
+    abstract fun sendMessage(messageText: String)
 
     sealed interface State {
         data object Success: State
         data class Error(val message: String): State
         data object Loading: State
+        data object NewReply: State
 
     }
 }

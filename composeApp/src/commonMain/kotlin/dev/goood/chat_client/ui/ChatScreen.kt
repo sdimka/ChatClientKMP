@@ -33,6 +33,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -73,11 +75,23 @@ fun ChatScreen(
         }
     }
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
         MessageList(
             viewModel = viewModel,
         )
 
+        Spacer(modifier = Modifier.padding(bottom = 120.dp))
+    }
 
+    MessageInput(
+        viewModel = viewModel,
+    )
 
 }
 
@@ -86,76 +100,32 @@ fun MessageList(
     viewModel: ChatViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val state by viewModel.state.collectAsState()
+
     val scrollState = rememberScrollState()
-//    val messageState = state ?: return
+    val state = viewModel.state.collectAsState()
+    val newReply = viewModel.newReply.collectAsState()
 
     val messagesList by viewModel.messages.collectAsState()
 
-    Column(
+    LazyColumn(
+        reverseLayout = true,
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxWidth()
+            .padding(10.dp)
+            .padding(bottom = 60.dp)
     ) {
-//        Text(
-//            text = "List",
-//            fontSize = 24.sp,
-//            fontWeight = FontWeight.Bold,
-//            modifier = Modifier.padding(top = 32.dp, bottom = 16.dp)
-//        )
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .padding(bottom = 60.dp)
-        ) {
-            items(messagesList) { message ->
-                MessageElement(message = message)
+        if (state.value is ChatViewModel.State.NewReply) {
+            item {
+                NewMessageElement(newReply.value)
             }
         }
 
-        Spacer(modifier = Modifier.padding(bottom = 120.dp))
+        items(messagesList) { message ->
+            MessageElement(message = message)
+        }
     }
 
-    MessageInput(
-        viewModel = viewModel,
-    )
-//    Box(
-//        modifier = Modifier.fillMaxSize(),
-//        contentAlignment = Alignment.BottomEnd
-//    ) {
-//        Button(
-//            shape = RectangleShape,
-//            onClick = {},
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(56.dp)
-//        ) {
-//            Icon(
-//                imageVector = Icons.Default.Call,
-//                contentDescription = "",
-//                tint = Color.Black,
-//                modifier = modifier.size(15.dp),
-//            )
-//            Spacer(modifier = Modifier.weight(54f))
-//            Text("Download Friend List")
-//        }
-
-//        FloatingActionButton(
-//            onClick = {},
-//            modifier = Modifier
-//                .padding(
-//                    bottom = 70.dp,
-//                    end = 16.dp
-//                )
-//        ) {
-//            Icon(imageVector = Icons.Default.Add, contentDescription = "Add New Friend")
-//        }
-//    }
-
-//    friendsListMutableState.addAll(friendsList)
+    Spacer(modifier = Modifier.padding(bottom = 120.dp))
 }
 
 
@@ -198,6 +168,43 @@ fun MessageElement(
 }
 
 @Composable
+fun NewMessageElement(
+    message: String,
+    modifier: Modifier = Modifier
+) {
+    Card  (
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(5.dp),
+
+        ) {
+        Row (
+            modifier = modifier.padding(horizontal = 5.dp).padding(top = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Phone,
+//                painter = painterResource(SharedRes.images.icon_menu_main),
+                contentDescription = "Filters icon",
+                modifier = modifier.size(15.dp),
+                tint = Color.Black
+            )
+
+            Text (
+                text = "1",
+                modifier = modifier.padding(start = 10.dp)
+            )
+        }
+
+        Text(
+            text = message,
+            modifier = modifier.padding(horizontal = 5.dp).padding(bottom = 5.dp)
+        )
+
+    }
+}
+
+@Composable
 fun MessageInput(
     viewModel: ChatViewModel,
     modifier: Modifier = Modifier,
@@ -218,17 +225,24 @@ fun MessageInput(
             modifier = modifier.fillMaxWidth().background(Color.White),
         ) {
             Column(modifier = Modifier.weight(1f)) {
+
                 TextField(
                     value = inputValue,
                     onValueChange = { inputValue = it },
                     label = { Text("Type your message...") },
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = buttonBackground,
+                        unfocusedIndicatorColor = buttonBackground,
+                        focusedLabelColor = buttonBackground
+                    ),
                     modifier = modifier.fillMaxWidth()
-
                 )
             }
             Button(
                 shape = RectangleShape,
-                onClick = {},
+                onClick = {
+                    sendMessage()
+                },
                 colors = ButtonDefaults.buttonColors(buttonBackground),
                 modifier = modifier
                     .height(56.dp)
