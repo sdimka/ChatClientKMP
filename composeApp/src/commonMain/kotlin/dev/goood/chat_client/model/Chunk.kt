@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Chunk (
-    val message: String,
+    val data: String,
     val index: Int,
 )

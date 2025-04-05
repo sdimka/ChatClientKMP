@@ -2,6 +2,8 @@ package dev.goood.chat_client.viewModels
 
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
+import dev.goood.chat_client.core.network.ReplyVariants
+import dev.goood.chat_client.model.Chunk
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
 import dev.goood.chat_client.model.MessageRequest
@@ -37,8 +39,8 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
 
                     _state.value = State.Error(it.message ?: "Unknown error")
                 }
-                .collect {
-                    _messages.value = it
+                .collect { list ->
+                    _messages.value = list.sortedByDescending { it.id }
                     _state.value = State.Success
                 }
         }
@@ -53,18 +55,36 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
 
         _newReply.value = ""
         _state.value = State.NewReply
+
+
         viewModelScope.launch {
-            api.streamApi.streamRequest(message)
+            api.streamApi.streamRequestWithType(message)
                 .onCompletion {
-                    println("onCompletion ${newReply.value}")
                     _state.value = State.Success
                 }
                 .catch {
+                    println(it.message)
                     _state.value = State.Error(it.message ?: "Unknown error")
                 }
                 .collect { event ->
-//                    event.
-                    _newReply.value += event.message
+                    when (event) {
+                        is ReplyVariants.SavedRequest -> {
+                            val newList = (_messages.value + event.content).sortedByDescending { it.id }
+                            _messages.value = newList
+                        }
+
+                        is ReplyVariants.Chunks -> {
+                            _newReply.value += event.content.data
+                        }
+                        is ReplyVariants.FinalReply -> {
+                            val newList = (_messages.value + event.content).sortedByDescending { it.id }
+                            _messages.value = newList
+                        }
+                        is ReplyVariants.Error -> {
+
+                        }
+                    }
+
                 }
 
         }
