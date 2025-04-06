@@ -70,6 +70,8 @@ kotlin {
             implementation(libs.ktor.client.auth)
 
             implementation(libs.multiplatform.settings.no.arg)
+
+            implementation(libs.composeIcons.lineAwesome)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

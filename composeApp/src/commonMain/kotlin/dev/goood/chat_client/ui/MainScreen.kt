@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,13 +25,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import compose.icons.LineAwesomeIcons
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import compose.icons.lineawesomeicons.PenFancySolid
+import compose.icons.lineawesomeicons.PlusSquareSolid
+import compose.icons.lineawesomeicons.TrashAlt
 import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.ui.composable.AddChatDialog
 import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DeleteChatDialog
 import dev.goood.chat_client.viewModels.MainViewModel
-import io.ktor.util.reflect.instanceOf
+import dev.goood.chat_client.viewModels.MainViewModel.State
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -59,42 +65,46 @@ fun MainScreen(
                 .padding(top = 10.dp, end = 10.dp)
         ) {
             CButton(
-                text = "Add",
+                icon = LineAwesomeIcons.PlusSquareSolid,
                 onClick = {
                     viewModel.addChatDialogState.value = true
                 }
             )
         }
-
-        if (state.value.instanceOf(MainViewModel.State.Success::class)) {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(top = 15.dp)
-            ) {
-                items(viewModel.chats.value) { chat ->
-                    ChatElement(
-                        chat = chat,
-                        toChat = toChat,
-                        onEditClick = {
+        when (state.value) {
+            is State.Success -> {
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(top = 15.dp)
+                ) {
+                    items(viewModel.chats.value) { chat ->
+                        ChatElement(
+                            chat = chat,
+                            toChat = toChat,
+                            onEditClick = {
 //                            viewModel.deleteChatDialogState.value = true
-                        },
-                        onDeleteClick = { chatToDel ->
-                            viewModel.deleteChatDialogState.value = chatToDel
-                        }
-                    )
+                            },
+                            onDeleteClick = { chatToDel ->
+                                viewModel.deleteChatDialogState.value = chatToDel
+                            }
+                        )
+                    }
                 }
             }
-        } else {
-            Column(
-                modifier = modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
+
+            is State.Error -> {}
+
+            State.Loading -> {
+                Column(
+                    modifier = modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         }
-
     }
 
     val dialogState by viewModel.addChatDialogState.collectAsState()
@@ -120,6 +130,7 @@ fun MainScreen(
         )
     }
 }
+
 
 @Composable
 fun ChatElement(
@@ -155,8 +166,8 @@ fun ChatElement(
                         fontSize = 16.sp,
                     )
                     Text(
-                        text = chat.model.name,
-                        fontSize = 16.sp,
+                        text = chat.model.displayName,
+                        fontSize = 12.sp,
                     )
                 }
 
@@ -170,14 +181,14 @@ fun ChatElement(
                 horizontalArrangement = Arrangement.End,
             ) {
                 CButton(
-                    text = "Edit",
+                    icon = LineAwesomeIcons.PenFancySolid,
                     onClick = {
                         onEditClick(chat)
                     },
-                    modifier = modifier.padding(start = 25.dp)
+                    modifier = modifier.padding(end = 4.dp)
                 )
                 CButton(
-                    text = "Delete",
+                    icon = LineAwesomeIcons.TrashAlt,
                     onClick = {
                         onDeleteClick(chat)
                     },

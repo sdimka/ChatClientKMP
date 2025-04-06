@@ -51,6 +51,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.User
+import compose.icons.lineawesomeicons.UserNinjaSolid
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.buttonBackground
@@ -137,10 +140,14 @@ fun MessageElement(
     onDeleteClick: (message: Message) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val icon = if (message.initiator == 0) LineAwesomeIcons.User else LineAwesomeIcons.UserNinjaSolid
+    val innPadding = if (message.initiator == 0) 0.dp else 5.dp
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(5.dp)
+            .padding(start = innPadding),
 
         ) {
         Row(
@@ -148,10 +155,10 @@ fun MessageElement(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Filled.Phone,
+                imageVector = icon,
 //                painter = painterResource(SharedRes.images.icon_menu_main),
                 contentDescription = "Filters icon",
-                modifier = modifier.size(15.dp),
+                modifier = modifier.size(18.dp),
                 tint = Color.Black
             )
 
@@ -164,7 +171,7 @@ fun MessageElement(
         SelectionContainer {
             Text(
                 text = message.content,
-                modifier = modifier.padding(horizontal = 5.dp).padding(bottom = 5.dp)
+                modifier = modifier.padding(horizontal = 8.dp).padding(bottom = 5.dp)
             )
         }
 
