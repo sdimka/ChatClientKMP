@@ -3,7 +3,6 @@ package dev.goood.chat_client.previews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import dev.goood.chat_client.di.appModule
 import dev.goood.chat_client.di.appModulePreview
 import dev.goood.chat_client.ui.ChatScreen
 import org.koin.android.ext.koin.androidContext

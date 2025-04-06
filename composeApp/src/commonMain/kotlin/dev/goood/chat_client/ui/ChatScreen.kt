@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.goood.chat_client.model.Message
+import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.buttonBackground
 import dev.goood.chat_client.ui.composable.verticalColumnScrollbar
 import dev.goood.chat_client.viewModels.ChatViewModel
@@ -158,6 +159,7 @@ fun MessageElement(
                 text = "${message.initiator}",
                 modifier = modifier.padding(start = 10.dp)
             )
+
         }
         SelectionContainer {
             Text(
@@ -195,6 +197,10 @@ fun NewMessageElement(
             Text (
                 text = "1",
                 modifier = modifier.padding(start = 10.dp)
+            )
+
+            BallProgerssIndicator(
+                modifier = modifier.padding(start = 100.dp)
             )
         }
 

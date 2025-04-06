@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ChatViewModelPreview: ChatViewModel() {
 
-    private val _state = MutableStateFlow<State>(State.Success)
+    private val _state = MutableStateFlow<State>(State.NewReply)
     override val state: StateFlow<State> = _state
     override val newReply: StateFlow<String> = MutableStateFlow("")
 

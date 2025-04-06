@@ -27,6 +27,7 @@ uiAndroid = "1.7.8"
 runtimeAndroid = "1.7.8"
 lifecycleViewmodelAndroid = "2.8.7"
 foundationAndroid = "1.7.8"
+uiGeometryAndroid = "1.7.8"
 
 [libraries]
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
@@ -63,6 +64,7 @@ androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettingsNoArg" }
 androidx-lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-android", version.ref = "lifecycleViewmodelAndroid" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
+androidx-ui-geometry-android = { group = "androidx.compose.ui", name = "ui-geometry-android", version.ref = "uiGeometryAndroid" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

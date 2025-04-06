@@ -112,6 +112,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.android)
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.ui.geometry.android)
     debugImplementation(compose.uiTooling)
 }
 
