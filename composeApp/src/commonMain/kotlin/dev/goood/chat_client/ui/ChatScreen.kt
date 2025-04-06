@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -135,13 +136,13 @@ fun MessageElement(
     onDeleteClick: (message: Message) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    Card  (
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(5.dp),
 
-    ) {
-        Row (
+        ) {
+        Row(
             modifier = modifier.padding(horizontal = 5.dp).padding(top = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -153,16 +154,17 @@ fun MessageElement(
                 tint = Color.Black
             )
 
-            Text (
+            Text(
                 text = "${message.initiator}",
                 modifier = modifier.padding(start = 10.dp)
             )
         }
-
-        Text(
-            text = message.content,
-            modifier = modifier.padding(horizontal = 5.dp).padding(bottom = 5.dp)
-        )
+        SelectionContainer {
+            Text(
+                text = message.content,
+                modifier = modifier.padding(horizontal = 5.dp).padding(bottom = 5.dp)
+            )
+        }
 
     }
 }
