@@ -19,3 +19,9 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Desktop.
 located in: .../ChatClient/composeApp/build/compose/binaries/main/app
 
 
+### Icon Pack
+https://github.com/DevSrSouza/compose-icons?tab=readme-ov-file
+https://github.com/DevSrSouza/compose-icons/blob/master/line-awesome/DOCUMENTATION.md
+https://icons8.com/line-awesome
+
+
