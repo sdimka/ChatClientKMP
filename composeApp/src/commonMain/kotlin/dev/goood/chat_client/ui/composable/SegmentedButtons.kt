@@ -1,5 +1,6 @@
 package dev.goood.chat_client.ui.composable
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -23,7 +24,7 @@ fun SegmentedButtons(
 
     val selectedChoiceIndex = remember { mutableIntStateOf(10) }
 
-    val darkBackgroundColor = Color.DarkGray
+    val darkBackgroundColor = Color.LightGray
 
     SingleChoiceSegmentedButtonRow(
         space = 5.dp,
@@ -47,7 +48,8 @@ fun SegmentedButtons(
                 ),
                 shape = SegmentedButtonDefaults.itemShape(
                     index = index,
-                    count = choiceList.count()
+                    count = choiceList.count(),
+                    baseShape = RoundedCornerShape(5.dp)
                 )
             ) {
                 Text(choice.name)

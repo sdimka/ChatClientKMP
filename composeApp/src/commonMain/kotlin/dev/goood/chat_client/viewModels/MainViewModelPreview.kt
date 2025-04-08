@@ -12,6 +12,7 @@ class MainViewModelPreview: MainViewModel() {
 
     override val state: StateFlow<State> = MutableStateFlow(State.Success)
     val chatSource = ChatSource(1, "Chat1")
+    val chatSource2 = ChatSource(4, "Chat1")
     val chatModel = ChatModel(1, "Model", "Model", "Model")
 
     override val chats: MutableStateFlow<ChatList>
@@ -19,7 +20,7 @@ class MainViewModelPreview: MainViewModel() {
         listOf(
             Chat(
                 1, "Chat1", source = chatSource, model = chatModel),
-            Chat(2,"Chat2", source = chatSource, model = chatModel),
+            Chat(2,"Chat2", source = chatSource2, model = chatModel),
             Chat(3,"Chat3", source = chatSource, model = chatModel),
 
         )

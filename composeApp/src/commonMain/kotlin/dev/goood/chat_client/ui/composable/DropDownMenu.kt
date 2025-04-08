@@ -1,30 +1,22 @@
 package dev.goood.chat_client.ui.composable
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,8 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.goood.chat_client.model.ChatModel
 
 
@@ -60,7 +53,7 @@ val itemListL = listOf(
     ),
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun DropDownMenu(
     itemList: List<ChatModel> = itemListL,
@@ -71,54 +64,33 @@ fun DropDownMenu(
     var selectedItem by remember { mutableStateOf(ChatModel(1, "", "", "")) }
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ExposedDropdownMenuBox(
+        Box(
+            contentAlignment = Alignment.CenterStart,
             modifier = Modifier
-//                .fillMaxWidth()
+                .fillMaxWidth()
                 .padding(horizontal = 10.dp)
-                .align(Alignment.CenterHorizontally)
-                .width(250.dp)
-                .clip(RoundedCornerShape(10.dp)),
-            expanded = expanded,
-            onExpandedChange = {
-                expanded = !expanded
-            }
+                .height(40.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(4.dp))
+                .clickable { expanded = !expanded },
         ) {
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                TextField(
-                    modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryEditable, true),
-                    value = selectedItem.name,
-                    onValueChange = {},
-                    label = { Text("Choose an model") },
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-        //                    leadingIcon = {
-        //                        Icon(
-        //                            imageVector = selectedItem.icon,
-        //                            contentDescription = selectedItem.title
-        //                        )
-        //                    }
-                    )
-
-            }
-
-            ExposedDropdownMenu(
+            Text(
+                text = selectedItem.displayName,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(start = 10.dp)
+            )
+            Icon(
+                Icons.Filled.ArrowDropDown, "contentDescription",
+                Modifier.align(Alignment.CenterEnd)
+            )
+            DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
-                }
+                onDismissRequest = { expanded = false }
             ) {
-                itemList.forEachIndexed { index, item ->
+                itemList.forEach { selectionOption ->
                     DropdownMenuItem(
                         text = {
                             Row(
@@ -129,24 +101,17 @@ fun DropDownMenu(
 //                                    imageVector = item.icon,
 //                                    contentDescription = item.title
 //                                )
-                                Text(item.name)
+                                Text(selectionOption.displayName)
                             }
                         },
                         onClick = {
-                            selectedItem = itemList[index]
-                            onSelected(selectedItem)
+                            selectedItem = selectionOption
+                            onSelected(selectionOption)
                             expanded = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                        }
                     )
                 }
             }
         }
-
-//        Text(
-//            text = "${selectedItem.name}",
-//            style = MaterialTheme.typography.headlineMedium,
-//            modifier = Modifier.padding(top = 20.dp)
-//        )
     }
 }

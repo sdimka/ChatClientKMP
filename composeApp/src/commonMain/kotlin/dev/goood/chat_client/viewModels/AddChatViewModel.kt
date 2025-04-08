@@ -23,7 +23,12 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
     private var _state = MutableStateFlow<State>(State.Loading)
     val state: StateFlow<State> = _state
 
-    private val _sourceList = MutableStateFlow<ChatSourceList>(emptyList())
+    private val _sourceList = MutableStateFlow<ChatSourceList>(listOf(
+        ChatSource(0, "Gemini"),
+        ChatSource(1, "OpenAI"),
+        ChatSource(2, "DeepSeek"),
+        ChatSource(3, "Test"),
+    ))
     val sourceList: StateFlow<ChatSourceList> = _sourceList
     private val _modelList = MutableStateFlow<ChatModelList>(emptyList())
     val modelList: StateFlow<ChatModelList> = _modelList

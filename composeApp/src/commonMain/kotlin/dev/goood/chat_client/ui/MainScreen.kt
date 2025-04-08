@@ -1,5 +1,6 @@
 package dev.goood.chat_client.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,13 +9,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import compose.icons.LineAwesomeIcons
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import compose.icons.lineawesomeicons.PenFancySolid
 import compose.icons.lineawesomeicons.PlusSquareSolid
+import compose.icons.lineawesomeicons.QuestionCircle
 import compose.icons.lineawesomeicons.TrashAlt
 import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.ui.composable.AddChatDialog
@@ -36,6 +36,12 @@ import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DeleteChatDialog
 import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModel.State
+import kotlinproject.composeapp.generated.resources.Res
+import kotlinproject.composeapp.generated.resources.gemini
+import kotlinproject.composeapp.generated.resources.test
+import kotlinproject.composeapp.generated.resources.unknown
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -140,6 +146,13 @@ fun ChatElement(
     toChat: (chat: Chat) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val  resource: DrawableResource = when (chat.source.id) {
+        1 -> Res.drawable.gemini
+        4 -> Res.drawable.test
+        else -> {
+            Res.drawable.unknown
+        }
+    }
     Card (
         colors = CardDefaults.cardColors(Color(0xFFF5F5F5)),
         modifier = modifier
@@ -152,8 +165,17 @@ fun ChatElement(
     ) {
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier.fillMaxWidth().padding(8.dp),
         ) {
+            Image(
+                painter = painterResource(
+                    resource
+                ),
+                contentDescription = "Vector Image",
+                modifier = Modifier.size(45.dp)
+            )
+
             Row (
                 horizontalArrangement = Arrangement.Start
             ) {
@@ -181,7 +203,7 @@ fun ChatElement(
                 horizontalArrangement = Arrangement.End,
             ) {
                 CButton(
-                    icon = LineAwesomeIcons.PenFancySolid,
+                    icon = LineAwesomeIcons.QuestionCircle, //LineAwesomeIcons.PenFancySolid,
                     onClick = {
                         onEditClick(chat)
                     },
