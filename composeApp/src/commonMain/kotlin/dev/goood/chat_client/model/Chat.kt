@@ -38,7 +38,9 @@ data class ChatModel (
     val name: String,
     @SerialName("display_name")
     val displayName: String,
-    val description: String
+    val description: String,
+    @SerialName("source_id")
+    val sourceID: Int
 )
 
 typealias ChatModelList = List<ChatModel>

@@ -37,19 +37,22 @@ val itemListL = listOf(
         id = 1,
         name = "Model 1",
         displayName = "Model dName",
-        description = "Some long description"
+        description = "Some long description",
+        sourceID = 1
     ),
     ChatModel(
         id = 2,
         name = "Model 1",
         displayName = "Model dName",
-        description = "Some long description"
+        description = "Some long description",
+        sourceID = 1
     ),
     ChatModel(
         id = 3,
         name = "Model 1",
         displayName = "Model dName",
-        description = "Some long description"
+        description = "Some long description",
+        sourceID = 1
     ),
 )
 
@@ -61,7 +64,9 @@ fun DropDownMenu(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf(ChatModel(1, "", "", "")) }
+    var selectedItem by remember {
+        mutableStateOf(ChatModel(1, "", "", "", 1))
+    }
 
     Column(
         modifier = modifier.fillMaxWidth(),

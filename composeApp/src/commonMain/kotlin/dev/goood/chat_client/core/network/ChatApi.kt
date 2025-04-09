@@ -28,7 +28,7 @@ interface ChatApi {
     fun getSources(): Flow<ChatSourceList>
 
     @GET("/api/Model/GetAvailableModels")
-    fun getModels(@Query("model_source") sourceId: Int): Flow<ChatModelList>
+    fun getModels(): Flow<ChatModelList>
 
     @GET("/api/Messages")
     fun getMessages(@Query("chat_id") chatId: Int): Flow<MessageList>

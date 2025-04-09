@@ -38,6 +38,7 @@ import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModel.State
 import kotlinproject.composeapp.generated.resources.Res
 import kotlinproject.composeapp.generated.resources.gemini
+import kotlinproject.composeapp.generated.resources.openai_
 import kotlinproject.composeapp.generated.resources.test
 import kotlinproject.composeapp.generated.resources.unknown
 import org.jetbrains.compose.resources.DrawableResource
@@ -148,6 +149,7 @@ fun ChatElement(
 ) {
     val  resource: DrawableResource = when (chat.source.id) {
         1 -> Res.drawable.gemini
+        2 -> Res.drawable.openai_
         4 -> Res.drawable.test
         else -> {
             Res.drawable.unknown

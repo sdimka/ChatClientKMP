@@ -30,6 +30,7 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
         ChatSource(3, "Test"),
     ))
     val sourceList: StateFlow<ChatSourceList> = _sourceList
+    private var allModels = emptyList<ChatModel>()
     private val _modelList = MutableStateFlow<ChatModelList>(emptyList())
     val modelList: StateFlow<ChatModelList> = _modelList
     private val _chatName = MutableStateFlow("")
@@ -46,19 +47,19 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
                 }
                 .collect{
                     _sourceList.value = it
-                    getModels(it.first().id)
+                    getModels()
                 }
         }
     }
 
-    private fun getModels(sourceId: Int) {
+    private fun getModels() {
         viewModelScope.launch {
-            api.chatApi.getModels(sourceId)
+            api.chatApi.getModels()
                 .catch {
 
                 }
                 .collect{
-                    _modelList.value = it
+                    allModels = it
                 }
 
         }
@@ -70,6 +71,7 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
 
     fun setSelectedSource(source: ChatSource) {
         selectedSource.value = source
+        _modelList.value = allModels.filter { it.sourceID == source.id }
         validateForm()
     }
 

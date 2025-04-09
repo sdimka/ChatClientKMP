@@ -3,8 +3,6 @@ package dev.goood.chat_client.viewModels
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
-import dev.goood.chat_client.model.Chunk
-import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
 import dev.goood.chat_client.model.MessageRequest
 import kotlinx.coroutines.flow.MutableStateFlow
