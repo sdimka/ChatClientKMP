@@ -1,15 +1,12 @@
-package dev.goood.chat_client.ui
+package dev.goood.chat_client.ui.chatScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,16 +18,11 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.composables.core.Menu
@@ -55,7 +46,7 @@ import compose.icons.lineawesomeicons.User
 import compose.icons.lineawesomeicons.UserNinjaSolid
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
-import dev.goood.chat_client.ui.composable.buttonBackground
+import dev.goood.chat_client.ui.composable.defaultTextSize
 import dev.goood.chat_client.viewModels.ChatViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -174,7 +165,10 @@ fun MessageElement(
         SelectionContainer {
             Text(
                 text = message.content,
-                modifier = modifier.padding(horizontal = 8.dp).padding(bottom = 5.dp)
+                fontSize = defaultTextSize,
+                modifier = modifier
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 5.dp)
             )
         }
 
@@ -219,63 +213,12 @@ fun NewMessageElement(
 
         Text(
             text = message,
-            modifier = modifier.padding(horizontal = 5.dp).padding(bottom = 5.dp)
+            fontSize = defaultTextSize,
+            modifier = modifier
+                .padding(horizontal = 5.dp)
+                .padding(bottom = 5.dp)
         )
 
-    }
-}
-
-@Composable
-fun MessageInput(
-    viewModel: ChatViewModel,
-    modifier: Modifier = Modifier,
-) {
-    var inputValue by remember { mutableStateOf("") }
-
-    fun sendMessage() {
-        viewModel.sendMessage(inputValue)
-        inputValue = ""
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = modifier.fillMaxWidth().background(Color.White),
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-
-                TextField(
-                    value = inputValue,
-                    onValueChange = { inputValue = it },
-                    label = { Text("Type your message...") },
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = buttonBackground,
-                        unfocusedIndicatorColor = buttonBackground,
-                        focusedLabelColor = buttonBackground
-                    ),
-                    modifier = modifier.fillMaxWidth()
-                )
-            }
-            Button(
-                shape = RectangleShape,
-                onClick = {
-                    sendMessage()
-                },
-                colors = ButtonDefaults.buttonColors(buttonBackground),
-                modifier = modifier
-                    .height(56.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Call,
-                    contentDescription = "",
-                    tint = Color.Black,
-                    modifier = modifier.size(15.dp),
-                )
-            }
-        }
     }
 }
 

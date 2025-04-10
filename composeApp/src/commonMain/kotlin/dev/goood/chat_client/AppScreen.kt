@@ -43,7 +43,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import dev.goood.chat_client.ui.ChatScreen
+import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
 import dev.goood.chat_client.ui.OtherScreen
