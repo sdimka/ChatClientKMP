@@ -3,6 +3,7 @@ package dev.goood.chat_client
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +32,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -51,7 +54,7 @@ import org.koin.compose.viewmodel.koinViewModel
 sealed class Screen(val route: String, val title: String, val icon:  ImageVector? = null) {
     data object Login: Screen("login_screen", "Login")
     data object Main: Screen("main_screen", "Main", Icons.AutoMirrored.Filled.List)
-    data object Chat: Screen("chat_screen", "Chat", Icons.AutoMirrored.Filled.Send)
+    data object ChatDetail: Screen("chat_screen", "Chat", Icons.AutoMirrored.Filled.Send)
     data object Other: Screen("other_screen", "Other", Icons.AutoMirrored.Filled.Send)
     data object Settings: Screen("settings_screen", "Settings", Icons.AutoMirrored.Filled.ArrowForward )
 
@@ -60,7 +63,7 @@ sealed class Screen(val route: String, val title: String, val icon:  ImageVector
             return when (route.substringBefore("/")) { // Extract base route
                 "login_screen" -> Login
                 "main_screen" -> Main
-                "chat_screen" -> Chat // Note: for navigation, you'll still need to provide the {chatID}
+                "chat_screen" -> ChatDetail // Note: for navigation, you'll still need to provide the {chatID}
                 "other_screen" -> Other
                 "settings_screen" -> Settings
                 else -> {
@@ -75,13 +78,33 @@ sealed class Screen(val route: String, val title: String, val icon:  ImageVector
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
-    currentScreen: String?,
+    currentScreen: Screen?,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val viewModel: AppViewModel = koinViewModel()
+    val selectedChat by viewModel.selectedChat.collectAsState()
+
     TopAppBar(
-        title = { currentScreen?.let { Text(it) } },
+        title = {
+            Row {
+                currentScreen?.let { Text(it.title) }
+
+                if (selectedChat != null) {
+                    Text(
+                        text =  "/" + selectedChat!!.name
+                    )
+
+                    Text(
+                        text = "(${selectedChat!!.model.displayName})",
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 5.dp)
+                    )
+                }
+            }
+        },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = Color.White
         ),
@@ -108,8 +131,7 @@ fun AppScreen(
     val authState by viewModel.authState.collectAsState()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen =  backStackEntry?.destination
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val bottomBarState = rememberSaveable { ( mutableStateOf(true)) }
     val scrState = backStackEntry?.destination?.route?.let {
@@ -126,7 +148,7 @@ fun AppScreen(
         Screen.Main -> {
             bottomBarState.value = true
         }
-        Screen.Chat -> {
+        Screen.ChatDetail -> {
             bottomBarState.value = false
         }
         Screen.Other -> {
@@ -143,13 +165,16 @@ fun AppScreen(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackBarHostState)
         },
         topBar = {
             AppTopBar(
-                currentScreen = currentScreen?.route,
+                currentScreen = scrState,
                 canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() }
+                navigateUp = {
+                    navController.navigateUp()
+                    viewModel.setCurrentChat(null)
+                }
             )
         },
         bottomBar = {
@@ -169,25 +194,28 @@ fun AppScreen(
                     onLoginSuccess = {
                     navController.navigate(Screen.Main.route) { popUpTo(0) }
                 },
-                    snackbarHostState = snackbarHostState)
+                    snackBarHostState = snackBarHostState)
             }
 
             composable(route = Screen.Main.route) {
                 MainScreen(
                     toChat = { chat ->
-                        navController.navigate(Screen.Chat.route + "/${chat.id}") {
+                        viewModel.setCurrentChat(chat)
+                        navController.navigate(Screen.ChatDetail.route + "/${chat.id}") {
                             popUpTo(navController.graph.findStartDestination().id)
                         }
-                    }
+                    },
+                    snackBarHostState = snackBarHostState
                 )
             }
 
-            composable(route = Screen.Chat.route + "/{chatID}",
+            composable(route = Screen.ChatDetail.route + "/{chatID}",
                 arguments = listOf(navArgument("chatID") { type = NavType.IntType })) {
                 stackEntry ->
                     val chatID = stackEntry.arguments?.getInt("chatID")
                     ChatScreen(
-                        chatID
+                        chatID,
+                        snackBarHostState = snackBarHostState
                     )
             }
 

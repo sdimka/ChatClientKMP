@@ -65,6 +65,7 @@ class MainViewModelImpl: MainViewModel(), KoinComponent {
             api.chatApi.getChats()
                 .catch {
                     println(it)
+                    _state.value = State.Error(it.message ?: "Unknown error")
                 }
                 .collect {
                     chats.value = it

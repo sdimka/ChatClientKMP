@@ -23,7 +23,7 @@ fun MyComposablePreview() {
     }) {
         LoginScreen(
             onLoginSuccess = {},
-            snackbarHostState = snackbarHostState,
+            snackBarHostState = snackbarHostState,
         )
     }
 }

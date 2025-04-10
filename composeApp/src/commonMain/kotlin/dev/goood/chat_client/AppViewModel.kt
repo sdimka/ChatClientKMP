@@ -1,8 +1,10 @@
 package dev.goood.chat_client
 
 import androidx.lifecycle.ViewModel
+import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.services.AuthService
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -17,6 +19,13 @@ class AppViewModel: ViewModel(), KoinComponent {
             } else {
                 AuthState.Unauthorized("You are not authorized")
             }
+    }
+
+    private val _selectedChat: MutableStateFlow<Chat?> = MutableStateFlow(null)
+    val selectedChat: StateFlow<Chat?> = _selectedChat
+
+    fun setCurrentChat(chat: Chat?) {
+        _selectedChat.value = chat
     }
 
     sealed interface AuthState {

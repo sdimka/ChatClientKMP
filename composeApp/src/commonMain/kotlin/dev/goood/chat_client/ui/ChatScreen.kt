@@ -1,6 +1,5 @@
 package dev.goood.chat_client.ui
 
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -63,7 +63,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ChatScreen(
     chatID: Int?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    snackBarHostState: SnackbarHostState
 ) {
 
     val viewModel: ChatViewModel = koinViewModel()
@@ -148,14 +149,17 @@ fun MessageElement(
 
         ) {
         Row(
-            modifier = modifier.padding(horizontal = 5.dp).padding(top = 5.dp),
+            modifier = modifier
+                .padding(start = 10.dp)
+                .padding(end = 5.dp)
+                .padding(top = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
 //                painter = painterResource(SharedRes.images.icon_menu_main),
                 contentDescription = "Filters icon",
-                modifier = modifier.size(18.dp),
+                modifier = modifier.size(22.dp),
                 tint = Color.Black
             )
 
@@ -189,14 +193,17 @@ fun NewMessageElement(
 
         ) {
         Row (
-            modifier = modifier.padding(horizontal = 5.dp).padding(top = 5.dp),
+            modifier = modifier
+                .padding(start = 10.dp)
+                .padding(end = 5.dp)
+                .padding(top = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Filled.Phone,
 //                painter = painterResource(SharedRes.images.icon_menu_main),
                 contentDescription = "Filters icon",
-                modifier = modifier.size(15.dp),
+                modifier = modifier.size(22.dp),
                 tint = Color.Black
             )
 
