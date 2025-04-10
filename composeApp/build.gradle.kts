@@ -72,6 +72,8 @@ kotlin {
             implementation(libs.multiplatform.settings.no.arg)
 
             implementation(libs.composeIcons.lineAwesome)
+
+            implementation(libs.core)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
