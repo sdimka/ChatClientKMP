@@ -1,6 +1,7 @@
 package dev.goood.chat_client.ui.chatScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import compose.icons.LineAwesomeIcons
-import compose.icons.lineawesomeicons.CommentDots
+import compose.icons.lineawesomeicons.CogSolid
 import compose.icons.lineawesomeicons.PaperPlane
 import dev.goood.chat_client.ui.composable.buttonBackground
 import dev.goood.chat_client.viewModels.ChatViewModel
@@ -37,6 +39,7 @@ fun MessageInput(
     modifier: Modifier = Modifier,
 ) {
     var inputValue by remember { mutableStateOf("") }
+    var settingsState by remember { mutableStateOf(false) }
 
     fun sendMessage() {
         viewModel.sendMessage(inputValue)
@@ -47,53 +50,72 @@ fun MessageInput(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = modifier.fillMaxWidth().background(Color.White),
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Box {
-
-                    TextField(
-                        value = inputValue,
-                        onValueChange = { inputValue = it },
-                        label = { Text("Type your message...") },
-                        colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = buttonBackground,
-                            unfocusedIndicatorColor = buttonBackground,
-                            focusedLabelColor = buttonBackground
-                        ),
-                        trailingIcon = {
-                            Icon(
-                                imageVector = LineAwesomeIcons.CommentDots,
-                                contentDescription = "",
-                                tint = Color.Black,
-                                modifier = modifier
-                                    .size(25.dp),
-                            )
-                        },
-                        modifier = modifier.fillMaxWidth()
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.SpaceAround,
+                modifier = modifier.fillMaxWidth().background(Color.White),
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Box {
+                        TextField(
+                            value = inputValue,
+                            onValueChange = { inputValue = it },
+                            label = { Text("Type your message...") },
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = buttonBackground,
+                                unfocusedIndicatorColor = buttonBackground,
+                                focusedLabelColor = buttonBackground
+                            ),
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = LineAwesomeIcons.CogSolid,
+                                    contentDescription = "",
+                                    tint = Color.Black,
+                                    modifier = modifier
+                                        .clickable {
+                                            settingsState = !settingsState
+                                        }
+                                        .size(25.dp),
+                                )
+                            },
+                            modifier = modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                Button(
+                    shape = RectangleShape,
+                    onClick = {
+                        sendMessage()
+                    },
+                    colors = ButtonDefaults.buttonColors(buttonBackground),
+                    modifier = modifier
+                        .height(56.dp)
+                ) {
+                    Icon(
+                        imageVector = LineAwesomeIcons.PaperPlane,
+                        contentDescription = "",
+                        tint = Color.Black,
+                        modifier = modifier.size(25.dp),
                     )
-
-
                 }
             }
-            Button(
-                shape = RectangleShape,
-                onClick = {
-                    sendMessage()
-                },
-                colors = ButtonDefaults.buttonColors(buttonBackground),
-                modifier = modifier
-                    .height(56.dp)
-            ) {
-                Icon(
-                    imageVector = LineAwesomeIcons.PaperPlane,
-                    contentDescription = "",
-                    tint = Color.Black,
-                    modifier = modifier.size(25.dp),
-                )
+
+            if (settingsState) {
+                SettingsElement()
             }
         }
+    }
+}
+
+@Composable
+fun SettingsElement(
+
+){
+    Column {
+        Text(text = "Some")
+        Text(
+            text = "Some",
+            modifier = Modifier.padding(top = 15.dp)
+        )
     }
 }
