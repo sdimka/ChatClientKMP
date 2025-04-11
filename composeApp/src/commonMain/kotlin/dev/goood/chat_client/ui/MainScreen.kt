@@ -29,11 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import compose.icons.LineAwesomeIcons
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import compose.icons.lineawesomeicons.PlusSquareSolid
 import compose.icons.lineawesomeicons.QuestionCircle
 import compose.icons.lineawesomeicons.TrashAlt
 import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.ui.composable.AddChatDialog
+import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DeleteChatDialog
 import dev.goood.chat_client.viewModels.MainViewModel
@@ -55,11 +57,8 @@ fun MainScreen(
 ) {
 
     val viewModel = koinViewModel<MainViewModel>()
-    val state = viewModel.state.collectAsState()
-
-    LaunchedEffect(LocalLifecycleOwner.current) {
-        viewModel.getChats()
-    }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val chats by viewModel.chats.collectAsStateWithLifecycle()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,14 +79,14 @@ fun MainScreen(
                 }
             )
         }
-        when (state.value) {
+        when (state) {
             is State.Success -> {
                 LazyColumn(
                     modifier = modifier
                         .fillMaxSize()
                         .padding(top = 15.dp)
                 ) {
-                    items(viewModel.chats.value) { chat ->
+                    items(chats) { chat ->
                         ChatElement(
                             chat = chat,
                             toChat = toChat,
@@ -103,7 +102,7 @@ fun MainScreen(
             }
 
             is State.Error -> {
-                val error = (state.value as State.Error).message
+                val error = (state as State.Error).message
                 LaunchedEffect(snackBarHostState) {
                     snackBarHostState.showSnackbar(error)
                 }
@@ -115,7 +114,7 @@ fun MainScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    CircularProgressIndicator()
+                    BallProgerssIndicator()
                 }
             }
         }

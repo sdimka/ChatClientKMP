@@ -24,4 +24,7 @@ https://github.com/DevSrSouza/compose-icons?tab=readme-ov-file
 https://github.com/DevSrSouza/compose-icons/blob/master/line-awesome/DOCUMENTATION.md
 https://icons8.com/line-awesome
 
+### Custom load indicators
+https://github.com/EhsanMsz/MszProgressIndicator/tree/master
+
 

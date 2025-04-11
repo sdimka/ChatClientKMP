@@ -16,7 +16,12 @@ class ChatViewModelPreview: ChatViewModel() {
         Message(
             id = 1,
             content = "### What's included \uD83D\uDE80\n" +
-                    "# This is H1" +
+                    "# This is H1 \n" +
+                    "## This is H2 \n" +
+                    "### This is H3 \n" +
+                    "#### This is H4 \n" +
+                    "Base text \n" +
+                    "**Marked text**" +
                     "\n" +
                     "- Super simple setup\n" +
                     "- Cross-platform ready\n" +

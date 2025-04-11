@@ -25,7 +25,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.composables.core.Menu
 import com.composables.core.MenuButton
 import com.composables.core.MenuContent
@@ -50,6 +50,7 @@ import compose.icons.lineawesomeicons.User
 import compose.icons.lineawesomeicons.UserNinjaSolid
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
+import dev.goood.chat_client.ui.composable.defaultMarkDownTypography
 import dev.goood.chat_client.ui.composable.defaultTextSize
 import dev.goood.chat_client.viewModels.ChatViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -63,9 +64,6 @@ fun ChatScreen(
 ) {
 
     val viewModel: ChatViewModel = koinViewModel()
-    val state = viewModel.state.collectAsState()
-
-    var inputValue by remember { mutableStateOf("") }
 
     LaunchedEffect(LocalLifecycleOwner.current) {
         if (chatID != null) {
@@ -100,10 +98,10 @@ fun MessageList(
 ) {
 
     val scrollState = rememberScrollState()
-    val state = viewModel.state.collectAsState()
-    val newReply = viewModel.newReply.collectAsState()
+    val state = viewModel.state.collectAsStateWithLifecycle()
+    val newReply = viewModel.newReply.collectAsStateWithLifecycle()
 
-    val messagesList by viewModel.messages.collectAsState()
+    val messagesList by viewModel.messages.collectAsStateWithLifecycle()
 
     LazyColumn(
         reverseLayout = true,
@@ -170,19 +168,11 @@ fun MessageElement(
             Markdown(
                 content = message.content,
                 colors = markdownColor(text = Color.Black),
-                typography = markdownTypography(h1 = TextStyle()),
+                typography = defaultMarkDownTypography(),
                 modifier = modifier
                     .padding(horizontal = 8.dp)
                     .padding(bottom = 5.dp)
             )
-
-//            Text(
-//                text = message.content,
-//                fontSize = defaultTextSize,
-//                modifier = modifier
-//                    .padding(horizontal = 8.dp)
-//                    .padding(bottom = 5.dp)
-//            )
         }
 
     }
