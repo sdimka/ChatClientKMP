@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.composables.core.Menu
@@ -41,6 +42,9 @@ import com.composables.core.MenuButton
 import com.composables.core.MenuContent
 import com.composables.core.MenuItem
 import com.composables.core.rememberMenuState
+import com.mikepenz.markdown.compose.Markdown
+import com.mikepenz.markdown.m3.markdownColor
+import com.mikepenz.markdown.m3.markdownTypography
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.User
 import compose.icons.lineawesomeicons.UserNinjaSolid
@@ -163,13 +167,22 @@ fun MessageElement(
 
         }
         SelectionContainer {
-            Text(
-                text = message.content,
-                fontSize = defaultTextSize,
+            Markdown(
+                content = message.content,
+                colors = markdownColor(text = Color.Black),
+                typography = markdownTypography(h1 = TextStyle()),
                 modifier = modifier
                     .padding(horizontal = 8.dp)
                     .padding(bottom = 5.dp)
             )
+
+//            Text(
+//                text = message.content,
+//                fontSize = defaultTextSize,
+//                modifier = modifier
+//                    .padding(horizontal = 8.dp)
+//                    .padding(bottom = 5.dp)
+//            )
         }
 
     }

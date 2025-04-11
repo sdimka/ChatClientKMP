@@ -15,7 +15,12 @@ class ChatViewModelPreview: ChatViewModel() {
     val list = listOf(
         Message(
             id = 1,
-            content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            content = "### What's included \uD83D\uDE80\n" +
+                    "# This is H1" +
+                    "\n" +
+                    "- Super simple setup\n" +
+                    "- Cross-platform ready\n" +
+                    "- Lightweight",
             initiator = 0,
             role = "A"
         ),
