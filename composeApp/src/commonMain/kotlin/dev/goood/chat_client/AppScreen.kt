@@ -46,7 +46,7 @@ import androidx.navigation.navArgument
 import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
-import dev.goood.chat_client.ui.OtherScreen
+import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
 import dev.goood.chat_client.ui.SettingsScreen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -220,7 +220,7 @@ fun AppScreen(
             }
 
             composable(route = Screen.Other.route) {
-                OtherScreen()
+                SystemMessagesScreen()
             }
 
             composable(route = Screen.Settings.route) {

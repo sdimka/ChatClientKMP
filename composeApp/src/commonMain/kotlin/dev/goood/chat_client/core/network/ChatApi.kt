@@ -11,6 +11,7 @@ import dev.goood.chat_client.model.ChatSourceList
 import dev.goood.chat_client.model.MessageList
 import dev.goood.chat_client.model.NewChat
 import dev.goood.chat_client.model.ResultMessage
+import dev.goood.chat_client.model.SystemMessageList
 import kotlinx.coroutines.flow.Flow
 
 interface ChatApi {
@@ -32,5 +33,8 @@ interface ChatApi {
 
     @GET("/api/Messages")
     fun getMessages(@Query("chat_id") chatId: Int): Flow<MessageList>
+
+    @GET("/api/system_messages")
+    fun getSystemMessages(): Flow<SystemMessageList>
 
 }

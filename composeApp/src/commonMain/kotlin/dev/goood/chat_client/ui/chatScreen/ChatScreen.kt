@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,7 +43,6 @@ import com.composables.core.MenuItem
 import com.composables.core.rememberMenuState
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
-import com.mikepenz.markdown.m3.markdownTypography
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.User
 import compose.icons.lineawesomeicons.UserNinjaSolid
@@ -187,7 +185,6 @@ fun NewMessageElement(
         modifier = modifier
             .fillMaxWidth()
             .padding(5.dp),
-
         ) {
         Row (
             modifier = modifier
