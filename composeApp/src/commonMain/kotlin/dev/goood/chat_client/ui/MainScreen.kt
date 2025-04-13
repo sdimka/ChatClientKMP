@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import compose.icons.LineAwesomeIcons
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import compose.icons.lineawesomeicons.PlusSquareSolid
 import compose.icons.lineawesomeicons.QuestionCircle
@@ -38,6 +36,7 @@ import dev.goood.chat_client.ui.composable.AddChatDialog
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DeleteChatDialog
+import dev.goood.chat_client.ui.composable.grayBackground
 import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModel.State
 import kotlinproject.composeapp.generated.resources.Res
@@ -63,7 +62,7 @@ fun MainScreen(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-        modifier = Modifier.fillMaxSize().background(Color(0xFFEFEFEF))
+        modifier = Modifier.fillMaxSize().background(grayBackground)
     ) {
         Column (
             horizontalAlignment = Alignment.End,

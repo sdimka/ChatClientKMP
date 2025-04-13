@@ -24,6 +24,7 @@ import dev.goood.chat_client.model.SystemMessage
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.viewModels.SystemMessagesViewModel
 import dev.goood.chat_client.services.SystemMessagesService.State
+import dev.goood.chat_client.ui.composable.grayBackground
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -39,7 +40,9 @@ fun SystemMessagesScreen(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-        modifier = Modifier.fillMaxSize().background(Color(0xFFEFEFEF))
+        modifier = Modifier
+            .fillMaxSize()
+            .background(grayBackground)
     ) {
         when (state) {
             is State.Error -> {

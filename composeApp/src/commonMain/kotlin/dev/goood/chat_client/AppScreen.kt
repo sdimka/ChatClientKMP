@@ -230,9 +230,7 @@ fun AppScreen(
             composable(route = Screen.SystemMessages.route) {
                 SystemMessagesScreen(
                     toDetail = { messID: Int ->
-                        navController.navigate(Screen.SysMessagesDetail.route + "/${messID}") {
-                            popUpTo(navController.graph.findStartDestination().id)
-                        }
+                        navController.navigate(Screen.SysMessagesDetail.route + "/${messID}")
                     },
                     snackBarHostState = snackBarHostState
                 )

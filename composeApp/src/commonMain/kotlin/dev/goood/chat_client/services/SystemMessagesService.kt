@@ -54,8 +54,23 @@ class SystemMessagesService: KoinComponent {
         }
     }
 
-    fun setCurrentMessage(messID: Int) {
-        _selectedMessage.value = messages.value.firstOrNull { it.id == messID }
+    fun getCurrentMessage(messID: Int): SystemMessage? {
+        return messages.value.firstOrNull { it.id == messID }
+    }
+
+    fun updateMessage(message: SystemMessage) {
+        scope.launch {
+            _state.value = State.Loading
+            api.chatApi.updateSystemMessage(message)
+                .catch {
+                    print(it.message)
+                    _state.value = State.Error(message = it.message ?: "Unknown error")
+                }
+                .collect {
+                    _state.value = State.Success
+                    updateMessages()
+                }
+        }
     }
 
     sealed interface State {
