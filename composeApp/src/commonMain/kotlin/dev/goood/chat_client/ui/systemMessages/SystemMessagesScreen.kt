@@ -1,14 +1,17 @@
 package dev.goood.chat_client.ui.systemMessages
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,12 +23,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.goood.chat_client.model.SystemMessage
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.viewModels.SystemMessagesViewModel
-import dev.goood.chat_client.viewModels.SystemMessagesViewModel.State
+import dev.goood.chat_client.services.SystemMessagesService.State
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SystemMessagesScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    toDetail: (Int) -> Unit,
+    snackBarHostState: SnackbarHostState
 ) {
     val viewModel = koinViewModel<SystemMessagesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -58,9 +63,7 @@ fun SystemMessagesScreen(
                     items(messages) { message ->
                         SysMessElement(
                             sysMessage = message,
-                            onEdit = {
-
-                            },
+                            onEdit = toDetail,
                             onDelete = {
 
                             }
@@ -75,17 +78,26 @@ fun SystemMessagesScreen(
 @Composable
 fun SysMessElement(
     sysMessage: SystemMessage,
-    onEdit: () -> Unit,
+    onEdit: (messageID: Int) -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ){
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(5.dp)
+            .clickable {
+                onEdit(sysMessage.id)
+            },
     ){
-        Text(
-            text = sysMessage.title
-        )
+        Row(
+            modifier = modifier
+                .padding(10.dp)
+
+        ) {
+            Text(
+                text = sysMessage.title
+            )
+        }
     }
 }

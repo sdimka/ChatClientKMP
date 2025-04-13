@@ -27,4 +27,7 @@ https://icons8.com/line-awesome
 ### Custom load indicators
 https://github.com/EhsanMsz/MszProgressIndicator/tree/master
 
+### Markdown Renderer
+https://github.com/mikepenz/multiplatform-markdown-renderer
+
 

@@ -4,26 +4,27 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import dev.goood.chat_client.di.appModulePreview
-import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
+import dev.goood.chat_client.ui.systemMessages.SystemMessageDetailScreen
+import androidx.compose.ui.tooling.preview.Preview
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.KoinApplication
 
+
 @Composable
 @Preview(showSystemUi = true)
-fun SystemMessageScreenPreview() {
+fun SystemMessageDetailScreenPreview() {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
 
     KoinApplication(application = {
-        // If you need Context
         androidContext(context)
         modules(appModulePreview)
     }) {
-        SystemMessagesScreen(
-            toDetail = {},
+        SystemMessageDetailScreen(
+            messID = 1,
             snackBarHostState = snackBarHostState
         )
     }
 }
+

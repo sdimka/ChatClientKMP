@@ -48,6 +48,7 @@ import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
 import dev.goood.chat_client.ui.SettingsScreen
+import dev.goood.chat_client.ui.systemMessages.SystemMessageDetailScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -55,7 +56,8 @@ sealed class Screen(val route: String, val title: String, val icon:  ImageVector
     data object Login: Screen("login_screen", "Login")
     data object Main: Screen("main_screen", "Main", Icons.AutoMirrored.Filled.List)
     data object ChatDetail: Screen("chat_screen", "Chat", Icons.AutoMirrored.Filled.Send)
-    data object Other: Screen("other_screen", "Other", Icons.AutoMirrored.Filled.Send)
+    data object SystemMessages: Screen("sys_mess_screen", "System Messages",Icons.AutoMirrored.Filled.Send)
+    data object SysMessagesDetail: Screen("sys_mess_detail", "System Message Edit", Icons.AutoMirrored.Filled.List )
     data object Settings: Screen("settings_screen", "Settings", Icons.AutoMirrored.Filled.ArrowForward )
 
     companion object {
@@ -64,7 +66,8 @@ sealed class Screen(val route: String, val title: String, val icon:  ImageVector
                 "login_screen" -> Login
                 "main_screen" -> Main
                 "chat_screen" -> ChatDetail // Note: for navigation, you'll still need to provide the {chatID}
-                "other_screen" -> Other
+                "sys_mess_screen" -> SystemMessages
+                "sys_mess_detail" -> SysMessagesDetail
                 "settings_screen" -> Settings
                 else -> {
                     println("Unknown route: $route")
@@ -151,8 +154,11 @@ fun AppScreen(
         Screen.ChatDetail -> {
             bottomBarState.value = false
         }
-        Screen.Other -> {
+        Screen.SystemMessages -> {
             bottomBarState.value = true
+        }
+        Screen.SysMessagesDetail -> {
+            bottomBarState.value = false
         }
         Screen.Settings -> {
             bottomBarState.value = false
@@ -209,8 +215,10 @@ fun AppScreen(
                 )
             }
 
-            composable(route = Screen.ChatDetail.route + "/{chatID}",
-                arguments = listOf(navArgument("chatID") { type = NavType.IntType })) {
+            composable(
+                route = Screen.ChatDetail.route + "/{chatID}",
+                arguments = listOf(navArgument("chatID") { type = NavType.IntType })
+            ){
                 stackEntry ->
                     val chatID = stackEntry.arguments?.getInt("chatID")
                     ChatScreen(
@@ -219,10 +227,28 @@ fun AppScreen(
                     )
             }
 
-            composable(route = Screen.Other.route) {
-                SystemMessagesScreen()
+            composable(route = Screen.SystemMessages.route) {
+                SystemMessagesScreen(
+                    toDetail = { messID: Int ->
+                        navController.navigate(Screen.SysMessagesDetail.route + "/${messID}") {
+                            popUpTo(navController.graph.findStartDestination().id)
+                        }
+                    },
+                    snackBarHostState = snackBarHostState
+                )
             }
 
+            composable(
+                route = Screen.SysMessagesDetail.route + "/{sysMessID}",
+                arguments = listOf(navArgument("sysMessID") { type = NavType.IntType})
+            ){
+                stackEntry ->
+                    val messID = stackEntry.arguments?.getInt("sysMessID")
+                SystemMessageDetailScreen(
+                    messID,
+                    snackBarHostState = snackBarHostState
+                )
+            }
             composable(route = Screen.Settings.route) {
                 SettingsScreen()
             }
@@ -234,7 +260,7 @@ fun AppScreen(
 fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean>) {
     val items = listOf(
         Screen.Main,
-        Screen.Other,
+        Screen.SystemMessages,
         Screen.Settings
     )
 
