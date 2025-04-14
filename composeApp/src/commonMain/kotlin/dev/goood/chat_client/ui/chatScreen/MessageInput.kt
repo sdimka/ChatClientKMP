@@ -1,5 +1,8 @@
 package dev.goood.chat_client.ui.chatScreen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,10 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.CogSolid
+import compose.icons.lineawesomeicons.InfoCircleSolid
 import compose.icons.lineawesomeicons.PaperPlane
 import dev.goood.chat_client.ui.theme.buttonBackground
+import dev.goood.chat_client.ui.theme.green
 import dev.goood.chat_client.viewModels.ChatViewModel
 
 @Composable
@@ -39,7 +45,8 @@ fun MessageInput(
     modifier: Modifier = Modifier,
 ) {
     var inputValue by remember { mutableStateOf("") }
-    var settingsState by remember { mutableStateOf(true) }
+    var settingsVisible by remember { mutableStateOf(true) }
+    val systemMessage by viewModel.selectedSysMessage.collectAsStateWithLifecycle()
 
     fun sendMessage() {
         viewModel.sendMessage(inputValue)
@@ -52,7 +59,11 @@ fun MessageInput(
     ) {
         Column {
 
-            if (settingsState) {
+            AnimatedVisibility(
+                visible = settingsVisible,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it })
+            ) {
                 SettingsElement(
                     viewModel = viewModel
                 )
@@ -80,18 +91,32 @@ fun MessageInput(
                                     tint = Color.Black,
                                     modifier = modifier
                                         .clickable {
-                                            settingsState = !settingsState
+                                            settingsVisible = !settingsVisible
                                         }
                                         .size(25.dp),
                                 )
                             },
                             modifier = modifier.fillMaxWidth()
                         )
+
+                        if (systemMessage != null) {
+                            Icon(
+                                imageVector = LineAwesomeIcons.InfoCircleSolid,
+                                contentDescription = "",
+                                tint = green,
+                                modifier = modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(all = 5.dp)
+                                    .size(15.dp),
+                            )
+                        }
+
                     }
                 }
                 Button(
                     shape = RectangleShape,
                     onClick = {
+                        settingsVisible = false
                         sendMessage()
                     },
                     colors = ButtonDefaults.buttonColors(buttonBackground),

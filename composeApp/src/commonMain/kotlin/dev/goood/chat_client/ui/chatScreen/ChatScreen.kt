@@ -161,11 +161,11 @@ fun MessageElement(
 
         ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .padding(start = 10.dp)
                 .padding(end = 5.dp)
                 .padding(top = 5.dp),
-            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
@@ -182,7 +182,7 @@ fun MessageElement(
             if (message.systemMessage != null) {
                 Icon(
                     imageVector = LineAwesomeIcons.InfoSolid,
-                    contentDescription = "Filters icon",
+                    contentDescription = "Sys icon",
                     modifier = modifier.size(15.dp),
                     tint = green
                 )
