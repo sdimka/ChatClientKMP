@@ -57,6 +57,7 @@ internal fun AddChatDialog(
 
     ){
         Surface(
+            shape = RoundedCornerShape(16.dp),
             modifier = modifier.fillMaxSize()
                 .padding(20.dp)
         ) {

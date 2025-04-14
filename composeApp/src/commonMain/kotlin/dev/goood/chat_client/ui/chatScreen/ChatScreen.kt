@@ -48,8 +48,8 @@ import compose.icons.lineawesomeicons.User
 import compose.icons.lineawesomeicons.UserNinjaSolid
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
-import dev.goood.chat_client.ui.composable.defaultMarkDownTypography
-import dev.goood.chat_client.ui.composable.defaultTextSize
+import dev.goood.chat_client.ui.theme.defaultMarkDownTypography
+import dev.goood.chat_client.ui.theme.defaultTextSize
 import dev.goood.chat_client.viewModels.ChatViewModel
 import org.koin.compose.viewmodel.koinViewModel
 

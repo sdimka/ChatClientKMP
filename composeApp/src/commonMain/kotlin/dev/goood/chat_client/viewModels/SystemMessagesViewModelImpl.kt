@@ -13,7 +13,10 @@ class SystemMessagesViewModelImpl: SystemMessagesViewModel(), KoinComponent {
 
     override val state: StateFlow<State> = service.state
 
-    override val messages =service.messages
+    override val messages = service.messages
 
+    override fun deleteMessage(messageID: Int) {
+        service.deleteMessage(messageID)
+    }
 
 }

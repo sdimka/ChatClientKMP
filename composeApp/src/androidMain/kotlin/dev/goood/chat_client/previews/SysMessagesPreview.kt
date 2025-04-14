@@ -23,6 +23,7 @@ fun SystemMessageScreenPreview() {
     }) {
         SystemMessagesScreen(
             toDetail = {},
+            toNew = {},
             snackBarHostState = snackBarHostState
         )
     }

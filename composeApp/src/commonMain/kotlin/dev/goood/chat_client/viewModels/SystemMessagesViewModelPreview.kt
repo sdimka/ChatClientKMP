@@ -25,4 +25,8 @@ class SystemMessagesViewModelPreview: SystemMessagesViewModel() {
         )
     )
 
+    override fun deleteMessage(messageID: Int) {
+
+    }
+
 }

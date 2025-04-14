@@ -36,8 +36,8 @@ class SystemMessagesService: KoinComponent {
             emptyList()
         )
 
-    private val _selectedMessage: MutableStateFlow<SystemMessage?> = MutableStateFlow(null)
-    val selectedMessage = _selectedMessage.asStateFlow()
+//    private val _selectedMessage: MutableStateFlow<SystemMessage?> = MutableStateFlow(null)
+//    val selectedMessage = _selectedMessage.asStateFlow()
 
     private fun updateMessages(){
         scope.launch {
@@ -68,6 +68,35 @@ class SystemMessagesService: KoinComponent {
                 }
                 .collect {
                     _state.value = State.Success
+                    updateMessages()
+                }
+        }
+    }
+
+    fun createMessage(message: SystemMessage, param: (SystemMessage) -> Unit) {
+        scope.launch {
+            _state.value = State.Loading
+            api.chatApi.createSystemMessage(message)
+                .catch {
+                    print(it.message)
+                    _state.value = State.Error(message = it.message ?: "Unknown error")
+                }
+                .collect { savedMessage ->
+                    param(savedMessage)
+                    updateMessages()
+                }
+        }
+    }
+
+    fun deleteMessage(messageID: Int) {
+        scope.launch {
+            _state.value = State.Loading
+            api.chatApi.deleteSystemMessage(messageID)
+                .catch {
+                    print(it.message)
+                    _state.value = State.Error(message = it.message ?: "Unknown error")
+                }
+                .collect{
                     updateMessages()
                 }
         }

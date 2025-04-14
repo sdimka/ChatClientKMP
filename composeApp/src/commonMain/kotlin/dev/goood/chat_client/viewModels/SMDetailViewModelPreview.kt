@@ -21,6 +21,10 @@ class SMDetailViewModelPreview: SMDetailViewModel() {
     override fun getCurrentMessage(messID: Int) {
     }
 
+    override fun getNewsMessage() {
+
+    }
+
     override fun setTitle(title: String) {
 
     }

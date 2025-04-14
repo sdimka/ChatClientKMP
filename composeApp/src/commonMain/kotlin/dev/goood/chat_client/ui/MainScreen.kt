@@ -35,8 +35,8 @@ import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.ui.composable.AddChatDialog
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
-import dev.goood.chat_client.ui.composable.DeleteChatDialog
-import dev.goood.chat_client.ui.composable.grayBackground
+import dev.goood.chat_client.ui.composable.DeleteDialog
+import dev.goood.chat_client.ui.theme.grayBackground
 import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModel.State
 import kotlinproject.composeapp.generated.resources.Res
@@ -132,7 +132,7 @@ fun MainScreen(
 
     val deleteDialogState by viewModel.deleteChatDialogState.collectAsState()
     if (deleteDialogState != null) {
-        DeleteChatDialog(
+        DeleteDialog(
             chat = deleteDialogState!!,
             onDismiss = { viewModel.deleteChatDialogState.value = null },
             onDelete = { chat ->

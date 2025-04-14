@@ -232,6 +232,9 @@ fun AppScreen(
                     toDetail = { messID: Int ->
                         navController.navigate(Screen.SysMessagesDetail.route + "/${messID}")
                     },
+                    toNew = {
+                        navController.navigate(Screen.SysMessagesDetail.route + "/-1")
+                    },
                     snackBarHostState = snackBarHostState
                 )
             }

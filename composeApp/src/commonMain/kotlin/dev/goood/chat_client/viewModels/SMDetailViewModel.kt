@@ -12,6 +12,7 @@ abstract class SMDetailViewModel: ViewModel() {
     abstract val selectedMessage: StateFlow<SystemMessage?>
 
     abstract fun getCurrentMessage(messID: Int)
+    abstract fun getNewsMessage()
 
     abstract fun setTitle(title: String)
     abstract fun setContent(title: String)

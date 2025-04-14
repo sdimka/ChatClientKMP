@@ -9,5 +9,6 @@ abstract class SystemMessagesViewModel: ViewModel() {
 
     abstract val state: StateFlow<State>
     abstract val messages: StateFlow<SystemMessageList>
+    abstract fun deleteMessage(messageID: Int)
 
 }

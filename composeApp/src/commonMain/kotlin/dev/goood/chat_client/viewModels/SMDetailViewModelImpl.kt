@@ -21,6 +21,10 @@ class SMDetailViewModelImpl: SMDetailViewModel(), KoinComponent {
         _selectedMessage.value = service.getCurrentMessage(messID)
     }
 
+    override fun getNewsMessage() {
+        _selectedMessage.value = SystemMessage(id = -1, title = "", content = "")
+    }
+
     override fun setTitle(title: String) {
         _selectedMessage.value = _selectedMessage.value?.copy(title = title)
     }
@@ -30,6 +34,10 @@ class SMDetailViewModelImpl: SMDetailViewModel(), KoinComponent {
     }
 
     override fun updateMessage() {
-        service.updateMessage(_selectedMessage.value!!)
+        if (_selectedMessage.value?.id == -1) {
+            service.createMessage(_selectedMessage.value!!) { it: SystemMessage -> _selectedMessage.value = it }
+        } else {
+            service.updateMessage(_selectedMessage.value!!)
+        }
     }
 }

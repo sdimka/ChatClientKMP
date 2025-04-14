@@ -1,6 +1,7 @@
 package dev.goood.chat_client.core.network
 
 import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.PUT
@@ -44,4 +45,13 @@ interface ChatApi {
         @Body message: SystemMessage
     ): Flow<SystemMessage>
 
+    @POST("/api/system_message")
+    fun createSystemMessage(
+        @Body message: SystemMessage
+    ): Flow<SystemMessage>
+
+    @DELETE("/api/system_message")
+    fun deleteSystemMessage(
+        @Query("system_message_id") id: Int
+    ): Flow<ResultMessage>
 }

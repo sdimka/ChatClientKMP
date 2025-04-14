@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.CogSolid
 import compose.icons.lineawesomeicons.PaperPlane
-import dev.goood.chat_client.ui.composable.buttonBackground
+import dev.goood.chat_client.ui.theme.buttonBackground
 import dev.goood.chat_client.viewModels.ChatViewModel
 
 @Composable
