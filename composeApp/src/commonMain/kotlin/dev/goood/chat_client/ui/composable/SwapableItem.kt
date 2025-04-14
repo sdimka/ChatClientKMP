@@ -1,6 +1,7 @@
 package dev.goood.chat_client.ui.composable
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
+import dev.goood.chat_client.ui.theme.grayBackground
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -65,6 +67,7 @@ fun SwipeableWithActions(
         }
 
         Surface(
+            color = grayBackground,
             modifier = Modifier
                 .fillMaxSize()
                 .offset { IntOffset(offset.value.roundToInt(), 0) }

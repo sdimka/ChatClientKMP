@@ -36,6 +36,7 @@ import dev.goood.chat_client.ui.composable.AddChatDialog
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DeleteDialog
+import dev.goood.chat_client.ui.composable.DeleteDialogImp
 import dev.goood.chat_client.ui.theme.grayBackground
 import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModel.State
@@ -131,14 +132,16 @@ fun MainScreen(
     }
 
     val deleteDialogState by viewModel.deleteChatDialogState.collectAsState()
-    if (deleteDialogState != null) {
-        DeleteDialog(
-            chat = deleteDialogState!!,
+    deleteDialogState?.let { chatToDelete ->
+        DeleteDialogImp(
+            item = chatToDelete,
+            title = "Delete chat",
+            getItemName = { it.name },
             onDismiss = { viewModel.deleteChatDialogState.value = null },
             onDelete = { chat ->
                 viewModel.deleteChat(chat)
                 viewModel.deleteChatDialogState.value = null
-            },
+            }
         )
     }
 }

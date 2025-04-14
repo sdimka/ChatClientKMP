@@ -5,6 +5,7 @@ import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.PUT
+import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.model.ChatList
@@ -50,8 +51,9 @@ interface ChatApi {
         @Body message: SystemMessage
     ): Flow<SystemMessage>
 
-    @DELETE("/api/system_message")
+    @DELETE("/api/system_message/{system_message_id}")
     fun deleteSystemMessage(
-        @Query("system_message_id") id: Int
+        @Path("system_message_id") id: Int
     ): Flow<ResultMessage>
+
 }

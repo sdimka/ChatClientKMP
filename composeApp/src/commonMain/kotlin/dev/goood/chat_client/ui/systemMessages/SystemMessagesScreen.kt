@@ -19,8 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -33,7 +31,7 @@ import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.viewModels.SystemMessagesViewModel
 import dev.goood.chat_client.services.SystemMessagesService.State
 import dev.goood.chat_client.ui.composable.CButton
-import dev.goood.chat_client.ui.composable.DeleteDialog
+import dev.goood.chat_client.ui.composable.DeleteDialogImp
 import dev.goood.chat_client.ui.composable.SwipeableWithActions
 import dev.goood.chat_client.ui.theme.grayBackground
 import org.koin.compose.viewmodel.koinViewModel
@@ -48,6 +46,7 @@ fun SystemMessagesScreen(
     val viewModel = koinViewModel<SystemMessagesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val messages by viewModel.messages.collectAsStateWithLifecycle()
+    val deleteDialogState = remember { mutableStateOf<SystemMessage?>(null) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -94,7 +93,7 @@ fun SystemMessagesScreen(
                             sysMessage = message,
                             onEdit = toDetail,
                             onDelete = {
-//                                viewModel.deleteMessage(it)
+                                deleteDialogState.value = message
                             }
                         )
                     }
@@ -103,16 +102,18 @@ fun SystemMessagesScreen(
         }
     }
 
-//    var deleteDialogState by remember { mutableStateOf(false) }
-//    if (deleteDialogState) {
-//        DeleteDialog(
-//            chat = deleteDialogState!!,
-//            onDismiss = { deleteDialogState = !deleteDialogState },
-//            onDelete = { chat ->
-//
-//            },
-//        )
-//    }
+    deleteDialogState.value?.let { messageToDelete ->
+        DeleteDialogImp(
+            item = messageToDelete,
+            title = "Delete system message",
+            getItemName = { it.title },
+            onDismiss = { deleteDialogState.value = null },
+            onDelete = { message ->
+                viewModel.deleteMessage(message.id)
+                deleteDialogState.value = null
+            }
+        )
+    }
 }
 
 @Composable

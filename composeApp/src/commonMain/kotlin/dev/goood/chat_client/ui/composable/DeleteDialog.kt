@@ -76,3 +76,51 @@ internal fun DeleteDialog(
         }
     }
 }
+
+@Composable
+fun <T> DeleteDialogImp(
+    item: T,
+    title: String = "Are you sure you want to delete this item?",
+    getItemName: (T) -> String = { "" },
+    onDismiss: () -> Unit,
+    onDelete: (T) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            modifier = modifier
+                .wrapContentSize()
+                .padding(20.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+                modifier = modifier.padding(20.dp)
+            ) {
+                Text(
+                    text = "$title ${getItemName(item)}?",
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(vertical = 10.dp)
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 10.dp)
+                ) {
+                    CButton(
+                        text = "Ok",
+                        onClick = { onDelete(item) },
+                        modifier = Modifier
+                            .padding(end = 15.dp)
+                    )
+                    CButton(
+                        text = "Cancel",
+                        onClick = onDismiss
+                    )
+                }
+            }
+        }
+    }
+}
