@@ -62,5 +62,9 @@ class ChatViewModelPreview: ChatViewModel() {
 
     override fun getMessages(chatId: Int) {}
 
+    override fun deleteMessage(message: Message) {
+
+    }
+
     override fun sendMessage(messageText: String) {}
 }

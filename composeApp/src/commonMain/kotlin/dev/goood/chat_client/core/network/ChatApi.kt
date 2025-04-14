@@ -38,6 +38,9 @@ interface ChatApi {
     @GET("/api/Messages")
     fun getMessages(@Query("chat_id") chatId: Int): Flow<MessageList>
 
+    @DELETE("/api/Message")
+    fun deleteMessage(@Query("message_id") messageID: Int): Flow<ResultMessage>
+
     @GET("/api/system_messages")
     fun getSystemMessages(): Flow<SystemMessageList>
 

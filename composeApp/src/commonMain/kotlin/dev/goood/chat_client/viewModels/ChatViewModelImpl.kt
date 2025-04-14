@@ -3,6 +3,7 @@ package dev.goood.chat_client.viewModels
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
+import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
 import dev.goood.chat_client.model.MessageRequest
 import dev.goood.chat_client.model.SystemMessage
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -57,6 +59,20 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
                 }
         }
     }
+
+    override fun deleteMessage(message: Message) {
+        _state.value = State.Loading
+        viewModelScope.launch {
+            api.chatApi.deleteMessage(message.id)
+                .catch {
+                    _state.value = State.Error(it.message ?: "Unknown error")
+                }
+                .collect {
+                    getMessages(currentChatId)
+                }
+        }
+    }
+
 
     override fun sendMessage(messageText: String) {
 

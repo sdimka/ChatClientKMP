@@ -1,6 +1,7 @@
 package dev.goood.chat_client.viewModels
 
 import androidx.lifecycle.ViewModel
+import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
 import dev.goood.chat_client.model.SystemMessage
 import dev.goood.chat_client.model.SystemMessageList
@@ -16,6 +17,7 @@ abstract class ChatViewModel: ViewModel() {
 
     abstract fun selectSysMessage(sysMessage: SystemMessage?)
     abstract fun getMessages(chatId: Int)
+    abstract fun deleteMessage(message: Message)
     abstract fun sendMessage(messageText: String)
 
     sealed interface State {

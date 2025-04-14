@@ -73,9 +73,6 @@ kotlin {
 
             implementation(libs.composeIcons.lineAwesome)
 
-            // Dropdown menu and dialog library
-            implementation(libs.core)
-
             // Markdown rendering library
             implementation(libs.multiplatform.markdown.renderer.m3)
         }
