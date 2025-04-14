@@ -58,18 +58,17 @@ val itemListL = listOf(
 
 
 @Composable
-fun DropDownMenu(
-    itemList: List<ChatModel> = itemListL,
-    onSelected: (ChatModel) -> Unit,
-    modifier: Modifier = Modifier
+fun <T> DropDownMenu(
+    itemList: List<T>,
+    selectedItem: T?,
+    onSelected: (T) -> Unit,
+    itemLabel: (T) -> String,
+    modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember {
-        mutableStateOf(ChatModel(1, "", "", "", 1))
-    }
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -83,35 +82,31 @@ fun DropDownMenu(
                 .clickable { expanded = !expanded },
         ) {
             Text(
-                text = selectedItem.displayName,
+                text = selectedItem?.let { itemLabel(it) } ?: "Select item",
                 fontSize = 14.sp,
                 modifier = Modifier.padding(start = 10.dp)
             )
             Icon(
-                Icons.Filled.ArrowDropDown, "contentDescription",
-                Modifier.align(Alignment.CenterEnd)
+                Icons.Filled.ArrowDropDown,
+                contentDescription = "Dropdown icon",
+                modifier = Modifier.align(Alignment.CenterEnd)
             )
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                itemList.forEach { selectionOption ->
+                itemList.forEach { item ->
                     DropdownMenuItem(
                         text = {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-//                                Icon(
-//                                    imageVector = item.icon,
-//                                    contentDescription = item.title
-//                                )
-                                Text(selectionOption.displayName)
+                                Text(itemLabel(item))
                             }
                         },
                         onClick = {
-                            selectedItem = selectionOption
-                            onSelected(selectionOption)
+                            onSelected(item)
                             expanded = false
                         }
                     )

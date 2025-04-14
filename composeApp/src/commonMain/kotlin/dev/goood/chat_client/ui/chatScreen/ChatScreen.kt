@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,13 +45,16 @@ import com.composables.core.rememberMenuState
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.InfoSolid
 import compose.icons.lineawesomeicons.User
 import compose.icons.lineawesomeicons.UserNinjaSolid
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.theme.defaultMarkDownTypography
 import dev.goood.chat_client.ui.theme.defaultTextSize
+import dev.goood.chat_client.ui.theme.green
 import dev.goood.chat_client.viewModels.ChatViewModel
+import dev.goood.chat_client.viewModels.ChatViewModel.State
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -62,6 +66,7 @@ fun ChatScreen(
 ) {
 
     val viewModel: ChatViewModel = koinViewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(LocalLifecycleOwner.current) {
         if (chatID != null) {
@@ -86,6 +91,22 @@ fun ChatScreen(
     MessageInput(
         viewModel = viewModel,
     )
+    when (state) {
+        is State.Error -> {
+            val error = (state as State.Error).message
+            LaunchedEffect(snackBarHostState) {
+                snackBarHostState.showSnackbar(
+                    error,
+                    actionLabel = "Close",
+                    withDismissAction = true,
+                    duration = SnackbarDuration.Long
+                )
+            }
+        }
+        State.Loading -> {}
+        State.NewReply -> {}
+        State.Success -> {}
+    }
 
 }
 
@@ -148,7 +169,6 @@ fun MessageElement(
         ) {
             Icon(
                 imageVector = icon,
-//                painter = painterResource(SharedRes.images.icon_menu_main),
                 contentDescription = "Filters icon",
                 modifier = modifier.size(22.dp),
                 tint = Color.Black
@@ -156,8 +176,21 @@ fun MessageElement(
 
             Text(
                 text = "${message.initiator}",
-                modifier = modifier.padding(start = 10.dp)
+                modifier = modifier.padding(horizontal = 15.dp)
             )
+
+            if (message.systemMessage != null) {
+                Icon(
+                    imageVector = LineAwesomeIcons.InfoSolid,
+                    contentDescription = "Filters icon",
+                    modifier = modifier.size(15.dp),
+                    tint = green
+                )
+                Text(
+                    text = message.systemMessage.title,
+                    color = green
+                )
+            }
             Spacer(modifier.weight(1f))
             MenuElement()
 

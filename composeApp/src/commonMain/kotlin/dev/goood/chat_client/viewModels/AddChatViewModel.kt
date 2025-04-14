@@ -10,6 +10,7 @@ import dev.goood.chat_client.model.ChatSourceList
 import dev.goood.chat_client.model.NewChat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -37,7 +38,8 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
     val chatName: StateFlow<String> = _chatName
 
     private val selectedSource = MutableStateFlow<ChatSource?>(null)
-    private val selectedModel = MutableStateFlow<ChatModel?>(null)
+    private val _selectedModel = MutableStateFlow<ChatModel?>(null)
+    val selectedModel = _selectedModel.asStateFlow()
 
     private fun getSources() {
         viewModelScope.launch {
@@ -76,7 +78,7 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
     }
 
     fun setSelectedModel(model: ChatModel) {
-        selectedModel.value = model
+        _selectedModel.value = model
         validateForm()
     }
 
@@ -86,7 +88,7 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
     }
 
     private fun validateForm() {
-        if (chatName.value.isNotEmpty() && selectedSource.value != null && selectedModel.value != null) {
+        if (chatName.value.isNotEmpty() && selectedSource.value != null && _selectedModel.value != null) {
             _state.value = State.FormValid
         } else {
             _state.value = State.Error("Fill all fields")
@@ -100,7 +102,7 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
                 id = 1,
                 name = chatName.value,
                 sourceID = selectedSource.value!!.id,
-                modelID = selectedModel.value!!.id,
+                modelID = _selectedModel.value!!.id,
             )
             api.chatApi.addChat(chat)
                 .catch {

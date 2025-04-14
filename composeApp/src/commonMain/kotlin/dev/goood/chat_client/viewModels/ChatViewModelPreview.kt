@@ -3,6 +3,8 @@ package dev.goood.chat_client.viewModels
 
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
+import dev.goood.chat_client.model.SystemMessage
+import dev.goood.chat_client.model.SystemMessageList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -27,7 +29,12 @@ class ChatViewModelPreview: ChatViewModel() {
                     "- Cross-platform ready\n" +
                     "- Lightweight",
             initiator = 0,
-            role = "A"
+            role = "A",
+            systemMessage = SystemMessage(
+                id =1,
+                title = "Sys message",
+                content = ""
+            )
         ),
         Message(
             id = 2,
@@ -36,6 +43,19 @@ class ChatViewModelPreview: ChatViewModel() {
             role = "A"
         )
     )
+
+    override val systemMessages: StateFlow<SystemMessageList> = MutableStateFlow(
+        listOf(
+            SystemMessage(1, "Some sys mess", "Some conetnt")
+        ))
+    override val selectedSysMessage: StateFlow<SystemMessage?> = MutableStateFlow(
+        SystemMessage(1, "Some sys mess", "Some conetnt")
+    )
+
+    override fun selectSysMessage(sysMessage: SystemMessage?) {
+
+    }
+
 
     private val _messages = MutableStateFlow(list)
     override val messages: StateFlow<MessageList> = _messages

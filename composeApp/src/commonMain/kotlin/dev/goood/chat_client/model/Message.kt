@@ -10,6 +10,8 @@ data class Message (
     val content: String,
     val initiator: Int,
     val role: String,
+    @SerialName("system_message")
+    val systemMessage: SystemMessage? = null,
 )
 
 typealias MessageList = List<Message>
@@ -20,4 +22,6 @@ data class MessageRequest (
     val content: String,
     @SerialName("chat_id")
     val chatId: Int,
+    @SerialName("system_message")
+    val systemMessage: SystemMessage? = null
 )

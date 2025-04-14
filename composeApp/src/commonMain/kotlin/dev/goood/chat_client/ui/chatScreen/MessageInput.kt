@@ -39,7 +39,7 @@ fun MessageInput(
     modifier: Modifier = Modifier,
 ) {
     var inputValue by remember { mutableStateOf("") }
-    var settingsState by remember { mutableStateOf(false) }
+    var settingsState by remember { mutableStateOf(true) }
 
     fun sendMessage() {
         viewModel.sendMessage(inputValue)
@@ -51,6 +51,13 @@ fun MessageInput(
         contentAlignment = Alignment.BottomEnd
     ) {
         Column {
+
+            if (settingsState) {
+                SettingsElement(
+                    viewModel = viewModel
+                )
+            }
+
             Row(
                 horizontalArrangement = Arrangement.SpaceAround,
                 modifier = modifier.fillMaxWidth().background(Color.White),
@@ -99,23 +106,6 @@ fun MessageInput(
                     )
                 }
             }
-
-            if (settingsState) {
-                SettingsElement()
-            }
         }
-    }
-}
-
-@Composable
-fun SettingsElement(
-
-){
-    Column {
-        Text(text = "Some")
-        Text(
-            text = "Some",
-            modifier = Modifier.padding(top = 15.dp)
-        )
     }
 }

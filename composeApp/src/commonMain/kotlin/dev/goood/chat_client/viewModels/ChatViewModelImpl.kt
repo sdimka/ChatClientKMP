@@ -5,8 +5,12 @@ import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
 import dev.goood.chat_client.model.MessageList
 import dev.goood.chat_client.model.MessageRequest
+import dev.goood.chat_client.model.SystemMessage
+import dev.goood.chat_client.model.SystemMessageList
+import dev.goood.chat_client.services.SystemMessagesService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -16,6 +20,7 @@ import org.koin.core.component.inject
 class ChatViewModelImpl: ChatViewModel(), KoinComponent {
 
     private val api: Api by inject()
+    private val systemMessagesService: SystemMessagesService by inject()
 
     private val _messages = MutableStateFlow<MessageList>(emptyList())
     override val messages: StateFlow<MessageList> = _messages
@@ -27,6 +32,15 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     override val newReply: StateFlow<String> = _newReply
 
     private var currentChatId = 1
+
+    override val systemMessages: StateFlow<SystemMessageList> = systemMessagesService.messages
+
+    private val _selectedSysMessage = MutableStateFlow<SystemMessage?>(null)
+    override val selectedSysMessage: StateFlow<SystemMessage?> = _selectedSysMessage.asStateFlow()
+
+    override fun selectSysMessage(sysMessage: SystemMessage?) {
+        _selectedSysMessage.value = sysMessage
+    }
 
     override fun getMessages(chatId: Int){
         _state.value = State.Loading
@@ -46,10 +60,13 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
 
     override fun sendMessage(messageText: String) {
 
-        val message = MessageRequest(
+        var message = MessageRequest(
             content = messageText,
             chatId = currentChatId
         )
+        if (_selectedSysMessage.value != null) {
+            message = message.copy(systemMessage =  _selectedSysMessage.value!!)
+        }
 
         _newReply.value = ""
         _state.value = State.NewReply

@@ -15,7 +15,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.goood.chat_client.viewModels.AddChatViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -41,15 +41,17 @@ internal fun AddChatDialog(
 ) {
 
     val viewModel = koinViewModel<AddChatViewModel>()
-    val state = viewModel.state.collectAsState()
+    val state = viewModel.state.collectAsStateWithLifecycle()
 
-    val sourceList by viewModel.sourceList.collectAsState()
-    val modelList by viewModel.modelList.collectAsState()
-    val chatName by viewModel.chatName.collectAsState()
+    val sourceList by viewModel.sourceList.collectAsStateWithLifecycle()
+    val modelList by viewModel.modelList.collectAsStateWithLifecycle()
+    val chatName by viewModel.chatName.collectAsStateWithLifecycle()
+    val selectedModel by viewModel.selectedModel.collectAsStateWithLifecycle()
 
     LaunchedEffect(LocalLifecycleOwner.current) {
         viewModel.upDate()
     }
+
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -95,11 +97,12 @@ internal fun AddChatDialog(
 
                 DropDownMenu(
                     itemList = modelList,
-                    onSelected = {
-                        viewModel.setSelectedModel(it)
-                    },
-                    modifier = modifier.fillMaxWidth().padding(bottom = 10.dp),
+                    selectedItem = selectedModel,
+                    onSelected = {  viewModel.setSelectedModel(it) },
+                    itemLabel = { it.displayName },
+                    modifier = modifier.padding(bottom = 10.dp)
                 )
+
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
