@@ -12,6 +12,7 @@ androidx-lifecycle = "2.8.4"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 compose-multiplatform = "1.7.3"
+filekitDialogs = "0.10.0-beta01"
 junit = "4.13.2"
 koin = "4.1.0-Beta5"
 kotlin = "2.1.10"
@@ -32,6 +33,10 @@ uiGeometryAndroid = "1.7.8"
 composeIcons = "1.1.1"
 
 [libraries]
+filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "filekitDialogs" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekitDialogs" }
+filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekitDialogs" }
+filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekitDialogs" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose-viewmodel = {module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin"}
 koin-compose-viewmodel-nav = {module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin"}

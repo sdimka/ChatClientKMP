@@ -40,8 +40,8 @@ class MainViewModelImpl: MainViewModel(), KoinComponent {
                     println(it)
                     _state.value = State.Error(it.message ?: "Unknown error")
                 }
-                .collect {
-                    chats.value = it
+                .collect { chatList ->
+                    chats.value = chatList.sortedByDescending { it.source.id }
                     _state.value = State.Success
                 }
         }

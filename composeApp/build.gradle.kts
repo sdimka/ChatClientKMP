@@ -75,6 +75,12 @@ kotlin {
 
             // Markdown rendering library
             implementation(libs.multiplatform.markdown.renderer.m3)
+
+            // FileKit
+            implementation(libs.filekit.core)
+            implementation(libs.filekit.dialogs)
+            implementation(libs.filekit.dialogs.compose)
+            implementation(libs.filekit.coil)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

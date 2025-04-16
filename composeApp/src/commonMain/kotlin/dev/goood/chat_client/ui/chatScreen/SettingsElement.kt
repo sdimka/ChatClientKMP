@@ -8,11 +8,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.PlusSquareSolid
+import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DropDownMenu
+import dev.goood.chat_client.ui.filesDialog.FilesDialog
 import dev.goood.chat_client.ui.theme.grayBackground
 import dev.goood.chat_client.viewModels.ChatViewModel
 
@@ -25,6 +31,8 @@ fun SettingsElement(
 
     val sysMessagesList by viewModel.systemMessages.collectAsStateWithLifecycle()
     val selectedSysMessage by viewModel.selectedSysMessage.collectAsStateWithLifecycle()
+
+    var fileDialogState = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -50,5 +58,18 @@ fun SettingsElement(
             )
 
         }
+
+        CButton(
+            icon = LineAwesomeIcons.PlusSquareSolid,
+            onClick = {
+                fileDialogState.value = !fileDialogState.value
+            }
+        )
+    }
+
+    if (fileDialogState.value) {
+        FilesDialog(
+            onDismiss = { fileDialogState.value = false }
+        )
     }
 }

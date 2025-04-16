@@ -45,6 +45,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
+import com.mikepenz.markdown.m3.markdownTypography
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.Copy
 import compose.icons.lineawesomeicons.InfoSolid
@@ -180,6 +181,7 @@ fun MessageElement(
 
     Card(
         modifier = modifier
+
             .fillMaxWidth()
             .padding(5.dp)
             .padding(start = innPadding),
@@ -188,9 +190,11 @@ fun MessageElement(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
+                .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(12.dp))
                 .padding(start = 10.dp)
                 .padding(end = 5.dp)
-                .padding(top = 5.dp),
+                .padding(top = 5.dp)
+                .padding(bottom = 5.dp)
         ) {
             Icon(
                 imageVector = icon,
@@ -208,14 +212,16 @@ fun MessageElement(
                 Icon(
                     imageVector = LineAwesomeIcons.InfoSolid,
                     contentDescription = "Sys icon",
-                    modifier = modifier.size(15.dp),
+                    modifier = modifier.size(18.dp),
                     tint = green
                 )
                 Text(
                     text = message.systemMessage.title,
+                    fontSize = defaultTextSize,
                     color = green
                 )
             }
+
             Spacer(modifier.weight(1f))
 
             DropDownMenuButton(
@@ -233,7 +239,7 @@ fun MessageElement(
                 typography = defaultMarkDownTypography(),
                 modifier = modifier
                     .padding(horizontal = 8.dp)
-                    .padding(bottom = 5.dp)
+                    .padding(vertical = 8.dp)
             )
         }
 

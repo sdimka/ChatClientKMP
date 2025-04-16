@@ -30,4 +30,7 @@ https://github.com/EhsanMsz/MszProgressIndicator/tree/master
 ### Markdown Renderer
 https://github.com/mikepenz/multiplatform-markdown-renderer
 
+### File Picker
+https://github.com/vinceglb/FileKit
+
 

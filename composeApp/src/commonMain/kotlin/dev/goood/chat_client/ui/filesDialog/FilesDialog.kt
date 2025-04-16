@@ -1,0 +1,106 @@
+package dev.goood.chat_client.ui.filesDialog
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.PlusSquareSolid
+import compose.icons.lineawesomeicons.WindowClose
+import dev.goood.chat_client.core.other.ShareFileModel
+import dev.goood.chat_client.ui.composable.CButton
+import dev.goood.chat_client.viewModels.FileDialogViewModel
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
+import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
+
+
+@Composable
+fun FilesDialog(
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val viewModel = koinViewModel<FileDialogViewModel>()
+    val file by viewModel.selectedFile.collectAsState()
+    val scope = rememberCoroutineScope()
+
+
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = onDismiss,
+
+        ) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            modifier = modifier.fillMaxSize()
+                .padding(20.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+                modifier = modifier
+                    .fillMaxSize()
+            ) {
+                Text(
+                    text = "File Dialog",
+                    fontSize = 25.sp,
+                    modifier = modifier
+                        .height(50.dp)
+                        .padding(vertical = 10.dp)
+                )
+
+                Text(
+                    text = file?.fileName ?: "",
+                    fontSize = 25.sp,
+                    modifier = modifier
+                        .height(50.dp)
+                        .padding(vertical = 10.dp)
+                )
+
+                CButton(
+                    icon = LineAwesomeIcons.PlusSquareSolid,
+                    onClick = {
+                        scope.launch {
+                            val file = FileKit.openFilePicker()
+                            if (file != null) {
+                                viewModel.shareFile(
+                                    ShareFileModel(
+                                        fileName = file.name,
+                                        bytes = file.readBytes()
+                                    )
+                                )
+                            }
+                        }
+                    },
+                    modifier = modifier.padding(bottom = 10.dp)
+                )
+
+                Spacer(modifier = modifier.weight(1F))
+
+                CButton(
+                    icon = LineAwesomeIcons.WindowClose,
+                    onClick = onDismiss,
+                    modifier = modifier.padding(bottom = 10.dp)
+                )
+            }
+        }
+    }
+}
