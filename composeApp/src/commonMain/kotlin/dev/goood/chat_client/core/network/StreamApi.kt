@@ -148,10 +148,10 @@ class StreamApi(private val client: HttpClient, baseUrl: String) {
 //        val info = fileReader.uriToFileInfo(contentUri)
 
         client.submitFormWithBinaryData(
-            url = "https://dlptest.com/https-post/",
+            url = "$url/api/file",
             formData = formData {
                 append("description", "Test")
-                append("the_file", content.bytes, Headers.build {
+                append("file", content.bytes, Headers.build {
                     append(HttpHeaders.ContentType, content.mime.toString())
                     append(
                         HttpHeaders.ContentDisposition,

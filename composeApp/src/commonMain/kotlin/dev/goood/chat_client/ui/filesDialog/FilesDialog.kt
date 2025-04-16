@@ -1,12 +1,16 @@
 package dev.goood.chat_client.ui.filesDialog
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +46,12 @@ fun FilesDialog(
     val file by viewModel.selectedFile.collectAsState()
     val scope = rememberCoroutineScope()
 
+    val state = viewModel.state
+    val animatedProgress by animateFloatAsState(
+        targetValue = state.progress,
+        animationSpec = tween(durationMillis = 100),
+        label = "File upload progress bar"
+    )
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -53,6 +63,9 @@ fun FilesDialog(
             modifier = modifier.fillMaxSize()
                 .padding(20.dp)
         ) {
+            FileList(
+
+            )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top,
@@ -69,28 +82,37 @@ fun FilesDialog(
 
                 Text(
                     text = file?.fileName ?: "",
-                    fontSize = 25.sp,
+                    fontSize = 14.sp,
                     modifier = modifier
                         .height(50.dp)
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = 5.dp)
                 )
 
                 CButton(
+                    text = "Send file",
                     icon = LineAwesomeIcons.PlusSquareSolid,
                     onClick = {
                         scope.launch {
-                            val file = FileKit.openFilePicker()
-                            if (file != null) {
-                                viewModel.shareFile(
+                            val nFile = FileKit.openFilePicker()
+                            if (nFile != null) {
+                                viewModel.sendFile(
                                     ShareFileModel(
-                                        fileName = file.name,
-                                        bytes = file.readBytes()
+                                        fileName = nFile.name,
+                                        bytes = nFile.readBytes(),
                                     )
                                 )
                             }
                         }
                     },
                     modifier = modifier.padding(bottom = 10.dp)
+                )
+
+                LinearProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .height(16.dp)
                 )
 
                 Spacer(modifier = modifier.weight(1F))
@@ -103,4 +125,12 @@ fun FilesDialog(
             }
         }
     }
+}
+
+@Composable
+fun FileList(
+    viewModel: FileDialogViewModel
+){
+
+
 }
