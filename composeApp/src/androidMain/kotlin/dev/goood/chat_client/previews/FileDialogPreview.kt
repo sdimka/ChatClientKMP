@@ -22,6 +22,7 @@ fun FileDialogPreview() {
         modules(appModulePreview)
     }) {
         FilesDialog(
+            chatID = 1,
             onDismiss = {}
         )
     }

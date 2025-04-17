@@ -41,6 +41,7 @@ import dev.goood.chat_client.viewModels.ChatViewModel
 
 @Composable
 fun MessageInput(
+    chatID: Int?,
     viewModel: ChatViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -65,6 +66,7 @@ fun MessageInput(
                 exit = slideOutVertically(targetOffsetY = { it })
             ) {
                 SettingsElement(
+                    chatID = chatID,
                     viewModel = viewModel
                 )
             }

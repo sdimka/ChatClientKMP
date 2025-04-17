@@ -89,5 +89,7 @@ class Api: KoinComponent {
     val streamApi = StreamApi(ktorfit.httpClient, Const.Network.API_ENDPOINT)
 
     val chatApi = ktorfit.createChatApi()
+    val filesApi = ktorfit.createFilesApi()
+
 
 }

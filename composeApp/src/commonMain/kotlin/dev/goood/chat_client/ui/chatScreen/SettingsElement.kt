@@ -25,6 +25,7 @@ import dev.goood.chat_client.viewModels.ChatViewModel
 
 @Composable
 fun SettingsElement(
+    chatID: Int?,
     viewModel: ChatViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -69,6 +70,7 @@ fun SettingsElement(
 
     if (fileDialogState.value) {
         FilesDialog(
+            chatID = chatID,
             onDismiss = { fileDialogState.value = false }
         )
     }

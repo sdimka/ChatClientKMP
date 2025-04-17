@@ -45,7 +45,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
-import com.mikepenz.markdown.m3.markdownTypography
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.Copy
 import compose.icons.lineawesomeicons.InfoSolid
@@ -98,6 +97,7 @@ fun ChatScreen(
     }
 
     MessageInput(
+        chatID = chatID,
         viewModel = viewModel,
     )
 

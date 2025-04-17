@@ -17,6 +17,8 @@ import dev.goood.chat_client.viewModels.ChatViewModel
 import dev.goood.chat_client.viewModels.ChatViewModelImpl
 import dev.goood.chat_client.viewModels.ChatViewModelPreview
 import dev.goood.chat_client.viewModels.FileDialogViewModel
+import dev.goood.chat_client.viewModels.FileDialogViewModelImpl
+import dev.goood.chat_client.viewModels.FileDialogViewModelPreview
 import dev.goood.chat_client.viewModels.SMDetailViewModel
 import dev.goood.chat_client.viewModels.SMDetailViewModelImpl
 import dev.goood.chat_client.viewModels.SMDetailViewModelPreview
@@ -44,7 +46,7 @@ val appModule = module {
     viewModelOf(::ChatViewModelImpl) { bind<ChatViewModel>()}
     viewModelOf(::SystemMessagesViewModelImpl) { bind<SystemMessagesViewModel>() }
     viewModelOf(::SMDetailViewModelImpl) { bind<SMDetailViewModel>() }
-    viewModelOf(::FileDialogViewModel) { bind() }
+    viewModelOf(::FileDialogViewModelImpl) { bind<FileDialogViewModel>() }
 
     factory { getPlatform() }
 }
@@ -65,7 +67,7 @@ val appModulePreview = module {
     viewModelOf(::ChatViewModelPreview) { bind<ChatViewModel>()}
     viewModelOf(::SystemMessagesViewModelPreview) { bind<SystemMessagesViewModel>() }
     viewModelOf(::SMDetailViewModelPreview) { bind<SMDetailViewModel>() }
-    viewModelOf(::FileDialogViewModel) { bind() }
+    viewModelOf(::FileDialogViewModelPreview) { bind<FileDialogViewModel>() }
 
     factory { getPlatform() }
 }

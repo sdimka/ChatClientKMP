@@ -46,6 +46,7 @@ kotlin {
             implementation(libs.koin.compose.viewmodel.nav)
         }
         commonMain.dependencies {
+            implementation(libs.kotlinx.datetime)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
