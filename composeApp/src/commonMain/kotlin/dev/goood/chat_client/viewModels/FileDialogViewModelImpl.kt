@@ -27,6 +27,8 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
     private val api: Api by inject()
     private val _selectedFile = MutableStateFlow<ShareFileModel?>(null)
     override val selectedFile = _selectedFile.asStateFlow()
+    private val _state = MutableStateFlow<State>(State.Loading)
+    override val state = _state.asStateFlow()
     override var uploadState by mutableStateOf(UploadState())
         private set
 
@@ -49,15 +51,17 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
     }
 
     override fun updateFileList(chatID: Int) {
-
+        _state.value = State.Loading
         viewModelScope.launch {
 
             api.filesApi.getFiles(chatID)
                 .catch {
                     print(it)
+                    _state.value = State.Error(it.message ?: "Unkown error")
                 }
                 .collect { fList ->
                     _fileList.value = fList
+                    _state.value = State.Success
                 }
 
         }

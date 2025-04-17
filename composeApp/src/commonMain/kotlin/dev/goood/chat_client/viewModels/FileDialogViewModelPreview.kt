@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 class FileDialogViewModelPreview : FileDialogViewModel() {
 
+    override val state: StateFlow<State> = MutableStateFlow(State.Loading)
+    
     override val uploadState: UploadState = UploadState(
         isUploading = false,
         isUploadComplete = false,

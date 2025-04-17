@@ -1,12 +1,10 @@
 package dev.goood.chat_client.ui.filesDialog
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,8 +35,10 @@ import compose.icons.lineawesomeicons.PlusSquareSolid
 import compose.icons.lineawesomeicons.WindowClose
 import dev.goood.chat_client.core.other.ShareFileModel
 import dev.goood.chat_client.model.MFile
+import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.viewModels.FileDialogViewModel
+import dev.goood.chat_client.viewModels.FileDialogViewModel.State
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.openFilePicker
 import io.github.vinceglb.filekit.name
@@ -50,7 +50,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
@@ -66,9 +65,11 @@ fun FilesDialog(
     val file by viewModel.selectedFile.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val state = viewModel.uploadState
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val uploadState = viewModel.uploadState
     val animatedProgress by animateFloatAsState(
-        targetValue = state.progress,
+        targetValue = uploadState.progress,
         animationSpec = tween(durationMillis = 100),
         label = "File upload progress bar"
     )
@@ -103,10 +104,12 @@ fun FilesDialog(
 
                 FileList(
                     viewModel = viewModel,
+                    state = state,
                     modifier = modifier
                         .weight(1f)
                         .fillMaxHeight()
                 )
+
                 Text(
                     text = file?.fileName ?: "",
                     fontSize = 14.sp,
@@ -174,22 +177,38 @@ fun FilesDialog(
 @Composable
 fun FileList(
     viewModel: FileDialogViewModel,
-    modifier: Modifier = Modifier
+    state: State,
+    modifier: Modifier = Modifier,
 ){
     val fileList by viewModel.fileList.collectAsStateWithLifecycle()
 
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(top = 15.dp)
-        ) {
-            items(fileList) { file ->
-                FileElement(
-                    file = file,
-                )
+    when (state) {
+        is State.Error -> {
+
+        }
+        State.Loading -> {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                BallProgerssIndicator()
             }
         }
-
+        State.Success -> {
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(top = 15.dp)
+            ) {
+                items(fileList) { file ->
+                    FileElement(
+                        file = file,
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable

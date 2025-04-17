@@ -8,12 +8,20 @@ import kotlinx.coroutines.flow.StateFlow
 
 abstract class FileDialogViewModel: ViewModel() {
 
+    abstract val state: StateFlow<State>
     abstract val uploadState: UploadState
     abstract val selectedFile: StateFlow<ShareFileModel?>
     abstract val fileList: StateFlow<List<MFile>>
     abstract fun setCurrentChat(chatID: Int?)
     abstract fun updateFileList(chatID: Int)
     abstract fun sendFile(sharedFile: ShareFileModel)
+
+    sealed interface State {
+        data object Success: State
+        data class Error(val message: String): State
+        data object Loading: State
+
+    }
 
 }
 
