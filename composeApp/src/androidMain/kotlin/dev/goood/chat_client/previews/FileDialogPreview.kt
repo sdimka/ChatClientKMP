@@ -23,7 +23,8 @@ fun FileDialogPreview() {
     }) {
         FilesDialog(
             chatID = 1,
-            onDismiss = {}
+            onDismiss = {},
+            fileListUpdate = {}
         )
     }
 }

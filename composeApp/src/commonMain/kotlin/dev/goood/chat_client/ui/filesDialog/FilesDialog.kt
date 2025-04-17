@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,13 +14,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +39,7 @@ import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.PlusSquareSolid
 import compose.icons.lineawesomeicons.WindowClose
 import dev.goood.chat_client.core.other.ShareFileModel
+import dev.goood.chat_client.model.FileList
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
@@ -58,6 +64,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun FilesDialog(
     chatID: Int?,
+    fileListUpdate: (FileList) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -74,8 +81,30 @@ fun FilesDialog(
         label = "File upload progress bar"
     )
 
+    val selectedFiles = remember { mutableListOf<MFile>() }
+
     LaunchedEffect(LocalLifecycleOwner.current) {
         viewModel.setCurrentChat(chatID)
+    }
+
+    val isEnabled by remember {
+        derivedStateOf {
+            !uploadState.isUploading && state is State.Success
+        }
+    }
+
+    fun sendFile() {
+        scope.launch {
+            val nFile = FileKit.openFilePicker()
+            if (nFile != null) {
+                viewModel.uploadFile(
+                    ShareFileModel(
+                        fileName = nFile.name,
+                        bytes = nFile.readBytes(),
+                    )
+                )
+            }
+        }
     }
 
     Dialog(
@@ -105,6 +134,7 @@ fun FilesDialog(
                 FileList(
                     viewModel = viewModel,
                     state = state,
+                    selectedFiles = selectedFiles,
                     modifier = modifier
                         .weight(1f)
                         .fillMaxHeight()
@@ -129,6 +159,7 @@ fun FilesDialog(
                     CButton(
                         text = "To chat",
                         icon = LineAwesomeIcons.WindowClose,
+                        enabled = isEnabled,
                         onClick = {},
                         modifier = modifier.padding(bottom = 10.dp)
                     )
@@ -136,37 +167,30 @@ fun FilesDialog(
                     CButton(
                         text = "New file",
                         icon = LineAwesomeIcons.PlusSquareSolid,
+                        enabled = isEnabled,
                         onClick = {
-                            scope.launch {
-                                val nFile = FileKit.openFilePicker()
-                                if (nFile != null) {
-                                    viewModel.sendFile(
-                                        ShareFileModel(
-                                            fileName = nFile.name,
-                                            bytes = nFile.readBytes(),
-                                        )
-                                    )
-                                }
-                            }
+                            sendFile()
                         },
                         modifier = modifier.padding(bottom = 10.dp)
                     )
 
                 }
-
-                LinearProgressIndicator(
-                    progress = { animatedProgress },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(16.dp)
-                )
-
-//                Spacer(modifier = modifier.weight(1F))
+                if (uploadState.isUploading) {
+                    LinearProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                            .height(16.dp)
+                    )
+                }
 
                 CButton(
                     icon = LineAwesomeIcons.WindowClose,
-                    onClick = onDismiss,
+                    onClick = {
+                        fileListUpdate(selectedFiles)
+                        onDismiss()
+                              },
                     modifier = modifier.padding(bottom = 10.dp)
                 )
             }
@@ -178,6 +202,7 @@ fun FilesDialog(
 fun FileList(
     viewModel: FileDialogViewModel,
     state: State,
+    selectedFiles: MutableList<MFile>,
     modifier: Modifier = Modifier,
 ){
     val fileList by viewModel.fileList.collectAsStateWithLifecycle()
@@ -204,6 +229,13 @@ fun FileList(
                 items(fileList) { file ->
                     FileElement(
                         file = file,
+                        onSelected = { selected, selectedFile ->
+                            if (selected) {
+                                selectedFiles.add(selectedFile)
+                            } else {
+                                selectedFiles.remove(selectedFile)
+                            }
+                        }
                     )
                 }
             }
@@ -214,15 +246,27 @@ fun FileList(
 @Composable
 fun FileElement(
     file: MFile,
+    onSelected: (Boolean, MFile) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ){
+    val checkedState = remember { mutableStateOf(false) }
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
             .padding(horizontal = 10.dp)
     ) {
+        Checkbox(
+            checked = checkedState.value,
+            onCheckedChange = {
+                checkedState.value = it
+                onSelected(it, file)
+            }
+        )
+
         Column {
             Text(
                 text = file.filename
@@ -233,7 +277,7 @@ fun FileElement(
                 color = Color.DarkGray
             )
         }
-
+        Spacer(modifier = modifier.weight(1f))
         Column {
             Text(
                 text = dateMillisToString(file.createdAt),
@@ -247,7 +291,7 @@ fun FileElement(
 
 private fun dateMillisToString(epoch: Long): String {
     val instant = Instant.fromEpochSeconds(epoch)
-    val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault()) // Or specify a timezone if needed
+    val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
 
     val formatter = LocalDateTime.Format {
         date(LocalDate.Formats.ISO)

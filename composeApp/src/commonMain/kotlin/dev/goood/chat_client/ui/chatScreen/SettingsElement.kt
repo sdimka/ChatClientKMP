@@ -33,7 +33,7 @@ fun SettingsElement(
     val sysMessagesList by viewModel.systemMessages.collectAsStateWithLifecycle()
     val selectedSysMessage by viewModel.selectedSysMessage.collectAsStateWithLifecycle()
 
-    var fileDialogState = remember { mutableStateOf(false) }
+    val fileDialogState = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -71,6 +71,7 @@ fun SettingsElement(
     if (fileDialogState.value) {
         FilesDialog(
             chatID = chatID,
+            fileListUpdate = viewModel::updateFilesList,
             onDismiss = { fileDialogState.value = false }
         )
     }

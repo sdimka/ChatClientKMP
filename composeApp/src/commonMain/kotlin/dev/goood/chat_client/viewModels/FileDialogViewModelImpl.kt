@@ -25,14 +25,16 @@ import kotlin.coroutines.cancellation.CancellationException
 class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
 
     private val api: Api by inject()
+    private var currentChatID by mutableStateOf<Int?>(null)
+
     private val _selectedFile = MutableStateFlow<ShareFileModel?>(null)
     override val selectedFile = _selectedFile.asStateFlow()
+
     private val _state = MutableStateFlow<State>(State.Loading)
     override val state = _state.asStateFlow()
     override var uploadState by mutableStateOf(UploadState())
         private set
 
-    private var currentChatID by mutableStateOf<Int?>(null)
 
     private val _fileList = MutableStateFlow<FileList>(emptyList())
     override val fileList = _fileList
@@ -60,7 +62,7 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
                     _state.value = State.Error(it.message ?: "Unkown error")
                 }
                 .collect { fList ->
-                    _fileList.value = fList
+                    _fileList.value = fList.sortedBy { it.createdAt }
                     _state.value = State.Success
                 }
 
@@ -68,10 +70,15 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
 
     }
 
-    override fun sendFile(sharedFile: ShareFileModel) {
+    override fun uploadFile(sharedFile: ShareFileModel) {
         _selectedFile.value = sharedFile
-
-        api.streamApi.uploadFile(sharedFile, 2)
+        if (currentChatID== null) {
+            uploadState = uploadState.copy(
+                errorMessage = "No chat selected"
+            )
+            return
+        }
+        api.streamApi.uploadFile(sharedFile, currentChatID!!)
             .onStart {
                 uploadState = uploadState.copy(
                     isUploading = true,
@@ -91,6 +98,7 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
                         isUploading = false,
                         isUploadComplete = true
                     )
+                    updateFileList(currentChatID!!)
                 } else if (cause is CancellationException) {
                     uploadState = uploadState.copy(
                         isUploading = false,

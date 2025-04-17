@@ -3,6 +3,8 @@ package dev.goood.chat_client.viewModels
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
+import dev.goood.chat_client.model.FileList
+import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
 import dev.goood.chat_client.model.MessageRequest
@@ -39,6 +41,9 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     private val _selectedSysMessage = MutableStateFlow<SystemMessage?>(null)
     override val selectedSysMessage: StateFlow<SystemMessage?> = _selectedSysMessage.asStateFlow()
 
+    private val _filesList = MutableStateFlow<List<MFile>>(emptyList())
+    override val filesList: StateFlow<List<MFile>> = _filesList
+
     override fun selectSysMessage(sysMessage: SystemMessage?) {
         _selectedSysMessage.value = sysMessage
     }
@@ -72,6 +77,10 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         }
     }
 
+    override fun updateFilesList(fileList: FileList) {
+        _filesList.value = fileList
+    }
+
 
     override fun sendMessage(messageText: String) {
 
@@ -99,7 +108,8 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
                 .collect { event ->
                     when (event) {
                         is ReplyVariants.SavedRequest -> {
-                            val newList = (_messages.value + event.content).sortedByDescending { it.id }
+                            val newList = (_messages.value + event.content)
+                                .sortedByDescending { it.id }
                             _messages.value = newList
                         }
 
@@ -107,7 +117,8 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
                             _newReply.value += event.content.data
                         }
                         is ReplyVariants.FinalReply -> {
-                            val newList = (_messages.value + event.content).sortedByDescending { it.id }
+                            val newList = (_messages.value + event.content)
+                                .sortedByDescending { it.id }
                             _messages.value = newList
                         }
                         is ReplyVariants.Error -> {

@@ -1,6 +1,8 @@
 package dev.goood.chat_client.viewModels
 
 
+import dev.goood.chat_client.model.FileList
+import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
 import dev.goood.chat_client.model.SystemMessage
@@ -52,7 +54,13 @@ class ChatViewModelPreview: ChatViewModel() {
         SystemMessage(1, "Some sys mess", "Some conetnt")
     )
 
+    override val filesList: StateFlow<List<MFile>> = MutableStateFlow(emptyList())
+
     override fun selectSysMessage(sysMessage: SystemMessage?) {
+
+    }
+
+    override fun updateFilesList(fileList: FileList) {
 
     }
 

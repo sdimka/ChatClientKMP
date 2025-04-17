@@ -8,7 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 class FileDialogViewModelPreview : FileDialogViewModel() {
 
-    override val state: StateFlow<State> = MutableStateFlow(State.Loading)
+    override val state: StateFlow<State> =
+        MutableStateFlow(State.Success)
     
     override val uploadState: UploadState = UploadState(
         isUploading = false,
@@ -17,7 +18,8 @@ class FileDialogViewModelPreview : FileDialogViewModel() {
         errorMessage = null
     )
 
-    override val selectedFile: StateFlow<ShareFileModel?> = MutableStateFlow(null)
+    override val selectedFile: StateFlow<ShareFileModel?> =
+        MutableStateFlow(null)
 
     override val fileList: StateFlow<List<MFile>> = MutableStateFlow(
         listOf(
@@ -104,7 +106,7 @@ class FileDialogViewModelPreview : FileDialogViewModel() {
 
     }
 
-    override fun sendFile(sharedFile: ShareFileModel) {
+    override fun uploadFile(sharedFile: ShareFileModel) {
 
     }
 

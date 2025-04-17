@@ -144,14 +144,14 @@ class StreamApi(private val client: HttpClient, baseUrl: String) {
         }
     }
 
-    fun uploadFile(content: ShareFileModel, sourceID: Int): Flow<ProgressUpdate> = channelFlow {
+    fun uploadFile(content: ShareFileModel, chatID: Int): Flow<ProgressUpdate> = channelFlow {
 //        val info = fileReader.uriToFileInfo(contentUri)
 
         client.submitFormWithBinaryData(
             url = "$url/api/file",
             formData = formData {
                 append("description", "Test")
-                append("chat_id", sourceID)
+                append("chat_id", chatID)
                 append("file", content.bytes, Headers.build {
                     append(HttpHeaders.ContentType, content.mime.toString())
                     append(
