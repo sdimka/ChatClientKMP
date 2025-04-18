@@ -93,6 +93,10 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
             message = message.copy(systemMessage =  _selectedSysMessage.value!!)
         }
 
+        if (_filesList.value.isNotEmpty()) {
+            message = message.copy(attachedFiles = _filesList.value.map { it.id })
+        }
+
         _newReply.value = ""
         _state.value = State.NewReply
 

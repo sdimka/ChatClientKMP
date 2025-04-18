@@ -23,5 +23,7 @@ data class MessageRequest (
     @SerialName("chat_id")
     val chatId: Int,
     @SerialName("system_message")
-    val systemMessage: SystemMessage? = null
+    val systemMessage: SystemMessage? = null,
+    @SerialName("attached_files")
+    val attachedFiles: List<String>? = null
 )
