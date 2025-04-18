@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.CogSolid
+import compose.icons.lineawesomeicons.FileAltSolid
 import compose.icons.lineawesomeicons.InfoCircleSolid
 import compose.icons.lineawesomeicons.PaperPlane
 import dev.goood.chat_client.ui.theme.buttonBackground
@@ -48,6 +50,8 @@ fun MessageInput(
     var inputValue by remember { mutableStateOf("") }
     var settingsVisible by remember { mutableStateOf(true) }
     val systemMessage by viewModel.selectedSysMessage.collectAsStateWithLifecycle()
+    val filesList by viewModel.filesList.collectAsStateWithLifecycle()
+    val isFileListEmpty = filesList.isEmpty()
 
     fun sendMessage() {
         viewModel.sendMessage(inputValue)
@@ -109,6 +113,19 @@ fun MessageInput(
                                 modifier = modifier
                                     .align(Alignment.TopEnd)
                                     .padding(all = 5.dp)
+                                    .size(15.dp),
+                            )
+                        }
+
+                        if (!isFileListEmpty) {
+                            Icon(
+                                imageVector = LineAwesomeIcons.FileAltSolid,
+                                contentDescription = "",
+                                tint = Color.Red,
+                                modifier = modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(all = 5.dp)
+                                    .padding(end = 25.dp)
                                     .size(15.dp),
                             )
                         }

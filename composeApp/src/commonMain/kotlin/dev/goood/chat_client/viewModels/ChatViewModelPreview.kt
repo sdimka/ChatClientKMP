@@ -54,13 +54,40 @@ class ChatViewModelPreview: ChatViewModel() {
         SystemMessage(1, "Some sys mess", "Some conetnt")
     )
 
-    override val filesList: StateFlow<List<MFile>> = MutableStateFlow(emptyList())
+    override val filesList: StateFlow<List<MFile>> = MutableStateFlow(
+        listOf(
+            MFile(
+                id = "1",
+                obj = "Obj",
+                bytes = 123456,
+                createdAt = 1613677385,
+                filename = "salesOverview.pdf",
+                purpose = "assistants"
+            ),
+            MFile(
+                id = "2",
+                obj = "Obj",
+                bytes = 123456,
+                createdAt = 1613677385,
+                filename = "salesOverview1.pdf",
+                purpose = "assistants"
+            ),
+            MFile(
+                id = "3",
+                obj = "Obj",
+                bytes = 123456,
+                createdAt = 1613677385,
+                filename = "salesOverview2.pdf",
+                purpose = "assistants"
+            ),
+        )
+    )
 
     override fun selectSysMessage(sysMessage: SystemMessage?) {
 
     }
 
-    override fun updateFilesList(fileList: FileList) {
+    override fun updateFileList(file: MFile, operation: (List<MFile>, MFile) -> List<MFile>) {
 
     }
 

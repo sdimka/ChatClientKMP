@@ -1,6 +1,7 @@
 package dev.goood.chat_client.viewModels
 
 import androidx.lifecycle.viewModelScope
+import com.mikepenz.markdown.compose.extendedspans.internal.update
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
 import dev.goood.chat_client.model.FileList
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -77,10 +79,9 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         }
     }
 
-    override fun updateFilesList(fileList: FileList) {
-        _filesList.value = fileList
+    override fun updateFileList(file: MFile, operation: (List<MFile>, MFile) -> List<MFile>) {
+        _filesList.update { currentList -> operation(currentList, file) }
     }
-
 
     override fun sendMessage(messageText: String) {
 

@@ -19,7 +19,7 @@ abstract class ChatViewModel: ViewModel() {
     abstract val filesList: StateFlow<List<MFile>>
 
     abstract fun selectSysMessage(sysMessage: SystemMessage?)
-    abstract fun updateFilesList(fileList: FileList)
+    abstract fun updateFileList(file: MFile, operation: (List<MFile>, MFile) -> List<MFile>)
     abstract fun getMessages(chatId: Int)
     abstract fun deleteMessage(message: Message)
     abstract fun sendMessage(messageText: String)

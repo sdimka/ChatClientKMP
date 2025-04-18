@@ -39,7 +39,6 @@ import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.PlusSquareSolid
 import compose.icons.lineawesomeicons.WindowClose
 import dev.goood.chat_client.core.other.ShareFileModel
-import dev.goood.chat_client.model.FileList
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
@@ -49,6 +48,7 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.openFilePicker
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -64,7 +64,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun FilesDialog(
     chatID: Int?,
-    fileListUpdate: (FileList) -> Unit,
+    selectedFilesList: StateFlow<List<MFile>>,
+    selectedFilesListUpdate: (file: MFile, operation: (List<MFile>, MFile) -> List<MFile>) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -81,7 +82,7 @@ fun FilesDialog(
         label = "File upload progress bar"
     )
 
-    val selectedFiles = remember { mutableListOf<MFile>() }
+//    val selectedFiles = remember { mutableListOf<MFile>() }
 
     LaunchedEffect(LocalLifecycleOwner.current) {
         viewModel.setCurrentChat(chatID)
@@ -134,7 +135,8 @@ fun FilesDialog(
                 FileList(
                     viewModel = viewModel,
                     state = state,
-                    selectedFiles = selectedFiles,
+                    selectedFiles = selectedFilesList,
+                    selectedFilesUpdate = selectedFilesListUpdate,
                     modifier = modifier
                         .weight(1f)
                         .fillMaxHeight()
@@ -156,13 +158,13 @@ fun FilesDialog(
                         .padding(horizontal = 10.dp)
                 ) {
 
-                    CButton(
-                        text = "To chat",
-                        icon = LineAwesomeIcons.WindowClose,
-                        enabled = isEnabled,
-                        onClick = {},
-                        modifier = modifier.padding(bottom = 10.dp)
-                    )
+//                    CButton(
+//                        text = "To chat",
+//                        icon = LineAwesomeIcons.WindowClose,
+//                        enabled = isEnabled,
+//                        onClick = {},
+//                        modifier = modifier.padding(bottom = 10.dp)
+//                    )
 
                     CButton(
                         text = "New file",
@@ -186,9 +188,9 @@ fun FilesDialog(
                 }
 
                 CButton(
+                    text = "Close",
                     icon = LineAwesomeIcons.WindowClose,
                     onClick = {
-                        fileListUpdate(selectedFiles)
                         onDismiss()
                               },
                     modifier = modifier.padding(bottom = 10.dp)
@@ -202,10 +204,15 @@ fun FilesDialog(
 fun FileList(
     viewModel: FileDialogViewModel,
     state: State,
-    selectedFiles: MutableList<MFile>,
+    selectedFiles: StateFlow<List<MFile>>,
+    selectedFilesUpdate: (file: MFile, operation: (List<MFile>, MFile) -> List<MFile>) -> Unit,
     modifier: Modifier = Modifier,
 ){
     val fileList by viewModel.fileList.collectAsStateWithLifecycle()
+
+    fun isSelected(file: MFile): Boolean {
+        return selectedFiles.value.contains(file)
+    }
 
     when (state) {
         is State.Error -> {
@@ -229,11 +236,12 @@ fun FileList(
                 items(fileList) { file ->
                     FileElement(
                         file = file,
-                        onSelected = { selected, selectedFile ->
+                        isSelected = isSelected(file),
+                        onSelected = { selected ->
                             if (selected) {
-                                selectedFiles.add(selectedFile)
+                                selectedFilesUpdate(file) { list, f -> list + f }
                             } else {
-                                selectedFiles.remove(selectedFile)
+                                selectedFilesUpdate(file) { list, f -> list - f }
                             }
                         }
                     )
@@ -246,10 +254,11 @@ fun FileList(
 @Composable
 fun FileElement(
     file: MFile,
-    onSelected: (Boolean, MFile) -> Unit = { _, _ -> },
+    isSelected: Boolean,
+    onSelected: (Boolean) -> Unit = { _ -> },
     modifier: Modifier = Modifier
 ){
-    val checkedState = remember { mutableStateOf(false) }
+    val checkedState = remember { mutableStateOf(isSelected) }
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -263,7 +272,7 @@ fun FileElement(
             checked = checkedState.value,
             onCheckedChange = {
                 checkedState.value = it
-                onSelected(it, file)
+                onSelected(it)
             }
         )
 
