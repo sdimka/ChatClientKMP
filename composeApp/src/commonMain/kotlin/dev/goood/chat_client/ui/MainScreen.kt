@@ -37,6 +37,7 @@ import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DeleteDialog
 import dev.goood.chat_client.ui.composable.DeleteDialogImp
+import dev.goood.chat_client.ui.composable.SwipeableWithActions
 import dev.goood.chat_client.ui.theme.grayBackground
 import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModel.State
@@ -163,49 +164,12 @@ fun ChatElement(
             Res.drawable.unknown
         }
     }
-    Card (
-        colors = CardDefaults.cardColors(Color(0xFFF5F5F5)),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 5.dp)
-            .clickable(enabled = true) {
-                toChat(chat)
-            }
-
-    ) {
-        Row (
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.fillMaxWidth().padding(8.dp),
-        ) {
-            Image(
-                painter = painterResource(
-                    resource
-                ),
-                contentDescription = "Vector Image",
-                modifier = Modifier.size(45.dp)
-            )
-
-            Row (
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    modifier = modifier.padding(start = 10.dp)
-                ) {
-                    Text(
-                        text = chat.name,
-                        fontSize = 16.sp,
-                    )
-                    Text(
-                        text = chat.model.displayName,
-                        fontSize = 12.sp,
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.weight(1f))
+    SwipeableWithActions(
+        isRevealed = false,
+        actions = {
             Row(
                 horizontalArrangement = Arrangement.End,
+                modifier = modifier.padding(end = 8.dp)
             ) {
                 CButton(
                     icon = LineAwesomeIcons.QuestionCircle, //LineAwesomeIcons.PenFancySolid,
@@ -221,10 +185,53 @@ fun ChatElement(
                     },
                 )
             }
+        }
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(Color(0xFFF5F5F5)),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 5.dp)
+                .clickable(enabled = true) {
+                    toChat(chat)
+                }
+
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier.fillMaxWidth().padding(8.dp),
+            ) {
+                Image(
+                    painter = painterResource(
+                        resource
+                    ),
+                    contentDescription = "Vector Image",
+                    modifier = Modifier.size(45.dp)
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        modifier = modifier.padding(start = 10.dp)
+                    ) {
+                        Text(
+                            text = chat.name,
+                            fontSize = 16.sp,
+                        )
+                        Text(
+                            text = chat.model.displayName,
+                            fontSize = 12.sp,
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+
+            }
+
 
         }
-
-
-
     }
 }

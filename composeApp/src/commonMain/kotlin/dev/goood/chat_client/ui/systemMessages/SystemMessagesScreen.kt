@@ -126,13 +126,20 @@ fun SysMessElement(
     SwipeableWithActions(
         isRevealed = false,
         actions = {
-            CButton(
-                icon = LineAwesomeIcons.TrashAlt,
-                onClick = {
-                    onDelete(sysMessage.id)
-                },
-                modifier = Modifier.fillMaxHeight().padding(5.dp)
-            )
+            Row (
+                modifier = modifier
+                    .padding(end = 8.dp)
+                    .padding(vertical = 2.dp)
+            ) {
+                CButton(
+                    icon = LineAwesomeIcons.TrashAlt,
+                    onClick = {
+                        onDelete(sysMessage.id)
+                    },
+                    modifier = Modifier.fillMaxHeight()
+                        .padding(5.dp)
+                )
+            }
         }
     ) {
         Card(
@@ -149,7 +156,7 @@ fun SysMessElement(
 
             ) {
                 Text(
-                    text = sysMessage.title
+                    text = sysMessage.title,
                 )
             }
         }
