@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -90,65 +91,87 @@ fun MessageInput(
                                 unfocusedIndicatorColor = buttonBackground,
                                 focusedLabelColor = buttonBackground
                             ),
+                            leadingIcon = {
+                                if (systemMessage != null) {
+                                    Icon(
+                                        imageVector = LineAwesomeIcons.InfoCircleSolid,
+                                        contentDescription = "",
+                                        tint = green,
+                                        modifier = modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(all = 5.dp)
+                                            .size(15.dp),
+                                    )
+                                }
+
+                                if (!isFileListEmpty) {
+                                    Icon(
+                                        imageVector = LineAwesomeIcons.FileAltSolid,
+                                        contentDescription = "",
+                                        tint = Color.Red,
+                                        modifier = modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(all = 5.dp)
+                                            .padding(end = 25.dp)
+                                            .size(15.dp),
+                                    )
+                                }
+                            },
                             trailingIcon = {
-                                Icon(
-                                    imageVector = LineAwesomeIcons.CogSolid,
-                                    contentDescription = "",
-                                    tint = Color.Black,
-                                    modifier = modifier
-                                        .clickable {
-                                            settingsVisible = !settingsVisible
-                                        }
-                                        .size(25.dp),
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = LineAwesomeIcons.CogSolid,
+                                        contentDescription = "",
+                                        tint = Color.Black,
+                                        modifier = modifier
+                                            .padding(end = 8.dp)
+                                            .clickable {
+                                                settingsVisible = !settingsVisible
+                                            }
+                                            .size(25.dp),
+                                    )
+
+                                    Button(
+                                        shape = RoundedCornerShape(5.dp),
+                                        onClick = {
+                                            settingsVisible = false
+                                            sendMessage()
+                                        },
+                                        colors = ButtonDefaults.buttonColors(buttonBackground),
+                                        modifier = modifier.padding(end = 5.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = LineAwesomeIcons.PaperPlane,
+                                            contentDescription = "",
+                                            tint = Color.Black,
+                                            modifier = modifier.size(25.dp),
+                                        )
+                                    }
+                                }
                             },
                             modifier = modifier.fillMaxWidth()
                         )
-
-                        if (systemMessage != null) {
-                            Icon(
-                                imageVector = LineAwesomeIcons.InfoCircleSolid,
-                                contentDescription = "",
-                                tint = green,
-                                modifier = modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(all = 5.dp)
-                                    .size(15.dp),
-                            )
-                        }
-
-                        if (!isFileListEmpty) {
-                            Icon(
-                                imageVector = LineAwesomeIcons.FileAltSolid,
-                                contentDescription = "",
-                                tint = Color.Red,
-                                modifier = modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(all = 5.dp)
-                                    .padding(end = 25.dp)
-                                    .size(15.dp),
-                            )
-                        }
-
                     }
                 }
-                Button(
-                    shape = RectangleShape,
-                    onClick = {
-                        settingsVisible = false
-                        sendMessage()
-                    },
-                    colors = ButtonDefaults.buttonColors(buttonBackground),
-                    modifier = modifier
-                        .height(56.dp)
-                ) {
-                    Icon(
-                        imageVector = LineAwesomeIcons.PaperPlane,
-                        contentDescription = "",
-                        tint = Color.Black,
-                        modifier = modifier.size(25.dp),
-                    )
-                }
+//                Button(
+//                    shape = RectangleShape,
+//                    onClick = {
+//                        settingsVisible = false
+//                        sendMessage()
+//                    },
+//                    colors = ButtonDefaults.buttonColors(buttonBackground),
+//                    modifier = modifier
+//                        .height(56.dp)
+//                ) {
+//                    Icon(
+//                        imageVector = LineAwesomeIcons.PaperPlane,
+//                        contentDescription = "",
+//                        tint = Color.Black,
+//                        modifier = modifier.size(25.dp),
+//                    )
+//                }
             }
         }
     }
