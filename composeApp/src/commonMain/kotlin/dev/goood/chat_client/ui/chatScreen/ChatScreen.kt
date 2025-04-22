@@ -1,6 +1,7 @@
 package dev.goood.chat_client.ui.chatScreen
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,16 +18,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -46,7 +51,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.CommentDots
 import compose.icons.lineawesomeicons.Copy
+import compose.icons.lineawesomeicons.EllipsisHSolid
 import compose.icons.lineawesomeicons.InfoSolid
 import compose.icons.lineawesomeicons.TrashAlt
 import compose.icons.lineawesomeicons.User
@@ -177,59 +184,68 @@ fun MessageElement(
     modifier: Modifier = Modifier,
 ) {
     val icon = if (message.initiator == 0) LineAwesomeIcons.User else LineAwesomeIcons.UserNinjaSolid
-    val innPadding = if (message.initiator == 0) 0.dp else 5.dp
+    val bColor = if (message.initiator == 0) Color(0xFFE2F3FF) else Color(0xFFFFF9E2)
 
     Card(
+        border = BorderStroke(1.dp, bColor),
+        colors = CardDefaults.cardColors().copy(containerColor = Color.White),
         modifier = modifier
-
             .fillMaxWidth()
-            .padding(5.dp)
-            .padding(start = innPadding),
-
+            .padding(bottom = 8.dp)
         ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+//            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
-                .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(12.dp))
-                .padding(start = 10.dp)
-                .padding(end = 5.dp)
-                .padding(top = 5.dp)
-                .padding(bottom = 5.dp)
+//                .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(12.dp))
+
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = "Filters icon",
-                modifier = modifier.size(22.dp),
-                tint = Color.Black
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier
+                    .fillMaxWidth()
+//                    .height(56.dp)  // Height of the header
+                    .background(bColor)  // Green color for header
+                    .padding(horizontal = 16.dp)
+                    .padding(vertical = 5.dp)
+//                    .clip(MaterialTheme.shapes.medium.copy(topEnd = CornerSize(16.dp), topStart = CornerSize(16.dp)))
+            ) {
 
-            Text(
-                text = "${message.initiator}",
-                modifier = modifier.padding(horizontal = 15.dp)
-            )
 
-            if (message.systemMessage != null) {
                 Icon(
-                    imageVector = LineAwesomeIcons.InfoSolid,
-                    contentDescription = "Sys icon",
-                    modifier = modifier.size(18.dp),
-                    tint = green
+                    imageVector = icon,
+                    contentDescription = "User icon",
+                    modifier = modifier.size(22.dp),
+                    tint = Color.Black
                 )
+
                 Text(
-                    text = message.systemMessage.title,
-                    fontSize = defaultTextSize,
-                    color = green
+                    text = "${message.initiator}",
+                    modifier = modifier.padding(horizontal = 15.dp)
+                )
+
+                if (message.systemMessage != null) {
+                    Icon(
+                        imageVector = LineAwesomeIcons.InfoSolid,
+                        contentDescription = "Sys icon",
+                        modifier = modifier.size(18.dp),
+//                        tint = green
+                    )
+                    Text(
+                        text = message.systemMessage.title,
+                        fontSize = defaultTextSize,
+//                        color = green
+                    )
+                }
+
+                Spacer(modifier.weight(1f))
+
+                DropDownMenuButton(
+                    onSelected = { },
+                    onDelete = {
+                        onDelete(message)
+                    }
                 )
             }
-
-            Spacer(modifier.weight(1f))
-
-            DropDownMenuButton(
-                onSelected = {  },
-                onDelete = {
-                    onDelete(message)
-                }
-            )
 
         }
         SelectionContainer {
@@ -298,7 +314,6 @@ fun DropDownMenuButton(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val itemList = listOf("United States", "Greece", "Indonesia", "United Kingdom")
     var expanded by remember { mutableStateOf(false) }
 
     Column(
@@ -312,12 +327,12 @@ fun DropDownMenuButton(
                 .height(36.dp)
                 .width(36.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(4.dp))
+//                .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(4.dp))
                 .clickable { expanded = !expanded },
         ) {
 
             Icon(
-                Icons.Filled.ArrowDropDown,
+                imageVector = LineAwesomeIcons.EllipsisHSolid,
                 contentDescription = "Dropdown icon",
                 modifier = Modifier.align(Alignment.Center)
             )
