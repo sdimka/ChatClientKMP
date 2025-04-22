@@ -109,7 +109,7 @@ fun AppTopBar(
             }
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = Color.White
+            containerColor = Color(0xFFE7ECEF)
         ),
         modifier = modifier,
         navigationIcon = {

@@ -139,13 +139,13 @@ fun MessageInput(
                                             settingsVisible = false
                                             sendMessage()
                                         },
-                                        colors = ButtonDefaults.buttonColors(buttonBackground),
+                                        colors = ButtonDefaults.buttonColors(Color(0xFF274C77)),
                                         modifier = modifier.padding(end = 5.dp)
                                     ) {
                                         Icon(
                                             imageVector = LineAwesomeIcons.PaperPlane,
                                             contentDescription = "",
-                                            tint = Color.Black,
+                                            tint = Color.LightGray,
                                             modifier = modifier.size(25.dp),
                                         )
                                     }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,7 +65,7 @@ fun MainScreen(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-        modifier = Modifier.fillMaxSize().background(grayBackground)
+        modifier = Modifier.fillMaxSize().background(Color(0xFFE7ECEF))
     ) {
         Column (
             horizontalAlignment = Alignment.End,
@@ -105,7 +106,12 @@ fun MainScreen(
             is State.Error -> {
                 val error = (state as State.Error).message
                 LaunchedEffect(snackBarHostState) {
-                    snackBarHostState.showSnackbar(error)
+                    snackBarHostState.showSnackbar(
+                        error,
+                        actionLabel = "Close",
+                        withDismissAction = true,
+                        duration = SnackbarDuration.Long
+                    )
                 }
             }
 

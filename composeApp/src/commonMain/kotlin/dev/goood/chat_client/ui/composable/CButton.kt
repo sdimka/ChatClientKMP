@@ -39,14 +39,14 @@ fun CButton(
         modifier = modifier
             .height(40.dp),
 //            .padding(4.dp),
-        colors = ButtonDefaults.buttonColors(buttonBackground),
+        colors = ButtonDefaults.buttonColors(Color(0xFF274C77)),
         shape = RoundedCornerShape(8.dp)
     ) {
         if (icon != null) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White
+                tint = Color.LightGray
             )
         }
         if (text != null) {

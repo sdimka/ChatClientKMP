@@ -2,7 +2,6 @@ package dev.goood.chat_client.ui.chatScreen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,20 +17,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -51,7 +46,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import compose.icons.LineAwesomeIcons
-import compose.icons.lineawesomeicons.CommentDots
 import compose.icons.lineawesomeicons.Copy
 import compose.icons.lineawesomeicons.EllipsisHSolid
 import compose.icons.lineawesomeicons.InfoSolid
@@ -63,7 +57,6 @@ import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.DeleteDialogImp
 import dev.goood.chat_client.ui.theme.defaultMarkDownTypography
 import dev.goood.chat_client.ui.theme.defaultTextSize
-import dev.goood.chat_client.ui.theme.green
 import dev.goood.chat_client.viewModels.ChatViewModel
 import dev.goood.chat_client.viewModels.ChatViewModel.State
 import org.koin.compose.viewmodel.koinViewModel
@@ -89,6 +82,7 @@ fun ChatScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(0xFFE7ECEF))
             .padding(horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -184,7 +178,8 @@ fun MessageElement(
     modifier: Modifier = Modifier,
 ) {
     val icon = if (message.initiator == 0) LineAwesomeIcons.User else LineAwesomeIcons.UserNinjaSolid
-    val bColor = if (message.initiator == 0) Color(0xFFE2F3FF) else Color(0xFFFFF9E2)
+    val bColor = if (message.initiator == 0) Color(0xFF6096BA) else Color(0xFFA3CEF1)
+    val text = if (message.initiator == 0) "User" else "Assistant"
 
     Card(
         border = BorderStroke(1.dp, bColor),
@@ -194,20 +189,16 @@ fun MessageElement(
             .padding(bottom = 8.dp)
         ) {
         Column(
-//            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
-//                .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(12.dp))
 
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
                     .fillMaxWidth()
-//                    .height(56.dp)  // Height of the header
                     .background(bColor)  // Green color for header
                     .padding(horizontal = 16.dp)
-                    .padding(vertical = 5.dp)
-//                    .clip(MaterialTheme.shapes.medium.copy(topEnd = CornerSize(16.dp), topStart = CornerSize(16.dp)))
+                    .padding(vertical = 3.dp)
             ) {
 
 
@@ -219,8 +210,8 @@ fun MessageElement(
                 )
 
                 Text(
-                    text = "${message.initiator}",
-                    modifier = modifier.padding(horizontal = 15.dp)
+                    text = text,
+                    modifier = modifier.padding(start = 5.dp).padding(end = 10.dp)
                 )
 
                 if (message.systemMessage != null) {
