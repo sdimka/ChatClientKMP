@@ -36,10 +36,8 @@ import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.ui.composable.AddChatDialog
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
-import dev.goood.chat_client.ui.composable.DeleteDialog
 import dev.goood.chat_client.ui.composable.DeleteDialogImp
 import dev.goood.chat_client.ui.composable.SwipeableWithActions
-import dev.goood.chat_client.ui.theme.grayBackground
 import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModel.State
 import kotlinproject.composeapp.generated.resources.Res

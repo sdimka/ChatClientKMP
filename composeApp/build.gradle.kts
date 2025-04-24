@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 
-    id("com.google.devtools.ksp") version "2.1.10-1.0.31"
+    id("com.google.devtools.ksp") version "2.1.20-1.0.32"
     id("de.jensklingenberg.ktorfit") version "2.4.0"
 
     kotlin("plugin.serialization") version "2.1.20"

@@ -23,12 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import compose.icons.LineAwesomeIcons
-import compose.icons.lineawesomeicons.CogSolid
 import compose.icons.lineawesomeicons.MinusCircleSolid
 import compose.icons.lineawesomeicons.PlusCircleSolid
-import compose.icons.lineawesomeicons.PlusSquareSolid
-import compose.icons.lineawesomeicons.WindowClose
-import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DropDownMenu
 import dev.goood.chat_client.ui.filesDialog.FilesDialog
 import dev.goood.chat_client.ui.theme.grayBackground

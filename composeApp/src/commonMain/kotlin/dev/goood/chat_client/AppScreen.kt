@@ -168,7 +168,6 @@ fun AppScreen(
         }
     }
 
-
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
