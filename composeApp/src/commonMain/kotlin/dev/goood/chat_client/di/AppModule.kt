@@ -25,6 +25,7 @@ import dev.goood.chat_client.viewModels.SMDetailViewModelPreview
 import dev.goood.chat_client.viewModels.SystemMessagesViewModel
 import dev.goood.chat_client.viewModels.SystemMessagesViewModelImpl
 import dev.goood.chat_client.viewModels.SystemMessagesViewModelPreview
+import dev.goood.chat_client.viewModels.TranslateViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModelOf
@@ -47,6 +48,7 @@ val appModule = module {
     viewModelOf(::SystemMessagesViewModelImpl) { bind<SystemMessagesViewModel>() }
     viewModelOf(::SMDetailViewModelImpl) { bind<SMDetailViewModel>() }
     viewModelOf(::FileDialogViewModelImpl) { bind<FileDialogViewModel>() }
+    viewModelOf(::TranslateViewModel) { bind() }
 
     factory { getPlatform() }
 }
@@ -68,6 +70,7 @@ val appModulePreview = module {
     viewModelOf(::SystemMessagesViewModelPreview) { bind<SystemMessagesViewModel>() }
     viewModelOf(::SMDetailViewModelPreview) { bind<SMDetailViewModel>() }
     viewModelOf(::FileDialogViewModelPreview) { bind<FileDialogViewModel>() }
+    viewModelOf(::TranslateViewModel) { bind() }
 
     factory { getPlatform() }
 }

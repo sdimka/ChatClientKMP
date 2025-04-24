@@ -13,12 +13,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import dev.goood.chat_client.ui.composable.CButton
+import dev.goood.chat_client.viewModels.TranslateViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier
 ) {
+
+    val viewModel: TranslateViewModel = koinViewModel()
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -41,7 +46,17 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .weight(0.35f) // 35% of parent height
                 .background(Color.Green)
-        )
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier.fillMaxWidth()
+            ) {
+                CButton(
+                    text = "Send",
+                    onClick = { viewModel.translate() }
+                )
+            }
+        }
 
         // Box 3: 45% height
         Box(

@@ -31,7 +31,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier
 ) {
 
-    val viewModel: LoginViewModel  = koinViewModel()
+    val viewModel: LoginViewModel = koinViewModel()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }

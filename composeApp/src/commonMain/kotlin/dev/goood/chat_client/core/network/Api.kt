@@ -90,6 +90,6 @@ class Api: KoinComponent {
 
     val chatApi = ktorfit.createChatApi()
     val filesApi = ktorfit.createFilesApi()
-
+    val translateApi = ktorfit.createTranslateApi()
 
 }
