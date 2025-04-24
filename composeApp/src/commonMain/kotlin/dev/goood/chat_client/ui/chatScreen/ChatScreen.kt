@@ -40,6 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -145,6 +147,11 @@ fun MessageList(
     val newReply = viewModel.newReply.collectAsStateWithLifecycle()
 
     val messagesList by viewModel.messages.collectAsStateWithLifecycle()
+    val clipboardManager = LocalClipboardManager.current
+
+    fun copyContent(text: String) {
+        clipboardManager.setText(AnnotatedString(text))
+    }
 
     LazyColumn(
         reverseLayout = true,
@@ -162,6 +169,7 @@ fun MessageList(
         items(messagesList) { message ->
             MessageElement(
                 message = message,
+                onToClipboard = { copyContent(message.content) },
                 onDelete = onDelete
             )
         }
@@ -174,6 +182,7 @@ fun MessageList(
 @Composable
 fun MessageElement(
     message: Message,
+    onToClipboard: () -> Unit,
     onDelete: (Message) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -231,7 +240,7 @@ fun MessageElement(
                 Spacer(modifier.weight(1f))
 
                 DropDownMenuButton(
-                    onSelected = { },
+                    onSelected = onToClipboard,
                     onDelete = {
                         onDelete(message)
                     }
