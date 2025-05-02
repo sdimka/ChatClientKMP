@@ -7,12 +7,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import dev.goood.chat_client.ui.composable.CButton
+import dev.goood.chat_client.ui.theme.buttonBackground
 import dev.goood.chat_client.viewModels.TranslateViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -23,6 +32,8 @@ fun SettingsScreen(
 ) {
 
     val viewModel: TranslateViewModel = koinViewModel()
+
+    var inputValue by remember { mutableStateOf("") }
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -51,10 +62,28 @@ fun SettingsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier.fillMaxWidth()
             ) {
-                CButton(
-                    text = "Send",
-                    onClick = { viewModel.translate() }
+                TextField(
+                    value = inputValue,
+                    onValueChange = { inputValue = it },
+                    label = { Text("") },
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = buttonBackground,
+                        unfocusedIndicatorColor = buttonBackground,
+                        focusedLabelColor = buttonBackground
+                    ),
+                    trailingIcon = {
+                        CButton(
+                            text = "Send",
+                            onClick = { viewModel.translate() }
+                        )
+                    },
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 5.dp)
+                        .padding(vertical = 10.dp)
                 )
+
+
             }
         }
 
