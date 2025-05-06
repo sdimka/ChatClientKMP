@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.mikepenz.markdown.compose.extendedspans.internal.update
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
+import dev.goood.chat_client.model.AttachedFiles
 import dev.goood.chat_client.model.FileList
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
@@ -94,7 +95,7 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         }
 
         if (_filesList.value.isNotEmpty()) {
-            message = message.copy(attachedFiles = _filesList.value.map { it.id })
+            message = message.copy(attachedFiles = _filesList.value.map { AttachedFiles(it.id) })
         }
 
         _newReply.value = ""
