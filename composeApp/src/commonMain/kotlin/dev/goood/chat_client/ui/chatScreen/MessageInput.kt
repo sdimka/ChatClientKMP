@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import compose.icons.LineAwesomeIcons
@@ -57,7 +58,8 @@ fun MessageInput(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
         Column {
@@ -65,7 +67,7 @@ fun MessageInput(
             AnimatedVisibility(
                 visible = settingsVisible,
                 enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it })
+                exit = slideOutVertically(targetOffsetY = { it }),
             ) {
                 SettingsElement(
                     chatID = chatID,
@@ -75,15 +77,24 @@ fun MessageInput(
 
             Row(
                 horizontalArrangement = Arrangement.SpaceAround,
-                modifier = modifier.fillMaxWidth().background(Color.White),
+                modifier = modifier
+                    .fillMaxWidth()
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Box {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Box(
+                        modifier = modifier
+                            .background(Color.LightGray)
+                    ) {
                         TextField(
                             value = inputValue,
                             onValueChange = { inputValue = it },
                             label = { Text("Type your message...") },
                             colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.LightGray,
+                                unfocusedContainerColor = Color.LightGray,
                                 focusedIndicatorColor = buttonBackground,
                                 unfocusedIndicatorColor = buttonBackground,
                                 focusedLabelColor = buttonBackground
@@ -109,7 +120,7 @@ fun MessageInput(
                                         modifier = modifier
                                             .align(Alignment.TopEnd)
                                             .padding(all = 5.dp)
-                                            .padding(end = 25.dp)
+                                            .padding(end = 20.dp)
                                             .size(15.dp),
                                     )
                                 }
@@ -152,23 +163,6 @@ fun MessageInput(
                         )
                     }
                 }
-//                Button(
-//                    shape = RectangleShape,
-//                    onClick = {
-//                        settingsVisible = false
-//                        sendMessage()
-//                    },
-//                    colors = ButtonDefaults.buttonColors(buttonBackground),
-//                    modifier = modifier
-//                        .height(56.dp)
-//                ) {
-//                    Icon(
-//                        imageVector = LineAwesomeIcons.PaperPlane,
-//                        contentDescription = "",
-//                        tint = Color.Black,
-//                        modifier = modifier.size(25.dp),
-//                    )
-//                }
             }
         }
     }

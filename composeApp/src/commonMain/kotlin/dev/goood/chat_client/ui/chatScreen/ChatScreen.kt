@@ -49,8 +49,10 @@ import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.Copy
+import compose.icons.lineawesomeicons.DizzySolid
 import compose.icons.lineawesomeicons.EllipsisHSolid
 import compose.icons.lineawesomeicons.InfoSolid
+import compose.icons.lineawesomeicons.Save
 import compose.icons.lineawesomeicons.TrashAlt
 import compose.icons.lineawesomeicons.User
 import compose.icons.lineawesomeicons.UserNinjaSolid
@@ -234,6 +236,17 @@ fun MessageElement(
                         text = message.systemMessage.title,
                         fontSize = defaultTextSize,
 //                        color = green
+                    )
+                }
+
+                if (message.files?.isNotEmpty() == true) {
+                    Icon(
+                        imageVector = LineAwesomeIcons.Save,
+                        contentDescription = "Files icon",
+                        modifier = modifier
+                            .padding(start = 15.dp)
+                            .size(18.dp),
+                        tint = Color.DarkGray
                     )
                 }
 
