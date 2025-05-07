@@ -38,36 +38,43 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
 import dev.goood.chat_client.ui.SettingsScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessageDetailScreen
+import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
 
-sealed class Screen(val route: String, val title: String, val icon:  ImageVector? = null) {
+@Serializable
+sealed class Screen(val route: String, val title: String) {
+    @Serializable
     data object Login: Screen("login_screen", "Login")
-    data object Main: Screen("main_screen", "Main", Icons.AutoMirrored.Filled.List)
-    data object ChatDetail: Screen("chat_screen", "Chat", Icons.AutoMirrored.Filled.Send)
-    data object SystemMessages: Screen("sys_mess_screen", "System Messages",Icons.AutoMirrored.Filled.Send)
-    data object SysMessagesDetail: Screen("sys_mess_detail", "System Message Edit", Icons.AutoMirrored.Filled.List )
-    data object Settings: Screen("settings_screen", "Settings", Icons.AutoMirrored.Filled.ArrowForward )
+    @Serializable
+    data object Main: Screen("main_screen", "Main")
+    @Serializable
+    data class ChatDetail (val chatID: Int): Screen("chat_screen", "Chat")
+    @Serializable
+    data object SystemMessages: Screen("sys_mess_screen", "System Messages")
+    @Serializable
+    data class SysMessagesDetail(val sysMessageID: Int): Screen("sys_mess_detail", "System Message Edit")
+    @Serializable
+    data object Settings: Screen("settings_screen", "Settings")
 
     companion object {
         fun fromRoute(route: String): Screen {
             return when (route.substringBefore("/")) { // Extract base route
                 "login_screen" -> Login
                 "main_screen" -> Main
-                "chat_screen" -> ChatDetail // Note: for navigation, you'll still need to provide the {chatID}
+                "chat_screen" -> ChatDetail(0) // Note: for navigation, you'll still need to provide the {chatID}
                 "sys_mess_screen" -> SystemMessages
-                "sys_mess_detail" -> SysMessagesDetail
+                "sys_mess_detail" -> SysMessagesDetail(0)
                 "settings_screen" -> Settings
                 else -> {
                     println("Unknown route: $route")
@@ -151,13 +158,13 @@ fun AppScreen(
         Screen.Main -> {
             bottomBarState.value = true
         }
-        Screen.ChatDetail -> {
+        is Screen.ChatDetail -> {
             bottomBarState.value = false
         }
         Screen.SystemMessages -> {
             bottomBarState.value = true
         }
-        Screen.SysMessagesDetail -> {
+        is Screen.SysMessagesDetail -> {
             bottomBarState.value = false
         }
         Screen.Settings -> {
@@ -189,24 +196,24 @@ fun AppScreen(
 
         NavHost(
             navController = navController,
-            startDestination =  if (authState is AppViewModel.AuthState.Authorized) Screen.Main.route else Screen.Login.route,
+            startDestination =  if (authState is AppViewModel.AuthState.Authorized) Screen.Main else Screen.Login,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            composable(route = Screen.Login.route) {
+            composable<Screen.Login> {
                 LoginScreen(
                     onLoginSuccess = {
-                    navController.navigate(Screen.Main.route) { popUpTo(0) }
+                    navController.navigate(Screen.Main) { popUpTo(0) }
                 },
                     snackBarHostState = snackBarHostState)
             }
 
-            composable(route = Screen.Main.route) {
+            composable<Screen.Main> {
                 MainScreen(
                     toChat = { chat ->
                         viewModel.setCurrentChat(chat)
-                        navController.navigate(Screen.ChatDetail.route + "/${chat.id}") {
+                        navController.navigate(Screen.ChatDetail(chat.id)) {
                             popUpTo(navController.graph.findStartDestination().id)
                         }
                     },
@@ -214,42 +221,35 @@ fun AppScreen(
                 )
             }
 
-            composable(
-                route = Screen.ChatDetail.route + "/{chatID}",
-                arguments = listOf(navArgument("chatID") { type = NavType.IntType })
-            ){
-                stackEntry ->
-                    val chatID = stackEntry.arguments?.getInt("chatID")
-                    ChatScreen(
-                        chatID,
-                        snackBarHostState = snackBarHostState
+            composable<Screen.ChatDetail> { stackEntry ->
+                val chatId = stackEntry.toRoute<Screen.ChatDetail>().chatID
+                ChatScreen(
+                    chatId,
+                    snackBarHostState = snackBarHostState
                     )
             }
 
-            composable(route = Screen.SystemMessages.route) {
+            composable<Screen.SystemMessages> {
                 SystemMessagesScreen(
                     toDetail = { messID: Int ->
-                        navController.navigate(Screen.SysMessagesDetail.route + "/${messID}")
+                        navController.navigate(Screen.SysMessagesDetail(messID))
                     },
                     toNew = {
-                        navController.navigate(Screen.SysMessagesDetail.route + "/-1")
+                        navController.navigate(Screen.SysMessagesDetail(-1))
                     },
                     snackBarHostState = snackBarHostState
                 )
             }
 
-            composable(
-                route = Screen.SysMessagesDetail.route + "/{sysMessID}",
-                arguments = listOf(navArgument("sysMessID") { type = NavType.IntType})
-            ){
+            composable<Screen.SysMessagesDetail>{
                 stackEntry ->
-                    val messID = stackEntry.arguments?.getInt("sysMessID")
+                    val messID = stackEntry.toRoute<Screen.SysMessagesDetail>().sysMessageID
                 SystemMessageDetailScreen(
                     messID,
                     snackBarHostState = snackBarHostState
                 )
             }
-            composable(route = Screen.Settings.route) {
+            composable<Screen.Settings> {
                 SettingsScreen()
             }
         }
@@ -258,10 +258,16 @@ fun AppScreen(
 
 @Composable
 fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean>) {
+
+    data class BarItem(
+        val icon: ImageVector,
+        val route: Screen
+    )
+
     val items = listOf(
-        Screen.Main,
-        Screen.SystemMessages,
-        Screen.Settings
+        BarItem(Icons.AutoMirrored.Filled.List, Screen.Main),
+        BarItem(Icons.AutoMirrored.Filled.Send, Screen.SystemMessages),
+        BarItem(Icons.AutoMirrored.Filled.ArrowForward, Screen.Settings)
     )
 
     AnimatedVisibility(
@@ -279,15 +285,13 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
 
                     NavigationBarItem (
                         icon = {
-                            item.icon?.let {
                                 Icon(
-                                    imageVector = it,
-                                    contentDescription = item.title
+                                    imageVector = item.icon,
+                                    contentDescription = item.route.title
                                 )
-                            }
                         },
-                        label = { Text(text = item.title) },
-                        selected = currentRoute == item.route,
+                        label = { Text(text = item.route.title) },
+                        selected = currentRoute == item.route.route,
                         onClick = {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
