@@ -155,15 +155,12 @@ fun TranslateInput(
                         }
                     }
                 }
-
             },
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 5.dp)
                 .padding(vertical = 10.dp)
         )
-
-
     }
 }
 

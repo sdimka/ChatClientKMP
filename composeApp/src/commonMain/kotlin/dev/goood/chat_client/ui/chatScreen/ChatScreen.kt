@@ -49,7 +49,6 @@ import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.Copy
-import compose.icons.lineawesomeicons.DizzySolid
 import compose.icons.lineawesomeicons.EllipsisHSolid
 import compose.icons.lineawesomeicons.InfoSolid
 import compose.icons.lineawesomeicons.Save
@@ -59,6 +58,7 @@ import compose.icons.lineawesomeicons.UserNinjaSolid
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.DeleteDialogImp
+import dev.goood.chat_client.ui.platformComposable.PlatformContextMenu
 import dev.goood.chat_client.ui.theme.defaultMarkDownTypography
 import dev.goood.chat_client.ui.theme.defaultTextSize
 import dev.goood.chat_client.viewModels.ChatViewModel
@@ -261,15 +261,23 @@ fun MessageElement(
             }
 
         }
-        SelectionContainer {
-            Markdown(
-                content = message.content,
-                colors = markdownColor(text = Color.Black),
-                typography = defaultMarkDownTypography(),
-                modifier = modifier
-                    .padding(horizontal = 8.dp)
-                    .padding(vertical = 8.dp)
-            )
+        PlatformContextMenu(
+            selectedTextProvider = {
+                ""
+            }
+        ) {
+            SelectionContainer(
+
+            ) {
+                Markdown(
+                    content = message.content,
+                    colors = markdownColor(text = Color.Black),
+                    typography = defaultMarkDownTypography(),
+                    modifier = modifier
+                        .padding(horizontal = 8.dp)
+                        .padding(vertical = 8.dp)
+                )
+            }
         }
 
     }
