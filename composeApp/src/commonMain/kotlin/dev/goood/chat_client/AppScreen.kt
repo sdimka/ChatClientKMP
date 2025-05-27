@@ -295,9 +295,12 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
                         selected = currentRoute == item.route.route,
                         onClick = {
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination()) {
+                                popUpTo(Screen.Main) {
                                     saveState = true
                                 }
+//                                popUpTo(navController.graph.findStartDestination()) {
+//                                    saveState = true
+//                                }
                                 launchSingleTop = true
                                 restoreState = true
                             }
