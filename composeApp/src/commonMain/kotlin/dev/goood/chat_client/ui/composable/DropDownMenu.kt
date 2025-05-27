@@ -10,9 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -28,6 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.ArrowDownSolid
 import dev.goood.chat_client.model.ChatModel
 
 
@@ -87,9 +88,12 @@ fun <T> DropDownMenu(
                 modifier = Modifier.padding(start = 10.dp)
             )
             Icon(
-                Icons.Filled.ArrowDropDown,
+                LineAwesomeIcons.ArrowDownSolid,
                 contentDescription = "Dropdown icon",
-                modifier = Modifier.align(Alignment.CenterEnd)
+                modifier = Modifier
+                    .size(20.dp)
+                    .padding(end = 5.dp)
+                    .align(Alignment.CenterEnd)
             )
             DropdownMenu(
                 expanded = expanded,

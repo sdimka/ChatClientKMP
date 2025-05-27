@@ -19,8 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -48,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.Connectdevelop
 import compose.icons.lineawesomeicons.Copy
 import compose.icons.lineawesomeicons.EllipsisHSolid
 import compose.icons.lineawesomeicons.InfoSolid
@@ -301,7 +300,7 @@ fun NewMessageElement(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Filled.Phone,
+                imageVector = LineAwesomeIcons.Connectdevelop,
 //                painter = painterResource(SharedRes.images.icon_menu_main),
                 contentDescription = "Filters icon",
                 modifier = modifier.size(22.dp),

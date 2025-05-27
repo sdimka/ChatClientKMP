@@ -13,11 +13,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.SnackbarHost
@@ -42,6 +37,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.ArrowLeftSolid
+import compose.icons.lineawesomeicons.HeadsetSolid
+import compose.icons.lineawesomeicons.HourglassEndSolid
+import compose.icons.lineawesomeicons.ListSolid
 import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.LoginScreen
 import dev.goood.chat_client.ui.MainScreen
@@ -123,7 +123,7 @@ fun AppTopBar(
             if (canNavigateBack) {
                 IconButton(onClick = navigateUp) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = LineAwesomeIcons.ArrowLeftSolid,
                         contentDescription = "Back"
                     )
                 }
@@ -214,7 +214,7 @@ fun AppScreen(
                     toChat = { chat ->
                         viewModel.setCurrentChat(chat)
                         navController.navigate(Screen.ChatDetail(chat.id)) {
-                            popUpTo(navController.graph.findStartDestination().id)
+                            popUpTo(Screen.Main)// navController.graph.findStartDestination())
                         }
                     },
                     snackBarHostState = snackBarHostState
@@ -249,6 +249,7 @@ fun AppScreen(
                     snackBarHostState = snackBarHostState
                 )
             }
+
             composable<Screen.Settings> {
                 SettingsScreen()
             }
@@ -265,9 +266,9 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
     )
 
     val items = listOf(
-        BarItem(Icons.AutoMirrored.Filled.List, Screen.Main),
-        BarItem(Icons.AutoMirrored.Filled.Send, Screen.SystemMessages),
-        BarItem(Icons.AutoMirrored.Filled.ArrowForward, Screen.Settings)
+        BarItem(LineAwesomeIcons.ListSolid, Screen.Main),
+        BarItem(LineAwesomeIcons.HourglassEndSolid, Screen.SystemMessages),
+        BarItem(LineAwesomeIcons.HeadsetSolid, Screen.Settings)
     )
 
     AnimatedVisibility(
@@ -294,7 +295,7 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
                         selected = currentRoute == item.route.route,
                         onClick = {
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
+                                popUpTo(navController.graph.findStartDestination()) {
                                     saveState = true
                                 }
                                 launchSingleTop = true

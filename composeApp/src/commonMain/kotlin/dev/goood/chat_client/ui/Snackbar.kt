@@ -12,8 +12,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
+import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.PhoneSlashSolid
 import kotlinx.coroutines.launch
 
 
@@ -31,7 +31,7 @@ fun ScaffoldSnackbar() {
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 text = { Text("Show snackbar") },
-                icon = { Icon(Icons.Filled.Call, contentDescription = "") },
+                icon = { Icon(LineAwesomeIcons.PhoneSlashSolid, contentDescription = "") },
                 onClick = {
                     scope.launch {
                         snackbarHostState.showSnackbar("Snackbar")
