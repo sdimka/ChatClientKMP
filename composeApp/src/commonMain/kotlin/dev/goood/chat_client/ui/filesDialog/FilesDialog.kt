@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,6 +43,7 @@ import dev.goood.chat_client.core.other.ShareFileModel
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
+import dev.goood.chat_client.ui.platformComposable.PlatformDragAndDropArea
 import dev.goood.chat_client.viewModels.FileDialogViewModel
 import dev.goood.chat_client.viewModels.FileDialogViewModel.State
 import io.github.vinceglb.filekit.FileKit
@@ -148,6 +150,14 @@ fun FilesDialog(
                     modifier = modifier
                         .height(50.dp)
                         .padding(vertical = 5.dp)
+                )
+
+
+                PlatformDragAndDropArea(
+                    modifier = modifier
+                        .size(200.dp, 100.dp)
+                        .padding(bottom = 5.dp),
+                    content = {}
                 )
 
                 Row(
