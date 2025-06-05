@@ -5,8 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +19,6 @@ import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.DragData.FilesList
 import androidx.compose.ui.draganddrop.dragData
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
@@ -36,17 +33,20 @@ import kotlin.io.path.toPath
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 actual fun PlatformDragAndDropArea(
+    onFilesDropped: (List<String>) -> Unit,
     content: @Composable (() -> Unit),
     modifier: Modifier
 ) {
 
     var isDragging by remember { mutableStateOf(false) }
-    var files by remember { mutableStateOf<List<File>>(emptyList()) }
+//    var files by remember { mutableStateOf<List<File>>(emptyList()) }
 
     val dragAndDropTarget = remember {
         object : DragAndDropTarget {
             override fun onEntered(event: DragAndDropEvent) {
-                isDragging = true
+                if (event.dragData() is FilesList) {
+                    isDragging = true
+                }
             }
 
             override fun onExited(event: DragAndDropEvent) {
@@ -55,14 +55,32 @@ actual fun PlatformDragAndDropArea(
 
             override fun onDrop(event: DragAndDropEvent): Boolean {
                 isDragging = false
-                (event.dragData() as? FilesList)
-                    ?.readFiles()
-                    ?.first()
-                    ?.let(::URI)
-                    ?.let(URI::toPath)
-                    ?.let(::println)
-                    ?: return false
-                return true
+                val dragData = event.dragData()
+                if (dragData is FilesList) {
+                    try {
+                        val fileUris = dragData.readFiles()
+                        val files = fileUris.mapNotNull { uriString ->
+                            try {
+                                URI(uriString).toPath().toString()
+                            } catch (e: Exception) {
+                                println("Error converting URI to File: $uriString, error: ${e.message}")
+                                null
+                            }
+                        }
+                        if (files.isNotEmpty()) {
+                            onFilesDropped(files)
+                            return true
+                        }
+                    } catch (e: Exception) {
+                        println("Error reading dropped files: ${e.message}")
+                        return false
+                    }
+                }
+                return false
+            }
+
+            override fun onEnded(event: DragAndDropEvent) {
+                isDragging = false
             }
         }
     }
@@ -70,7 +88,9 @@ actual fun PlatformDragAndDropArea(
     Box(modifier = modifier
         .background(if(isDragging) Color.Red else Color(0x2200AAFF))
         .dragAndDropTarget(
-            shouldStartDragAndDrop = { true },
+            shouldStartDragAndDrop = { event ->
+                event.dragData() is FilesList
+            },
             target = dragAndDropTarget
         )
     ) {

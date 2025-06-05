@@ -47,9 +47,12 @@ import dev.goood.chat_client.ui.platformComposable.PlatformDragAndDropArea
 import dev.goood.chat_client.viewModels.FileDialogViewModel
 import dev.goood.chat_client.viewModels.FileDialogViewModel.State
 import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.filesDir
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
+import io.github.vinceglb.filekit.size
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -110,6 +113,20 @@ fun FilesDialog(
         }
     }
 
+    fun sendFile(file: String) {
+        scope.launch {
+            println("File: $file")
+            val nFile = PlatformFile(file)
+            viewModel.uploadFile(
+                ShareFileModel(
+                    fileName = nFile.name,
+                    bytes = nFile.readBytes(),
+                )
+            )
+
+        }
+    }
+
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = onDismiss,
@@ -157,7 +174,13 @@ fun FilesDialog(
                     modifier = modifier
                         .size(200.dp, 100.dp)
                         .padding(bottom = 5.dp),
-                    content = {}
+                    content = {},
+                    onFilesDropped = { files ->
+                        files.forEach { file ->
+                            sendFile(file)
+//                            println("File: $file")
+                        }
+                    }
                 )
 
                 Row(

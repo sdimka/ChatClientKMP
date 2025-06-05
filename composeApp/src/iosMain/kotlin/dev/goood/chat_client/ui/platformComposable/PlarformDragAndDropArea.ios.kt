@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-expect fun PlatformDragAndDropArea (
+actual fun PlatformDragAndDropArea(
     onFilesDropped: (List<String>) -> Unit,
-    content: @Composable () -> Unit,
-    modifier: Modifier = Modifier
-)
+    content: @Composable (() -> Unit),
+    modifier: Modifier
+) {
+
+}
