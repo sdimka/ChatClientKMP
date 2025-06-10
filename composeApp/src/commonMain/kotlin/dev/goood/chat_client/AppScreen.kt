@@ -184,8 +184,8 @@ fun AppScreen(
                 currentScreen = scrState,
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = {
-                    navController.navigateUp()
-                    viewModel.setCurrentChat(null)
+                    navController.popBackStack() //navigateUp()
+//                    viewModel.setCurrentChat(null)
                 }
             )
         },
@@ -298,6 +298,7 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
                                 popUpTo(Screen.Main) {
                                     saveState = true
                                 }
+
 //                                popUpTo(navController.graph.findStartDestination()) {
 //                                    saveState = true
 //                                }

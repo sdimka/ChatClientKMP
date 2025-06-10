@@ -22,7 +22,7 @@ class TranslateViewModel: ViewModel(), KoinComponent {
     val sourceLanguage = MutableStateFlow(Lang.EN)
     val targetLanguage = MutableStateFlow(Lang.RU)
     val fromString = MutableStateFlow("")
-    val resultString = MutableStateFlow("Result will be here")
+    val resultString = MutableStateFlow(listOf("Result will be here" , "Result will be here"))
 
     fun setInput(resStr: String) {
         fromString.value = resStr
@@ -43,7 +43,7 @@ class TranslateViewModel: ViewModel(), KoinComponent {
                     _state.value = TranslateState.Error(it.message?: "Unknown error")
                 }
                 .collect { res ->
-                    resultString.value = res.translatedText[0]
+                    resultString.value = res.translatedText
                     _state.value = TranslateState.Success
                 }
         }

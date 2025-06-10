@@ -9,12 +9,16 @@ import dev.goood.chat_client.model.SystemMessage
 import dev.goood.chat_client.model.SystemMessageList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class ChatViewModelPreview: ChatViewModel() {
 
     private val _state = MutableStateFlow<State>(State.NewReply)
     override val state: StateFlow<State> = _state
     override val newReply: StateFlow<String> = MutableStateFlow("")
+
+    private val _inputValue = MutableStateFlow("")
+    override val inputValue: StateFlow<String> = _inputValue.asStateFlow()
 
     val list = listOf(
         Message(
@@ -102,4 +106,8 @@ class ChatViewModelPreview: ChatViewModel() {
     }
 
     override fun sendMessage(messageText: String) {}
+
+    override fun updateInputValue(newValue: String) {}
+
+    override fun clearInputValue() {}
 }

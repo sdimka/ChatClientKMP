@@ -47,6 +47,17 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     private val _filesList = MutableStateFlow<List<MFile>>(emptyList())
     override val filesList: StateFlow<List<MFile>> = _filesList
 
+    private val _inputValue = MutableStateFlow("")
+    override val inputValue: StateFlow<String> = _inputValue.asStateFlow()
+
+    override fun updateInputValue(newValue: String) {
+        _inputValue.value = newValue
+    }
+
+    override fun clearInputValue() {
+        _inputValue.value = ""
+    }
+
     override fun selectSysMessage(sysMessage: SystemMessage?) {
         _selectedSysMessage.value = sysMessage
     }
@@ -101,6 +112,7 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         _newReply.value = ""
         _state.value = State.NewReply
 
+        clearInputValue()
 
         viewModelScope.launch {
             api.streamApi.streamRequestWithType(message)
@@ -137,5 +149,9 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        // clearInputValue()
+    }
 
 }

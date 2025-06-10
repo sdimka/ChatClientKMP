@@ -46,7 +46,7 @@ fun MessageInput(
     viewModel: ChatViewModel,
     modifier: Modifier = Modifier,
 ) {
-    var inputValue by remember { mutableStateOf("") }
+    val inputValue by viewModel.inputValue.collectAsStateWithLifecycle()
     var settingsVisible by remember { mutableStateOf(true) }
     val systemMessage by viewModel.selectedSysMessage.collectAsStateWithLifecycle()
     val filesList by viewModel.filesList.collectAsStateWithLifecycle()
@@ -54,7 +54,6 @@ fun MessageInput(
 
     fun sendMessage() {
         viewModel.sendMessage(inputValue)
-        inputValue = ""
     }
 
     Box(
@@ -90,7 +89,8 @@ fun MessageInput(
                     ) {
                         TextField(
                             value = inputValue,
-                            onValueChange = { inputValue = it },
+                            onValueChange = { newVal ->
+                                viewModel.updateInputValue(newVal) },
                             label = { Text("Type your message...") },
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.LightGray,

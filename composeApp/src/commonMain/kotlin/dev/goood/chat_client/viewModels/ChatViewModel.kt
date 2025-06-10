@@ -17,12 +17,16 @@ abstract class ChatViewModel: ViewModel() {
     abstract val systemMessages: StateFlow<SystemMessageList>
     abstract val selectedSysMessage: StateFlow<SystemMessage?>
     abstract val filesList: StateFlow<List<MFile>>
+    abstract val inputValue: StateFlow<String>
+
 
     abstract fun selectSysMessage(sysMessage: SystemMessage?)
     abstract fun updateFileList(file: MFile, operation: (List<MFile>, MFile) -> List<MFile>)
     abstract fun getMessages(chatId: Int)
     abstract fun deleteMessage(message: Message)
     abstract fun sendMessage(messageText: String)
+    abstract fun updateInputValue(newValue: String)
+    abstract fun clearInputValue()
 
     sealed interface State {
         data object Success: State

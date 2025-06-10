@@ -1,6 +1,7 @@
 package dev.goood.chat_client.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Button
@@ -170,39 +172,51 @@ fun TranslateOutput(
     modifier: Modifier = Modifier
 ) {
 
-    val result by viewModel.resultString.collectAsStateWithLifecycle()
+    val results by viewModel.resultString.collectAsStateWithLifecycle()
     val clipboardManager = LocalClipboardManager.current
 
     Column(
         modifier = modifier.fillMaxWidth()
-    ){
-        Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = modifier
-                .padding(all = 5.dp)
-                .fillMaxWidth()
-        ) {
-            Button(
-                onClick = {
-                    clipboardManager.setText(AnnotatedString(result))
-                },
-                modifier = modifier
-                    .height(40.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFF274C77)),
-                shape = RoundedCornerShape(8.dp)
-            ){
+    ) {
+        results.forEach { result ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier
+                    .padding(all = 5.dp)
+                    .fillMaxWidth()
+            ) {
+                SelectionContainer {
+                    Text(
+                        result,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 5.dp)
+                    )
+                }
                 Icon(
                     imageVector = LineAwesomeIcons.CopySolid,
                     contentDescription = null,
-                    tint = Color.LightGray
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .clickable { clipboardManager.setText(AnnotatedString(result)) }
+                        .size(30.dp)
+                        .padding(start = 8.dp)
                 )
+
+//                Button(
+//                    onClick = {
+//                        clipboardManager.setText(AnnotatedString(result))
+//                    },
+//                    modifier = modifier
+//                        .height(40.dp),
+//                    colors = ButtonDefaults.buttonColors(Color(0xFF274C77)),
+//                    shape = RoundedCornerShape(8.dp)
+//                ) {
+//
+//                }
             }
-        }
-        SelectionContainer {
-            Text(
-                result,
-                modifier = modifier.padding(horizontal = 5.dp)
-            )
+
         }
     }
 }
