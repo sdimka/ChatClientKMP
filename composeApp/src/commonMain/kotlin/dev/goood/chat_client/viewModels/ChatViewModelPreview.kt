@@ -1,7 +1,6 @@
 package dev.goood.chat_client.viewModels
 
 
-import dev.goood.chat_client.model.FileList
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
@@ -19,6 +18,7 @@ class ChatViewModelPreview: ChatViewModel() {
 
     private val _inputValue = MutableStateFlow("")
     override val inputValue: StateFlow<String> = _inputValue.asStateFlow()
+    override val isPreviousMessagesEnabled: StateFlow<Boolean> = MutableStateFlow(true)
 
     val list = listOf(
         Message(
@@ -88,6 +88,14 @@ class ChatViewModelPreview: ChatViewModel() {
     )
 
     override fun selectSysMessage(sysMessage: SystemMessage?) {
+
+    }
+
+    override fun omPreviousMessagesEnabledChanged(checked: Boolean) {
+
+    }
+
+    override fun onSelectedMessagesListUpdate(messageID: Int) {
 
     }
 

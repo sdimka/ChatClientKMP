@@ -26,7 +26,9 @@ data class MessageRequest (
     @SerialName("system_message")
     val systemMessage: SystemMessage? = null,
     @SerialName("attached_files")
-    val attachedFiles: List<AttachedFiles>? = null
+    val attachedFiles: List<AttachedFiles>? = null,
+    @SerialName("appended_messages")
+    val attachedMessages: List<Int>? = emptyList()
 )
 
 @Serializable

@@ -1,11 +1,9 @@
 package dev.goood.chat_client.viewModels
 
 import androidx.lifecycle.viewModelScope
-import com.mikepenz.markdown.compose.extendedspans.internal.update
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
 import dev.goood.chat_client.model.AttachedFiles
-import dev.goood.chat_client.model.FileList
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
@@ -47,8 +45,13 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     private val _filesList = MutableStateFlow<List<MFile>>(emptyList())
     override val filesList: StateFlow<List<MFile>> = _filesList
 
+    private val attachedMessages = mutableListOf<Int>()
+
     private val _inputValue = MutableStateFlow("")
     override val inputValue: StateFlow<String> = _inputValue.asStateFlow()
+
+    private val _isPreviousMessagesEnabled = MutableStateFlow(false)
+    override val isPreviousMessagesEnabled: StateFlow<Boolean> = _isPreviousMessagesEnabled.asStateFlow()
 
     override fun updateInputValue(newValue: String) {
         _inputValue.value = newValue
@@ -58,8 +61,20 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         _inputValue.value = ""
     }
 
+    override fun omPreviousMessagesEnabledChanged(checked: Boolean) {
+        _isPreviousMessagesEnabled.value = !_isPreviousMessagesEnabled.value
+    }
+
     override fun selectSysMessage(sysMessage: SystemMessage?) {
         _selectedSysMessage.value = sysMessage
+    }
+
+    override fun onSelectedMessagesListUpdate(messageID: Int) {
+        if (attachedMessages.contains(messageID)) {
+            attachedMessages.remove(messageID)
+        } else {
+            attachedMessages.add(messageID)
+        }
     }
 
     override fun getMessages(chatId: Int){
@@ -107,6 +122,10 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
 
         if (_filesList.value.isNotEmpty()) {
             message = message.copy(attachedFiles = _filesList.value.map { AttachedFiles(it.id) })
+        }
+
+        if (_isPreviousMessagesEnabled.value) {
+            message = message.copy(attachedMessages = attachedMessages)
         }
 
         _newReply.value = ""

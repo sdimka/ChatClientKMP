@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -146,6 +147,7 @@ fun MessageList(
     val scrollState = rememberScrollState()
     val state = viewModel.state.collectAsStateWithLifecycle()
     val newReply = viewModel.newReply.collectAsStateWithLifecycle()
+    val isSelectedEnabled by viewModel.isPreviousMessagesEnabled.collectAsStateWithLifecycle()
 
     val messagesList by viewModel.messages.collectAsStateWithLifecycle()
     val clipboardManager = LocalClipboardManager.current
@@ -171,7 +173,10 @@ fun MessageList(
             MessageElement(
                 message = message,
                 onToClipboard = { copyContent(message.content) },
-                onDelete = onDelete
+                onDelete = onDelete,
+                isSelectedEnabled = isSelectedEnabled,
+                onSelect = viewModel::onSelectedMessagesListUpdate
+
             )
         }
     }
@@ -185,11 +190,15 @@ fun MessageElement(
     message: Message,
     onToClipboard: () -> Unit,
     onDelete: (Message) -> Unit,
+    isSelectedEnabled: Boolean = false,
+    onSelect: (messageID: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val icon = if (message.initiator == 0) LineAwesomeIcons.User else LineAwesomeIcons.UserNinjaSolid
     val bColor = if (message.initiator == 0) Color(0xFF6096BA) else Color(0xFFA3CEF1)
     val text = if (message.initiator == 0) "User" else "Assistant"
+
+    val isSelected = remember { mutableStateOf(false) }
 
     Card(
         border = BorderStroke(1.dp, bColor),
@@ -257,6 +266,16 @@ fun MessageElement(
                         onDelete(message)
                     }
                 )
+
+                if (isSelectedEnabled) {
+                    Checkbox(
+                        checked = isSelected.value,
+                        onCheckedChange = {
+                            isSelected.value = !isSelected.value
+                            onSelect(message.id)
+                        }
+                    )
+                }
             }
 
         }

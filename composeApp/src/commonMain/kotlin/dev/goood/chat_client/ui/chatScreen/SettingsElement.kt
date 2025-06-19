@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +49,7 @@ fun SettingsElement(
     val sysMessagesList by viewModel.systemMessages.collectAsStateWithLifecycle()
     val selectedSysMessage by viewModel.selectedSysMessage.collectAsStateWithLifecycle()
     val selectedFiles by viewModel.filesList.collectAsStateWithLifecycle()
+    val isMessageEnabled by viewModel.isPreviousMessagesEnabled.collectAsStateWithLifecycle()
 
     val fileDialogState = remember { mutableStateOf(false) }
 
@@ -61,6 +63,20 @@ fun SettingsElement(
             .padding(bottom = 5.dp)
             .fillMaxWidth()
     ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier.padding(all = 8.dp)
+        ) {
+            Text(
+                text = "Attach previous massages:",
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 5.dp)
+            )
+            Checkbox(
+                checked =  isMessageEnabled,
+                onCheckedChange = viewModel::omPreviousMessagesEnabledChanged
+            )
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier.padding(all = 8.dp)

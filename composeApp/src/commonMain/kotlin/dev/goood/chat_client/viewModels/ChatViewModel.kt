@@ -1,7 +1,6 @@
 package dev.goood.chat_client.viewModels
 
 import androidx.lifecycle.ViewModel
-import dev.goood.chat_client.model.FileList
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
@@ -18,6 +17,7 @@ abstract class ChatViewModel: ViewModel() {
     abstract val selectedSysMessage: StateFlow<SystemMessage?>
     abstract val filesList: StateFlow<List<MFile>>
     abstract val inputValue: StateFlow<String>
+    abstract val isPreviousMessagesEnabled: StateFlow<Boolean>
 
 
     abstract fun selectSysMessage(sysMessage: SystemMessage?)
@@ -27,6 +27,10 @@ abstract class ChatViewModel: ViewModel() {
     abstract fun sendMessage(messageText: String)
     abstract fun updateInputValue(newValue: String)
     abstract fun clearInputValue()
+    abstract fun omPreviousMessagesEnabledChanged(checked: Boolean)
+    abstract fun onSelectedMessagesListUpdate(messageID: Int)
+
+
 
     sealed interface State {
         data object Success: State
