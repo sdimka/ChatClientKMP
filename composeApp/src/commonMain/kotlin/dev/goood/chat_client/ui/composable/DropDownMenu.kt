@@ -12,10 +12,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.ArrowDownSolid
 import dev.goood.chat_client.model.ChatModel
@@ -58,6 +62,7 @@ val itemListL = listOf(
 )
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> DropDownMenu(
     itemList: List<T>,
@@ -77,43 +82,58 @@ fun <T> DropDownMenu(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp)
-                .height(40.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(4.dp))
-                .clickable { expanded = !expanded },
         ) {
-            Text(
-                text = selectedItem?.let { itemLabel(it) } ?: "Select item",
-                fontSize = 14.sp,
-                modifier = Modifier.padding(start = 10.dp)
-            )
-            Icon(
-                LineAwesomeIcons.ArrowDownSolid,
-                contentDescription = "Dropdown icon",
-                modifier = Modifier
-                    .size(20.dp)
-                    .padding(end = 5.dp)
-                    .align(Alignment.CenterEnd)
-            )
-            DropdownMenu(
+
+//            Icon(
+//                LineAwesomeIcons.ArrowDownSolid,
+//                contentDescription = "Dropdown icon",
+//                modifier = Modifier
+//                    .size(20.dp)
+//                    .padding(end = 5.dp)
+//                    .align(Alignment.CenterEnd)
+//            )
+            ExposedDropdownMenuBox(
                 expanded = expanded,
-                onDismissRequest = { expanded = false },
+                onExpandedChange = {
+                    expanded = !expanded
+                },
             ) {
-                itemList.forEach { item ->
-                    DropdownMenuItem(
-                        text = {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(itemLabel(item))
+
+                BasicTextField(
+                    modifier = Modifier
+                        .padding(vertical = 5.dp)
+                        .fillMaxWidth()
+                        .menuAnchor(MenuAnchorType.PrimaryEditable, true),
+                    value = selectedItem?.let { itemLabel(it) } ?: "Select item",
+                    onValueChange = { },
+                    readOnly = true,
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    itemList.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = itemLabel(item),
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            },
+                            onClick = {
+                                onSelected(item)
+                                expanded = false
                             }
-                        },
-                        onClick = {
-                            onSelected(item)
-                            expanded = false
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

@@ -18,8 +18,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,21 +67,28 @@ fun SettingsElement(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.padding(all = 8.dp)
+            modifier = modifier
+                .padding(horizontal = 8.dp)
+                .padding(top = 10.dp)
         ) {
             Text(
                 text = "Attach previous massages:",
                 fontSize = 12.sp,
-                modifier = Modifier.padding(start = 5.dp)
+                modifier = Modifier.padding(start = 5.dp, end = 15.dp)
             )
-            Checkbox(
-                checked =  isMessageEnabled,
-                onCheckedChange = viewModel::omPreviousMessagesEnabledChanged
-            )
+            CompositionLocalProvider( // Remove paddings
+                LocalMinimumInteractiveComponentSize provides 0.dp
+            ) {
+                Checkbox(
+                    checked = isMessageEnabled,
+                    onCheckedChange = viewModel::omPreviousMessagesEnabledChanged
+                )
+            }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.padding(all = 8.dp)
+            modifier = modifier
+                .padding(horizontal = 8.dp, vertical = 10.dp)
         ) {
             Text(
                 text = "System prompt:",
@@ -102,7 +111,8 @@ fun SettingsElement(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
-                .padding(7.dp)
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 8.dp)
         ) {
 
             Text(

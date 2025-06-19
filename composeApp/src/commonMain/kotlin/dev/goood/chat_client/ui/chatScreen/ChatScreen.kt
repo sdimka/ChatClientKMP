@@ -24,12 +24,16 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -118,7 +122,16 @@ fun ChatScreen(
                 )
             }
         }
-        State.Loading -> {}
+        State.Loading -> {
+            Box(
+                modifier = modifier.fillMaxSize()
+                    .background(Color.LightGray.copy(alpha = 0.5f))
+            ) {
+                BallProgerssIndicator(
+                    modifier = modifier.align(Alignment.Center)
+                )
+            }
+        }
         State.NewReply -> {}
         State.Success -> {}
     }
@@ -184,7 +197,6 @@ fun MessageList(
     Spacer(modifier = Modifier.padding(bottom = 120.dp))
 }
 
-
 @Composable
 fun MessageElement(
     message: Message,
@@ -207,20 +219,18 @@ fun MessageElement(
             .fillMaxWidth()
             .padding(bottom = 8.dp)
         ) {
-        Column(
-            modifier = modifier
-
-        ) {
+//        Column(
+////            modifier = modifier
+//
+//        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
                     .fillMaxWidth()
                     .background(bColor)  // Green color for header
                     .padding(horizontal = 16.dp)
-                    .padding(vertical = 3.dp)
+//                    .padding(vertical = 3.dp)
             ) {
-
-
                 Icon(
                     imageVector = icon,
                     contentDescription = "User icon",
@@ -268,17 +278,21 @@ fun MessageElement(
                 )
 
                 if (isSelectedEnabled) {
-                    Checkbox(
-                        checked = isSelected.value,
-                        onCheckedChange = {
-                            isSelected.value = !isSelected.value
-                            onSelect(message.id)
-                        }
-                    )
+                    CompositionLocalProvider( // Remove paddings
+                        LocalMinimumInteractiveComponentSize provides 0.dp
+                    ) {
+                        Checkbox(
+                            checked = isSelected.value,
+                            onCheckedChange = {
+                                isSelected.value = !isSelected.value
+                                onSelect(message.id)
+                            }
+                        )
+                    }
                 }
             }
 
-        }
+//        }
         PlatformContextMenu(
             selectedTextProvider = {
                 ""
