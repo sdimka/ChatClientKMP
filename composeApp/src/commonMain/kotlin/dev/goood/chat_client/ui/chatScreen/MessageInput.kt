@@ -47,7 +47,7 @@ fun MessageInput(
     modifier: Modifier = Modifier,
 ) {
     val inputValue by viewModel.inputValue.collectAsStateWithLifecycle()
-    var settingsVisible by remember { mutableStateOf(true) }
+    var settingsVisible by remember { mutableStateOf(false) }
     val systemMessage by viewModel.selectedSysMessage.collectAsStateWithLifecycle()
     val filesList by viewModel.filesList.collectAsStateWithLifecycle()
     val isFileListEmpty = filesList.isEmpty()

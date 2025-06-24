@@ -12,7 +12,8 @@ data class Message (
     val role: String,
     @SerialName("system_message")
     val systemMessage: SystemMessage? = null,
-    val files: List<AttachedFiles>? = null
+    val files: List<AttachedFiles>? = null,
+    val isSelected: Boolean = false
 )
 
 typealias MessageList = List<Message>

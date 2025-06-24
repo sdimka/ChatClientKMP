@@ -24,10 +24,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -210,8 +208,6 @@ fun MessageElement(
     val bColor = if (message.initiator == 0) Color(0xFF6096BA) else Color(0xFFA3CEF1)
     val text = if (message.initiator == 0) "User" else "Assistant"
 
-    val isSelected = remember { mutableStateOf(false) }
-
     Card(
         border = BorderStroke(1.dp, bColor),
         colors = CardDefaults.cardColors().copy(containerColor = Color.White),
@@ -219,10 +215,6 @@ fun MessageElement(
             .fillMaxWidth()
             .padding(bottom = 8.dp)
         ) {
-//        Column(
-////            modifier = modifier
-//
-//        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
@@ -282,17 +274,15 @@ fun MessageElement(
                         LocalMinimumInteractiveComponentSize provides 0.dp
                     ) {
                         Checkbox(
-                            checked = isSelected.value,
+                            checked = message.isSelected,
                             onCheckedChange = {
-                                isSelected.value = !isSelected.value
+//                                isSelected.value = !isSelected.value
                                 onSelect(message.id)
                             }
                         )
                     }
                 }
             }
-
-//        }
         PlatformContextMenu(
             selectedTextProvider = {
                 ""

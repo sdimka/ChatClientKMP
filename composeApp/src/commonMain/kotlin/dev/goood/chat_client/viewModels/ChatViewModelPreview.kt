@@ -91,7 +91,7 @@ class ChatViewModelPreview: ChatViewModel() {
 
     }
 
-    override fun omPreviousMessagesEnabledChanged(checked: Boolean) {
+    override fun onPreviousMessagesEnabledChanged(checked: Boolean) {
 
     }
 

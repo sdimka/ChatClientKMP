@@ -27,7 +27,7 @@ abstract class ChatViewModel: ViewModel() {
     abstract fun sendMessage(messageText: String)
     abstract fun updateInputValue(newValue: String)
     abstract fun clearInputValue()
-    abstract fun omPreviousMessagesEnabledChanged(checked: Boolean)
+    abstract fun onPreviousMessagesEnabledChanged(checked: Boolean)
     abstract fun onSelectedMessagesListUpdate(messageID: Int)
 
 

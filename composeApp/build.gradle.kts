@@ -133,10 +133,12 @@ compose.desktop {
     application {
         mainClass = "dev.goood.chat_client.MainKt"
 
+
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "dev.goood.chat_client"
             packageVersion = "1.0.0"
+
             macOS {
                 iconFile.set(project.file("src/commonMain/composeResources/drawable/icon.icns"))
             }

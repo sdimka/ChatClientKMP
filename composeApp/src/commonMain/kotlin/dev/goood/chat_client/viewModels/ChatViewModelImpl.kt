@@ -45,7 +45,7 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     private val _filesList = MutableStateFlow<List<MFile>>(emptyList())
     override val filesList: StateFlow<List<MFile>> = _filesList
 
-    private val attachedMessages = mutableListOf<Int>()
+//    private val attachedMessages = mutableListOf<Int>()
 
     private val _inputValue = MutableStateFlow("")
     override val inputValue: StateFlow<String> = _inputValue.asStateFlow()
@@ -61,7 +61,7 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         _inputValue.value = ""
     }
 
-    override fun omPreviousMessagesEnabledChanged(checked: Boolean) {
+    override fun onPreviousMessagesEnabledChanged(checked: Boolean) {
         _isPreviousMessagesEnabled.value = !_isPreviousMessagesEnabled.value
     }
 
@@ -70,10 +70,19 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     }
 
     override fun onSelectedMessagesListUpdate(messageID: Int) {
-        if (attachedMessages.contains(messageID)) {
-            attachedMessages.remove(messageID)
-        } else {
-            attachedMessages.add(messageID)
+//        if (attachedMessages.contains(messageID)) {
+//            attachedMessages.remove(messageID)
+//        } else {
+//            attachedMessages.add(messageID)
+//        }
+        _messages.update { currentList ->
+            currentList.map { message ->
+                if (message.id == messageID) {
+                    message.copy(isSelected = !message.isSelected) // Toggle selection
+                } else {
+                    message
+                }
+            }
         }
     }
 
@@ -87,7 +96,11 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
                     _state.value = State.Error(it.message ?: "Unknown error")
                 }
                 .collect { list ->
-                    _messages.value = list.sortedByDescending { it.id }
+                    // Save previously selected messages
+                    val currentSelectedIds = _messages.value.filter { it.isSelected }.map { it.id }.toSet()
+                    _messages.value = list.map {
+                            it.copy(isSelected = currentSelectedIds.contains(it.id))
+                    }.sortedByDescending { it.id }
                     _state.value = State.Success
                 }
         }
@@ -121,11 +134,13 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         }
 
         if (_filesList.value.isNotEmpty()) {
-            message = message.copy(attachedFiles = _filesList.value.map { AttachedFiles(it.id) })
+            message = message.copy(attachedFiles =
+                _filesList.value.map { AttachedFiles(it.id) })
         }
 
         if (_isPreviousMessagesEnabled.value) {
-            message = message.copy(attachedMessages = attachedMessages)
+            message = message.copy(attachedMessages =
+                _messages.value.filter { it.isSelected }.map { it.id })
         }
 
         _newReply.value = ""
@@ -145,21 +160,21 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
                 .collect { event ->
                     when (event) {
                         is ReplyVariants.SavedRequest -> {
-                            val newList = (_messages.value + event.content)
-                                .sortedByDescending { it.id }
-                            _messages.value = newList
+                            _messages.update { currentList ->
+                                (currentList + event.content).sortedByDescending { it.id }
+                        }
                         }
 
                         is ReplyVariants.Chunks -> {
                             _newReply.value += event.content.data
                         }
                         is ReplyVariants.FinalReply -> {
-                            val newList = (_messages.value + event.content)
-                                .sortedByDescending { it.id }
-                            _messages.value = newList
+                            _messages.update { currentList ->
+                                (currentList + event.content).sortedByDescending { it.id }
+                            }
                         }
                         is ReplyVariants.Error -> {
-
+                            _state.value = State.Error(event.message)
                         }
                     }
 

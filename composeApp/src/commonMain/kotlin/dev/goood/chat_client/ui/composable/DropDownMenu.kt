@@ -1,14 +1,11 @@
 package dev.goood.chat_client.ui.composable
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,11 +13,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.ArrowDownSolid
@@ -83,17 +81,8 @@ fun <T> DropDownMenu(
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .border(BorderStroke(1.dp, Color.LightGray), RoundedCornerShape(4.dp))
         ) {
 
-//            Icon(
-//                LineAwesomeIcons.ArrowDownSolid,
-//                contentDescription = "Dropdown icon",
-//                modifier = Modifier
-//                    .size(20.dp)
-//                    .padding(end = 5.dp)
-//                    .align(Alignment.CenterEnd)
-//            )
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = {
@@ -101,14 +90,11 @@ fun <T> DropDownMenu(
                 },
             ) {
 
-                BasicTextField(
-                    modifier = Modifier
-                        .padding(vertical = 5.dp)
-                        .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryEditable, true),
+                DropDownTextField(
                     value = selectedItem?.let { itemLabel(it) } ?: "Select item",
-                    onValueChange = { },
-                    readOnly = true,
+                    label = "Select item",
+                    expanded = expanded,
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)
                 )
 
                 ExposedDropdownMenu(
@@ -137,5 +123,72 @@ fun <T> DropDownMenu(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropDownTextField(
+    value: String,
+    label: String,
+    expanded: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val colors =
+        OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            unfocusedBorderColor = Color.LightGray,
+            focusedBorderColor = Color.DarkGray
+        )
+
+    BasicTextField(
+        modifier = modifier
+            .padding(vertical = 5.dp)
+            .fillMaxWidth(),
+        value = value.ifEmpty { label },
+        onValueChange = { },
+        readOnly = true,
+        // textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Start)
+        singleLine = true,
+        maxLines = 1,
+
+    ) { innerTextField ->
+        OutlinedTextFieldDefaults.DecorationBox(
+            value = value.ifEmpty { label },
+            visualTransformation = VisualTransformation.None,
+            innerTextField = innerTextField,
+            singleLine = true,
+            enabled = false,
+            interactionSource = interactionSource,
+            contentPadding =
+                OutlinedTextFieldDefaults.contentPadding(top = 5.dp, bottom = 5.dp),
+            trailingIcon = {
+                Icon(
+                    imageVector = LineAwesomeIcons.ArrowDownSolid,
+                    contentDescription = "Dropdown icon",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .padding(end = 5.dp)
+                        .graphicsLayer( // Example: Rotate the icon
+                            rotationZ = if (expanded) 180f else 0f
+                        )
+                )
+            },
+            container = {
+                OutlinedTextFieldDefaults.Container(
+                    enabled = false,
+                    isError = false,
+                    colors = colors,
+                    interactionSource = interactionSource,
+                    shape = RoundedCornerShape(10.dp),
+                    unfocusedBorderThickness = 1.dp,
+                    focusedBorderThickness = 1.dp,
+//                            modifier = Modifier.weight(0.5f)
+                )
+            }
+        )
     }
 }
