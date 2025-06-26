@@ -12,10 +12,10 @@ fun main() = application {
         width = 800.dp,
         height = 1200.dp,
     )
-    FileKit.init(appId = "MyApplication")
+    FileKit.init(appId = "PolyChat")
     Window(
         onCloseRequest = ::exitApplication,
-        title = "KotlinProject",
+        title = "PolyChat",
         state = state
     ) {
         App()

@@ -70,11 +70,6 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     }
 
     override fun onSelectedMessagesListUpdate(messageID: Int) {
-//        if (attachedMessages.contains(messageID)) {
-//            attachedMessages.remove(messageID)
-//        } else {
-//            attachedMessages.add(messageID)
-//        }
         _messages.update { currentList ->
             currentList.map { message ->
                 if (message.id == messageID) {
