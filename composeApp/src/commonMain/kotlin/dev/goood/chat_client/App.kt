@@ -7,6 +7,7 @@ import dev.goood.chat_client.di.createKoinConfiguration
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinMultiplatformApplication
 
+
 @Composable
 @Preview
 fun App() {

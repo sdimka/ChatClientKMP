@@ -50,7 +50,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun MainScreen(
+fun ChatListScreen(
     toChat: (chat: Chat) -> Unit,
     snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
