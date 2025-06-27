@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 actual fun PlatformDragAndDropArea(
+    onFilesDropped: (List<String>) -> Unit,
     content: @Composable (() -> Unit),
     modifier: Modifier
 ) {

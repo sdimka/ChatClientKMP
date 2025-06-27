@@ -21,13 +21,16 @@ sealed class NavigationRoute {
     data object ChatListRoute: NavigationRoute()
 
     @Serializable
-    data object ChatDetailRoute: NavigationRoute()
+    data class ChatDetailRoute(val chatID: Int): NavigationRoute()
+
+    @Serializable
+    data object SystemMessagesGraph: NavigationRoute()
 
     @Serializable
     data object SystemMessagesRoute: NavigationRoute()
 
     @Serializable
-    data object SystemMessageDetailRoute: NavigationRoute()
+    data class SystemMessageDetailRoute(val sysMessageID: Int): NavigationRoute()
 
     @Serializable
     data object SettingsRoute: NavigationRoute()

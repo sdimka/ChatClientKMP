@@ -31,11 +31,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.HeadsetSolid
 import compose.icons.lineawesomeicons.HourglassEndSolid
 import compose.icons.lineawesomeicons.ListSolid
 import dev.goood.chat_client.NavigationRoute
+import dev.goood.chat_client.ui.chatScreen.ChatScreen
+import dev.goood.chat_client.ui.systemMessages.SystemMessageDetailScreen
+import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,12 +54,12 @@ fun MainContainer(
         BottomRouteElement(
             "Chats",
             LineAwesomeIcons.ListSolid,
-            NavigationRoute.ChatListRoute
+            NavigationRoute.MainGraph
         ),
         BottomRouteElement(
             "SysMessages",
             LineAwesomeIcons.HourglassEndSolid,
-            NavigationRoute.SystemMessagesRoute
+            NavigationRoute.SystemMessagesGraph
         ),
         BottomRouteElement(
             "Translate",
@@ -157,21 +161,51 @@ private fun NavGraphBuilder.addMainNavigationGraph(
             ChatListScreen(
                 toChat = { chat ->
 //                    viewModel.setCurrentChat(chat)
-//                    navController.navigate(Screen.ChatDetail(chat.id)) {
-//                        popUpTo(Screen.Main)// navController.graph.findStartDestination())
-//                    }
+                    nestedNavController.navigate(NavigationRoute.ChatDetailRoute(chat.id)) {
+//                        popUpTo(nestedNavController.graph.findStartDestination())// navController.graph.findStartDestination())
+                    }
                 },
                 snackBarHostState = snackBarHostState
             )
         }
 
+        composable<NavigationRoute.ChatDetailRoute> { from: NavBackStackEntry ->
+            val chatId = from.toRoute<NavigationRoute.ChatDetailRoute>().chatID
+            ChatScreen(
+                chatId,
+                snackBarHostState = snackBarHostState
+            )
+        }
+
+    }
+
+    navigation<NavigationRoute.SystemMessagesGraph>(
+        startDestination = NavigationRoute.SystemMessagesRoute
+    ) {
         composable<NavigationRoute.SystemMessagesRoute> { from: NavBackStackEntry ->
-
+            SystemMessagesScreen(
+                toDetail = { messID: Int ->
+                    nestedNavController.navigate(NavigationRoute.SystemMessageDetailRoute(messID))
+                },
+                toNew = {
+//                        navController.navigate(Screen.SysMessagesDetail(-1))
+                },
+                snackBarHostState = snackBarHostState
+            )
         }
 
-        composable<NavigationRoute.SettingsRoute> { from: NavBackStackEntry ->
-
+        composable<NavigationRoute.SystemMessageDetailRoute> { from: NavBackStackEntry ->
+            val messID = from.toRoute<NavigationRoute.SystemMessageDetailRoute>().sysMessageID
+            SystemMessageDetailScreen(
+                messID = messID,
+                snackBarHostState = snackBarHostState
+            )
         }
+
+    }
+
+    composable<NavigationRoute.SettingsRoute> { from: NavBackStackEntry ->
+        SettingsScreen()
     }
 
 }
