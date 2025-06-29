@@ -15,6 +15,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -65,6 +68,8 @@ fun ChatListScreen(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier.fillMaxSize().background(Color(0xFFE7ECEF))
     ) {
+
+
         Column (
             horizontalAlignment = Alignment.End,
 //            horizontalArrangement = Arrangement.End,
@@ -124,6 +129,9 @@ fun ChatListScreen(
             }
         }
     }
+
+
+
 
     val dialogState by viewModel.addChatDialogState.collectAsState()
     if (dialogState) {

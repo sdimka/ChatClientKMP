@@ -12,7 +12,7 @@ import org.koin.compose.KoinApplication
 
 @Composable
 @Preview(showSystemUi = true)
-fun MainScreenPreview() {
+fun ChatListScreenPreview() {
     val context = LocalContext.current
 
     val snackBarHostState = remember { SnackbarHostState() }

@@ -58,6 +58,10 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
 
             implementation(libs.androidx.navigation.compose)
+            implementation(libs.compose.adaptive)
+            implementation(libs.compose.adaptive.layout)
+            implementation(libs.compose.adaptive.navigation)
+            implementation("org.jetbrains.compose.material3:material3-window-size-class:1.8.2")
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel.nav)

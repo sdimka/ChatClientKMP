@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -14,9 +15,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
+import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,6 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.ArrowLeftSolid
 import compose.icons.lineawesomeicons.CogSolid
 import compose.icons.lineawesomeicons.HeadsetSolid
 import compose.icons.lineawesomeicons.HourglassEndSolid
@@ -42,9 +53,10 @@ import dev.goood.chat_client.NavigationRoute
 import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessageDetailScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+//import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MainContainer(
     onGoToAuth: (
@@ -75,18 +87,65 @@ fun MainContainer(
     val navBackStackEntry: NavBackStackEntry? by nestedNavController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    var topBarTitle by rememberSaveable { mutableStateOf("PolyChat") }
+
+    val onSetTitle: (String) -> Unit = { newTitle ->
+        topBarTitle = newTitle
+    }
+
+    LaunchedEffect(currentDestination) {
+        val newTitle = when {
+            currentDestination?.hierarchy?.any { it.hasRoute(NavigationRoute.MainGraph::class) } == true -> "Chats"
+            currentDestination?.hierarchy?.any { it.hasRoute(NavigationRoute.SystemMessagesGraph::class) } == true -> "System Messages"
+            currentDestination?.hasRoute(NavigationRoute.TranslateRoute::class) == true -> "Translate"
+            currentDestination?.hasRoute(NavigationRoute.SettingsRoute::class) == true -> "Settings"
+            else -> "PolyChat" // Fallback if no specific screen sets it
+        }
+        // This ensures a base title is set when switching bottom tabs,
+        // detail screens can then override it.
+        if (topBarTitle != newTitle &&
+            !(currentDestination?.hasRoute(NavigationRoute.ChatDetailRoute::class) == true ||
+                    currentDestination?.hasRoute(NavigationRoute.SystemMessageDetailRoute::class) == true)) {
+            // Avoid resetting if a detail screen is active and might have set its own title
+            topBarTitle = newTitle
+        }
+    }
+
     val snackBarHostState = remember { SnackbarHostState() }
+
+    val navButtonEnabled = nestedNavController.previousBackStackEntry != null
+
+//    val windowSizeClass = WindowSizeClass.
+
+//    val navigator = rememberSupportingPaneScaffoldNavigator<Nothing>()
+//    SupportingPaneScaffold(
+//        directive = navigator.scaffoldDirective,
+//        value = navigator.scaffoldValue,
+//        mainPane = {  },
+//        supportingPane = {  },
+//        extraPane = {  },
+//    )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
-                    Text("TopAppbar")
+                    Text(topBarTitle)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White
                 ),
+                navigationIcon = {
+                    if (navButtonEnabled) {
+                        IconButton(onClick = { nestedNavController.popBackStack() }) {
+                            Icon(
+                                imageVector = LineAwesomeIcons.ArrowLeftSolid,
+                                contentDescription = "Back"
+                            )
+                        }
+                    }
+                },
                 actions = {
                     IconButton(
                         onClick = {
@@ -146,6 +205,18 @@ fun MainContainer(
                     )
                 }
             }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {},
+                modifier = Modifier.padding(16.dp),
+//            shape = TODO(),
+//            containerColor = TODO(),
+//            contentColor = TODO(),
+//            elevation = TODO(),
+//            interactionSource = TODO(),
+//            content = TODO(),
+            ){}
         }
     ) { paddingValues: PaddingValues ->
 
@@ -162,7 +233,8 @@ fun MainContainer(
                 },
                 onBottomScreenClick = { route, navBackStackEntry ->
                     nestedNavController.navigate(route)
-                }
+                },
+                onSetTitle = onSetTitle
             )
         }
     }
@@ -174,6 +246,7 @@ private fun NavGraphBuilder.addMainNavigationGraph(
     snackBarHostState: SnackbarHostState,
     onGoToAuthScreen: (route: Any, navBackStackEntry: NavBackStackEntry) -> Unit,
     onBottomScreenClick: (route: Any, navBackStackEntry: NavBackStackEntry) -> Unit,
+    onSetTitle: (String) -> Unit
 ) {
 
     navigation<NavigationRoute.MainGraph>(
@@ -182,7 +255,7 @@ private fun NavGraphBuilder.addMainNavigationGraph(
         composable<NavigationRoute.ChatListRoute> { from: NavBackStackEntry ->
             ChatListScreen(
                 toChat = { chat ->
-//                    viewModel.setCurrentChat(chat)
+                    onSetTitle(chat.name)
                     nestedNavController.navigate(NavigationRoute.ChatDetailRoute(chat.id)) {
 //                        popUpTo(nestedNavController.graph.findStartDestination())// navController.graph.findStartDestination())
                     }
@@ -210,6 +283,7 @@ private fun NavGraphBuilder.addMainNavigationGraph(
                     nestedNavController.navigate(NavigationRoute.SystemMessageDetailRoute(messID))
                 },
                 toNew = {
+                    nestedNavController.navigate(NavigationRoute.SystemMessageDetailRoute(-1))
 //                        navController.navigate(Screen.SysMessagesDetail(-1))
                 },
                 snackBarHostState = snackBarHostState
