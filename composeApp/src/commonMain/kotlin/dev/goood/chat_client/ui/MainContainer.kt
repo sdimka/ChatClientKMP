@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -33,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import compose.icons.LineAwesomeIcons
+import compose.icons.lineawesomeicons.CogSolid
 import compose.icons.lineawesomeicons.HeadsetSolid
 import compose.icons.lineawesomeicons.HourglassEndSolid
 import compose.icons.lineawesomeicons.ListSolid
@@ -50,6 +52,7 @@ fun MainContainer(
         navBackStackEntry: NavBackStackEntry,
             ) -> Unit,
 ) {
+
     val items = listOf(
         BottomRouteElement(
             "Chats",
@@ -64,9 +67,10 @@ fun MainContainer(
         BottomRouteElement(
             "Translate",
             LineAwesomeIcons.HeadsetSolid,
-            NavigationRoute.SettingsRoute
+            NavigationRoute.TranslateRoute
         )
     )
+
     val nestedNavController = rememberNavController()
     val navBackStackEntry: NavBackStackEntry? by nestedNavController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -82,7 +86,25 @@ fun MainContainer(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White
-                )
+                ),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            nestedNavController.navigate(route = NavigationRoute.SettingsRoute) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(nestedNavController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                            }
+                        }
+                    ){
+                        Icon(
+                            imageVector = LineAwesomeIcons.CogSolid,
+                            contentDescription = "Close",
+                        )
+                    }
+                }
             )
         },
         bottomBar = {
@@ -204,8 +226,16 @@ private fun NavGraphBuilder.addMainNavigationGraph(
 
     }
 
+    composable<NavigationRoute.TranslateRoute> { from: NavBackStackEntry ->
+        TranslateScreen()
+    }
+
     composable<NavigationRoute.SettingsRoute> { from: NavBackStackEntry ->
-        SettingsScreen()
+        SettingsScreen(
+            onLogout = {
+                onGoToAuthScreen(NavigationRoute.AuthGraph, from)
+            }
+        )
     }
 
 }

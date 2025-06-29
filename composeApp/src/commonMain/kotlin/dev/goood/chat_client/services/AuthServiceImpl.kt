@@ -17,7 +17,8 @@ class AuthServiceImpl: AuthService, KoinComponent {
     }
 
     override fun logout() {
-
+        localStorage.user = null
+        localStorage.bearerToken = null
     }
 
     override fun isAuthorized(): Boolean {

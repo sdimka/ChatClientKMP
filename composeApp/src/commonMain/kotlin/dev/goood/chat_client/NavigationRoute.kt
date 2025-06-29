@@ -33,6 +33,9 @@ sealed class NavigationRoute {
     data class SystemMessageDetailRoute(val sysMessageID: Int): NavigationRoute()
 
     @Serializable
+    data object TranslateRoute: NavigationRoute()
+
+    @Serializable
     data object SettingsRoute: NavigationRoute()
 
 }

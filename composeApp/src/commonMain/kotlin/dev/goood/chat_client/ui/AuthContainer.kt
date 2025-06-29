@@ -61,7 +61,7 @@ private fun NavGraphBuilder.addAuthNavigationGraph(
         composable<NavigationRoute.LoginRoute> { from: NavBackStackEntry ->
             LoginScreen(
                 onLoginSuccess = {
-                    onGoToMainScreen
+                    onGoToMainScreen(NavigationRoute.MainGraph, from)
                 },
                 snackBarHostState = snackBarHostState
             )

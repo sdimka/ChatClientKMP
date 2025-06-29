@@ -28,6 +28,12 @@ class AppViewModel: ViewModel(), KoinComponent {
         _selectedChat.value = chat
     }
 
+    fun logout() {
+        authService.logout()
+        authState.value = authState()
+
+    }
+
     sealed interface AuthState {
         data class Authorized(val token: String): AuthState
         data class Unauthorized(val message: String): AuthState
