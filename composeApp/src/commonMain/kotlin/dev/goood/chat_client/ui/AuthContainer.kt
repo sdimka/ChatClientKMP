@@ -34,7 +34,7 @@ fun AuthContainer(
     NavHost(
         modifier = Modifier.fillMaxSize(),
         navController = nestedNavController,
-        startDestination = NavigationRoute.MainGraph
+        startDestination = NavigationRoute.AuthGraph
     ) {
         addAuthNavigationGraph(
             nestedNavController = nestedNavController,
