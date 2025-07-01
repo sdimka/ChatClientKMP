@@ -9,6 +9,7 @@ actual fun PlatformContextMenu (
     selectedTextProvider: () -> String,
     content: @Composable () -> Unit
 ) {
+
     ContextMenuDataProvider(items = {
         listOf(
             ContextMenuItem("User-defined action") {

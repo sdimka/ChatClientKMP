@@ -1,6 +1,9 @@
 package dev.goood.chat_client.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,6 +13,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -54,7 +59,8 @@ import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessageDetailScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-//import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import dev.goood.chat_client.ui.platformComposable.PlatformWindowSize
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -115,7 +121,8 @@ fun MainContainer(
 
     val navButtonEnabled = nestedNavController.previousBackStackEntry != null
 
-//    val windowSizeClass = WindowSizeClass.
+    val windowSizeClass = PlatformWindowSize()
+    val useNavRail = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
 
 //    val navigator = rememberSupportingPaneScaffoldNavigator<Nothing>()
 //    SupportingPaneScaffold(
@@ -125,6 +132,7 @@ fun MainContainer(
 //        supportingPane = {  },
 //        extraPane = {  },
 //    )
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -167,75 +175,101 @@ fun MainContainer(
             )
         },
         bottomBar = {
-            NavigationBar(
-                modifier = Modifier.height(56.dp),
-                tonalElevation = 4.dp
-            ) {
-                items.forEachIndexed { index, item ->
-
-                    val selected =
-                        currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
-
-                    NavigationBarItem(
-                        selected = selected,
-                        icon = {
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = null
-                            )
-                        },
-                        onClick = {
-                            nestedNavController.navigate(route = item.route) {
-                                launchSingleTop = true
-
-                                // If restoreState = true and saveState = true are commented
-                                // routes other than Home1 are not saved
-                                restoreState = true
-
-                                // Pop up backstack to the first destination and save state.
-
-                                // Then restore any previous back stack state associated with
-                                // the item.route destination.
-                                // Finally navigate to the item.route destination.
-                                popUpTo(nestedNavController.graph.findStartDestination().id) {
-                                    saveState = true
+            if (!useNavRail) {
+                NavigationBar(
+                    modifier = Modifier.height(56.dp),
+                    tonalElevation = 4.dp
+                ) {
+                    items.forEach { item ->
+                        val selected = currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
+                        NavigationBarItem(
+                            selected = selected,
+                            onClick = {
+                                nestedNavController.navigate(route = item.route) {
+                                    popUpTo(nestedNavController.graph.findStartDestination().id) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                            }
-                        }
-                    )
+                            },
+                            icon = { Icon(item.icon, contentDescription = item.title) },
+                            label = { Text(item.title) }
+                        )
+                    }
                 }
             }
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {},
-                modifier = Modifier.padding(16.dp),
-//            shape = TODO(),
-//            containerColor = TODO(),
-//            contentColor = TODO(),
-//            elevation = TODO(),
-//            interactionSource = TODO(),
-//            content = TODO(),
-            ){}
-        }
+//        floatingActionButton = {
+//            FloatingActionButton(
+//                onClick = {},
+//                modifier = Modifier.padding(16.dp),
+////            shape = TODO(),
+////            containerColor = TODO(),
+////            contentColor = TODO(),
+////            elevation = TODO(),
+////            interactionSource = TODO(),
+////            content = TODO(),
+//            ){}
+//        }
     ) { paddingValues: PaddingValues ->
 
-        NavHost(
-            modifier = Modifier.padding(paddingValues),
-            navController = nestedNavController,
-            startDestination = NavigationRoute.MainGraph
-        ) {
-            addMainNavigationGraph(
-                nestedNavController = nestedNavController,
-                snackBarHostState = snackBarHostState,
-                onGoToAuthScreen = { route, navBackStackEntry ->
-                    onGoToAuth(route, navBackStackEntry)
-                },
-                onBottomScreenClick = { route, navBackStackEntry ->
-                    nestedNavController.navigate(route)
-                },
-                onSetTitle = onSetTitle
-            )
+        Row(Modifier.fillMaxSize()) { // Use Row for NavRail + Content
+            if (useNavRail) { // Show NavRail if useNavRail is true AND it's allowed
+                NavigationRail(
+                    modifier = Modifier.fillMaxHeight()
+                        .padding(top = paddingValues.calculateTopPadding()), // Apply top padding from Scaffold
+                    header = {
+                        // Optional: Add a header to the NavRail, like an app icon or a FAB-like action
+                        // Example:
+                        // IconButton(onClick = { /* Action */ }) {
+                        //     Icon(Icons.Filled.Add, contentDescription = "Add")
+                        // }
+                    }
+                ) {
+                    items.forEach { item ->
+                        val selected =
+                            currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
+                        NavigationRailItem(
+                            selected = selected,
+                            onClick = {
+                                nestedNavController.navigate(route = item.route) {
+                                    popUpTo(nestedNavController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            icon = { Icon(item.icon, contentDescription = item.title) },
+                            label = { Text(item.title) },
+                            alwaysShowLabel = false // Common for NavRail to only show labels for selected items or on hover
+                        )
+                    }
+                }
+            }
+
+
+            NavHost(
+                modifier = Modifier
+                    .weight(1f) // Ensures NavHost takes remaining width
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        bottom = if (useNavRail) paddingValues.calculateBottomPadding() else 0.dp // Only apply bottom scaffold padding if no bottom bar is there
+                    ),
+                navController = nestedNavController,
+                startDestination = NavigationRoute.MainGraph
+            ) {
+                addMainNavigationGraph(
+                    nestedNavController = nestedNavController,
+                    snackBarHostState = snackBarHostState,
+                    onGoToAuthScreen = { route, navBackStackEntry ->
+                        onGoToAuth(route, navBackStackEntry)
+                    },
+                    onBottomScreenClick = { route, navBackStackEntry ->
+                        nestedNavController.navigate(route)
+                    },
+                    onSetTitle = onSetTitle
+                )
+            }
         }
     }
 }
