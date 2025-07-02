@@ -9,7 +9,7 @@ import io.github.vinceglb.filekit.FileKit
 
 fun main() = application {
     val state = rememberWindowState(
-        width = 800.dp,
+        width = 1300.dp,
         height = 1200.dp,
     )
     FileKit.init(appId = "PolyChat")

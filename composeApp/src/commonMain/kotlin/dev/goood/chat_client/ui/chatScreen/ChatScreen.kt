@@ -86,27 +86,28 @@ fun ChatScreen(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFE7ECEF))
-            .padding(horizontal = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+//            .background(Color.Cyan)
     ) {
 
         MessageList(
             viewModel = viewModel,
             onDelete = { message: Message ->
                 deleteDialogState.value = message
-            }
+            },
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
         )
 
-        Spacer(modifier = Modifier.padding(bottom = 120.dp))
+        MessageInput(
+            chatID = chatID,
+            viewModel = viewModel,
+//            modifier = Modifier.fillMaxWidth()
+        )
     }
-
-    MessageInput(
-        chatID = chatID,
-        viewModel = viewModel,
-    )
 
     when (state) {
         is State.Error -> {
@@ -120,6 +121,7 @@ fun ChatScreen(
                 )
             }
         }
+
         State.Loading -> {
             Box(
                 modifier = modifier.fillMaxSize()
@@ -130,6 +132,7 @@ fun ChatScreen(
                 )
             }
         }
+
         State.NewReply -> {}
         State.Success -> {}
     }
@@ -169,10 +172,10 @@ fun MessageList(
 
     LazyColumn(
         reverseLayout = true,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
+//            .fillMaxWidth()
             .padding(5.dp)
-            .padding(bottom = 60.dp)
+//            .padding(bottom = 60.dp)
     ) {
         if (state.value is State.NewReply) {
             item {
@@ -191,8 +194,6 @@ fun MessageList(
             )
         }
     }
-
-    Spacer(modifier = Modifier.padding(bottom = 120.dp))
 }
 
 @Composable

@@ -253,7 +253,7 @@ fun MainContainer(
                     .weight(1f) // Ensures NavHost takes remaining width
                     .padding(
                         top = paddingValues.calculateTopPadding(),
-                        bottom = if (useNavRail) paddingValues.calculateBottomPadding() else 0.dp // Only apply bottom scaffold padding if no bottom bar is there
+                        bottom = if (!useNavRail) paddingValues.calculateBottomPadding() else 0.dp
                     ),
                 navController = nestedNavController,
                 startDestination = NavigationRoute.MainGraph

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -143,27 +146,10 @@ fun ListScaffold(
     snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ){
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
+    Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFFE7ECEF))
     ) {
 
-
-        Column(
-            horizontalAlignment = Alignment.End,
-//            horizontalArrangement = Arrangement.End,
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp, end = 10.dp)
-        ) {
-            CButton(
-                icon = LineAwesomeIcons.PlusSquareSolid,
-                onClick = {
-                    onNewChat()
-                }
-            )
-        }
         when (state) {
             is State.Success -> {
                 LazyColumn(
@@ -208,6 +194,19 @@ fun ListScaffold(
                     BallProgerssIndicator()
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = { onNewChat() },
+            modifier = Modifier
+            .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = LineAwesomeIcons.PlusSquareSolid,
+                contentDescription = null,
+                tint = Color.Gray
+            )
         }
     }
 }
