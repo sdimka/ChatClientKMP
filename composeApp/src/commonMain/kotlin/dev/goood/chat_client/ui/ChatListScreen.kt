@@ -15,16 +15,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +40,8 @@ import compose.icons.lineawesomeicons.PlusSquareSolid
 import compose.icons.lineawesomeicons.QuestionCircle
 import compose.icons.lineawesomeicons.TrashAlt
 import dev.goood.chat_client.model.Chat
+import dev.goood.chat_client.model.ChatList
+import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.composable.AddChatDialog
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
@@ -48,10 +54,12 @@ import kotlinproject.composeapp.generated.resources.gemini
 import kotlinproject.composeapp.generated.resources.openai_
 import kotlinproject.composeapp.generated.resources.test
 import kotlinproject.composeapp.generated.resources.unknown
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ChatListScreen(
     toChat: (chat: Chat) -> Unit,
@@ -63,75 +71,40 @@ fun ChatListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val chats by viewModel.chats.collectAsStateWithLifecycle()
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier.fillMaxSize().background(Color(0xFFE7ECEF))
-    ) {
+    val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>()
+    val scope = rememberCoroutineScope()
 
+    val selectedChat = remember { mutableStateOf<Chat?>(null) }
 
-        Column (
-            horizontalAlignment = Alignment.End,
-//            horizontalArrangement = Arrangement.End,
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp, end = 10.dp)
-        ) {
-            CButton(
-                icon = LineAwesomeIcons.PlusSquareSolid,
-                onClick = {
-                    viewModel.addChatDialogState.value = true
-                }
-            )
-        }
-        when (state) {
-            is State.Success -> {
-                LazyColumn(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(top = 15.dp)
-                ) {
-                    items(chats) { chat ->
-                        ChatElement(
-                            chat = chat,
-                            toChat = toChat,
-                            onEditClick = {
-//                            viewModel.deleteChatDialogState.value = true
-                            },
-                            onDeleteClick = { chatToDel ->
-                                viewModel.deleteChatDialogState.value = chatToDel
-                            }
-                        )
+    ListDetailPaneScaffold(
+        directive = navigator.scaffoldDirective,
+        value = navigator.scaffoldValue,
+        listPane = {
+            ListScaffold(
+                state = state,
+                chats = chats,
+                onNewChat = { viewModel.addChatDialogState.value = true },
+                onEdit = {  },
+                onDelete = { chatToDel -> viewModel.deleteChatDialogState.value = chatToDel},
+                toChat = {
+                    selectedChat.value = it
+                    scope.launch {
+                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
                     }
-                }
-            }
+                },
 
-            is State.Error -> {
-                val error = (state as State.Error).message
-                LaunchedEffect(snackBarHostState) {
-                    snackBarHostState.showSnackbar(
-                        error,
-                        actionLabel = "Close",
-                        withDismissAction = true,
-                        duration = SnackbarDuration.Long
-                    )
-                }
-            }
-
-            State.Loading -> {
-                Column(
-                    modifier = modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    BallProgerssIndicator()
-                }
-            }
-        }
-    }
-
-
-
+                snackBarHostState = snackBarHostState,
+            )
+        },
+        detailPane = {
+            ChatScreen(
+                chatID = selectedChat.value?.id ?: -1,
+                modifier = Modifier,
+                snackBarHostState = snackBarHostState
+            )
+        },
+        extraPane = {  },
+    )
 
     val dialogState by viewModel.addChatDialogState.collectAsState()
     if (dialogState) {
@@ -156,6 +129,86 @@ fun ChatListScreen(
                 viewModel.deleteChatDialogState.value = null
             }
         )
+    }
+}
+
+@Composable
+fun ListScaffold(
+    state: State,
+    chats: ChatList,
+    onNewChat: () -> Unit,
+    toChat: (chat: Chat) -> Unit,
+    onEdit: (chat: Chat) -> Unit,
+    onDelete: (chat: Chat) -> Unit,
+    snackBarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+){
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier.fillMaxSize().background(Color(0xFFE7ECEF))
+    ) {
+
+
+        Column(
+            horizontalAlignment = Alignment.End,
+//            horizontalArrangement = Arrangement.End,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp, end = 10.dp)
+        ) {
+            CButton(
+                icon = LineAwesomeIcons.PlusSquareSolid,
+                onClick = {
+                    onNewChat()
+                }
+            )
+        }
+        when (state) {
+            is State.Success -> {
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(top = 15.dp)
+                ) {
+                    items(chats) { chat ->
+                        ChatElement(
+                            chat = chat,
+                            toChat = toChat,
+                            onEditClick = {
+                                onEdit(it)
+//                            viewModel.deleteChatDialogState.value = true
+                            },
+                            onDeleteClick = { chatToDel ->
+                                onDelete(chatToDel)
+                            }
+                        )
+                    }
+                }
+            }
+
+            is State.Error -> {
+                val error = state.message
+                LaunchedEffect(snackBarHostState, error) {
+                    snackBarHostState.showSnackbar(
+                        error,
+                        actionLabel = "Close",
+                        withDismissAction = true,
+                        duration = SnackbarDuration.Long
+                    )
+                }
+            }
+
+            State.Loading -> {
+                Column(
+                    modifier = modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    BallProgerssIndicator()
+                }
+            }
+        }
     }
 }
 

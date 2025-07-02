@@ -79,7 +79,7 @@ fun ChatScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val deleteDialogState = remember { mutableStateOf<Message?>(null) }
 
-    LaunchedEffect(LocalLifecycleOwner.current) {
+    LaunchedEffect(chatID) {
         if (chatID != null) {
             viewModel.getMessages(chatID)
         }

@@ -290,9 +290,8 @@ private fun NavGraphBuilder.addMainNavigationGraph(
             ChatListScreen(
                 toChat = { chat ->
                     onSetTitle(chat.name)
-                    nestedNavController.navigate(NavigationRoute.ChatDetailRoute(chat.id)) {
-//                        popUpTo(nestedNavController.graph.findStartDestination())// navController.graph.findStartDestination())
-                    }
+//                    nestedNavController.navigate(NavigationRoute.ChatDetailRoute(chat.id)) {
+//                    }
                 },
                 snackBarHostState = snackBarHostState
             )

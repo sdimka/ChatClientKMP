@@ -20,7 +20,7 @@ fun SettingsScreen(
 //    val viewModel: TranslateViewModel = koinViewModel()
 
     Column(
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
