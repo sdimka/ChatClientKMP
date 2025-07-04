@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.other.ShareFileModel
 import dev.goood.chat_client.model.FileList
+import dev.goood.chat_client.model.MFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,7 +36,6 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
     override var uploadState by mutableStateOf(UploadState())
         private set
 
-
     private val _fileList = MutableStateFlow<FileList>(emptyList())
     override val fileList = _fileList
         .onStart {
@@ -47,6 +47,8 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
             emptyList()
         )
 
+    private val _deleteFileDialogState = MutableStateFlow<MFile?>(null)
+    override val deleteFileDialogState = _deleteFileDialogState.asStateFlow()
 
     override fun setCurrentChat(chatID: Int?) {
         currentChatID = chatID
@@ -72,7 +74,7 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
 
     override fun uploadFile(sharedFile: ShareFileModel) {
         _selectedFile.value = sharedFile
-        if (currentChatID== null) {
+        if (currentChatID == null) {
             uploadState = uploadState.copy(
                 errorMessage = "No chat selected"
             )
@@ -116,7 +118,31 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
                 )
             }
             .launchIn(viewModelScope)
+    }
 
+    override fun deleteFile(fileID: String) {
+        if (currentChatID == null) {
+            uploadState = uploadState.copy(
+                errorMessage = "No chat selected"
+            )
+            return
+        }
+        api.filesApi.deleteFile(fileID, currentChatID!!)
+            .onStart {
+                _state.value = State.Loading
+            }
+            .onCompletion {
+                updateFileList(currentChatID!!)
+            }
+            .catch {
+                print(it.message)
+                _state.value = State.Error(it.message ?: "Unknown error")
+            }
+            .launchIn(viewModelScope)
+    }
+
+    override fun setFileDialogState(file: MFile?) {
+        _deleteFileDialogState.value = file
     }
 
 }

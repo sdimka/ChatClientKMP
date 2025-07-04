@@ -2,6 +2,7 @@ package dev.goood.chat_client.ui.filesDialog
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,11 +41,15 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import compose.icons.LineAwesomeIcons
 import compose.icons.lineawesomeicons.PlusSquareSolid
+import compose.icons.lineawesomeicons.QuestionCircle
+import compose.icons.lineawesomeicons.TrashAlt
 import compose.icons.lineawesomeicons.WindowClose
 import dev.goood.chat_client.core.other.ShareFileModel
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
+import dev.goood.chat_client.ui.composable.DeleteDialogImp
+import dev.goood.chat_client.ui.composable.SwipeableWithActions
 import dev.goood.chat_client.ui.platformComposable.PlatformDragAndDropArea
 import dev.goood.chat_client.viewModels.FileDialogViewModel
 import dev.goood.chat_client.viewModels.FileDialogViewModel.State
@@ -123,7 +130,6 @@ fun FilesDialog(
                     bytes = nFile.readBytes(),
                 )
             )
-
         }
     }
 
@@ -135,6 +141,7 @@ fun FilesDialog(
         Surface(
             shape = RoundedCornerShape(16.dp),
             modifier = modifier.fillMaxSize()
+                .background(Color.LightGray)
                 .padding(20.dp)
         ) {
             Column(
@@ -169,7 +176,6 @@ fun FilesDialog(
                         .padding(vertical = 5.dp)
                 )
 
-
                 PlatformDragAndDropArea(
                     modifier = modifier
                         .size(200.dp, 100.dp)
@@ -190,14 +196,6 @@ fun FilesDialog(
                         .fillMaxWidth()
                         .padding(horizontal = 10.dp)
                 ) {
-
-//                    CButton(
-//                        text = "To chat",
-//                        icon = LineAwesomeIcons.WindowClose,
-//                        enabled = isEnabled,
-//                        onClick = {},
-//                        modifier = modifier.padding(bottom = 10.dp)
-//                    )
 
                     CButton(
                         text = "New file",
@@ -230,6 +228,20 @@ fun FilesDialog(
                 )
             }
         }
+    }
+
+    val deleteDialogState by viewModel.deleteFileDialogState.collectAsState()
+    deleteDialogState?.let { fileToDelete ->
+        DeleteDialogImp(
+            item = fileToDelete,
+            title = "Delete file",
+            getItemName = { it.filename },
+            onDismiss = { viewModel.setFileDialogState( null ) },
+            onDelete = { file ->
+                viewModel.deleteFile(file.id)
+                viewModel.setFileDialogState( null )
+            }
+        )
     }
 }
 
@@ -276,7 +288,8 @@ fun FileList(
                             } else {
                                 selectedFilesUpdate(file) { list, f -> list - f }
                             }
-                        }
+                        },
+                        onDelete = { chatToDel -> viewModel.setFileDialogState(chatToDel) }
                     )
                 }
             }
@@ -289,45 +302,70 @@ fun FileElement(
     file: MFile,
     isSelected: Boolean,
     onSelected: (Boolean) -> Unit = { _ -> },
+    onDelete: (MFile) -> Unit = { _ -> },
     modifier: Modifier = Modifier
 ){
     val checkedState = remember { mutableStateOf(isSelected) }
 
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 5.dp)
-            .padding(horizontal = 10.dp)
-    ) {
-        Checkbox(
-            checked = checkedState.value,
-            onCheckedChange = {
-                checkedState.value = it
-                onSelected(it)
+    SwipeableWithActions(
+        isRevealed = false,
+        actions = {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = modifier.padding(end = 8.dp)
+            ) {
+                IconButton(
+                    onClick = {
+                        onDelete(file)
+                    }
+                ){
+                    Icon(
+                        imageVector = LineAwesomeIcons.TrashAlt,
+                        contentDescription = "Delete file icon",
+                        tint = if (checkedState.value) Color.Green else Color.Gray
+                    )
+                }
             }
-        )
-
-        Column {
-            Text(
-                text = file.filename
-            )
-            Text(
-                text = "${file.bytes / 1024} KB",
-                fontSize = 10.sp,
-                color = Color.DarkGray
-            )
         }
-        Spacer(modifier = modifier.weight(1f))
-        Column {
-            Text(
-                text = dateMillisToString(file.createdAt),
-                fontSize = 10.sp,
-                color = Color.DarkGray
-            )
-        }
+    ) {
 
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(vertical = 5.dp)
+                .padding(horizontal = 10.dp)
+        ) {
+            Checkbox(
+                checked = checkedState.value,
+                onCheckedChange = {
+                    checkedState.value = it
+                    onSelected(it)
+                }
+            )
+
+            Column {
+                Text(
+                    text = file.filename
+                )
+                Text(
+                    text = "${file.bytes / 1024} KB",
+                    fontSize = 10.sp,
+                    color = Color.DarkGray
+                )
+            }
+            Spacer(modifier = modifier.weight(1f))
+            Column {
+                Text(
+                    text = dateMillisToString(file.createdAt),
+                    fontSize = 8.sp,
+                    color = Color.DarkGray
+                )
+            }
+
+        }
     }
 }
 

@@ -110,4 +110,14 @@ class FileDialogViewModelPreview : FileDialogViewModel() {
 
     }
 
+    override fun deleteFile(fileID: String) {
+
+    }
+
+    override fun setFileDialogState(file: MFile?) {
+
+    }
+
+    override val deleteFileDialogState: StateFlow<MFile?> = MutableStateFlow(null)
+
 }

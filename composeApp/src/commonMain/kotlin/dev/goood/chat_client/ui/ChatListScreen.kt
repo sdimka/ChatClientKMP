@@ -18,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -253,19 +254,27 @@ fun ChatElement(
                 horizontalArrangement = Arrangement.End,
                 modifier = modifier.padding(end = 8.dp)
             ) {
-                CButton(
-                    icon = LineAwesomeIcons.QuestionCircle, //LineAwesomeIcons.PenFancySolid,
+                IconButton(
                     onClick = {
                         onEditClick(chat)
-                    },
-                    modifier = modifier.padding(end = 4.dp)
-                )
-                CButton(
-                    icon = LineAwesomeIcons.TrashAlt,
+                    }
+                ){
+                    Icon(
+                        imageVector = LineAwesomeIcons.QuestionCircle,
+                        contentDescription = "Check",
+                    )
+                }
+
+                IconButton(
                     onClick = {
                         onDeleteClick(chat)
-                    },
-                )
+                    }
+                ){
+                    Icon(
+                        imageVector = LineAwesomeIcons.TrashAlt,
+                        contentDescription = "Check",
+                    )
+                }
             }
         }
     ) {

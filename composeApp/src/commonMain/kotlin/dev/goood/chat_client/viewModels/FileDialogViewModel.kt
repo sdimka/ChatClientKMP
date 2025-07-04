@@ -15,6 +15,9 @@ abstract class FileDialogViewModel: ViewModel() {
     abstract fun setCurrentChat(chatID: Int?)
     abstract fun updateFileList(chatID: Int)
     abstract fun uploadFile(sharedFile: ShareFileModel)
+    abstract fun deleteFile(fileID: String)
+    abstract fun setFileDialogState(file: MFile?)
+    abstract val deleteFileDialogState: StateFlow<MFile?>
 
     sealed interface State {
         data object Success: State
