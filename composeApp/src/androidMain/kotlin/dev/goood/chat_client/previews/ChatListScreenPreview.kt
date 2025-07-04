@@ -25,6 +25,8 @@ fun ChatListScreenPreview() {
         ChatListScreen(
             toChat = {},
             snackBarHostState = snackBarHostState,
+            updateListDetailPaneStatus = { _, _ -> },
+
         )
     }
 }

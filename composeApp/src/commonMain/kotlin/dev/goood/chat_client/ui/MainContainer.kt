@@ -1,6 +1,5 @@
 package dev.goood.chat_client.ui
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -21,10 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
-import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
-import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -99,6 +93,14 @@ fun MainContainer(
         topBarTitle = newTitle
     }
 
+    var isListDetailPaneShowingDetail by remember { mutableStateOf(false) }
+    var onListDetailPaneNavigateBack: (() -> Unit)? by remember { mutableStateOf(null) }
+
+    val updateListDetailPaneStatus: (Boolean, (() -> Unit)?) -> Unit = { showingDetail, navigateBackAction ->
+        isListDetailPaneShowingDetail = showingDetail
+        onListDetailPaneNavigateBack = navigateBackAction
+    }
+
     LaunchedEffect(currentDestination) {
         val newTitle = when {
             currentDestination?.hierarchy?.any { it.hasRoute(NavigationRoute.MainGraph::class) } == true -> "Chats"
@@ -115,24 +117,19 @@ fun MainContainer(
             // Avoid resetting if a detail screen is active and might have set its own title
             topBarTitle = newTitle
         }
+
+        if (currentDestination?.hasRoute(NavigationRoute.ChatListRoute::class) != true) {
+            isListDetailPaneShowingDetail = false
+            onListDetailPaneNavigateBack = null
+        }
     }
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val navButtonEnabled = nestedNavController.previousBackStackEntry != null
+    val navButtonEnabled = nestedNavController.previousBackStackEntry != null || isListDetailPaneShowingDetail
 
     val windowSizeClass = PlatformWindowSize()
     val useNavRail = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
-
-//    val navigator = rememberSupportingPaneScaffoldNavigator<Nothing>()
-//    SupportingPaneScaffold(
-//        directive = navigator.scaffoldDirective,
-//        value = navigator.scaffoldValue,
-//        mainPane = {  },
-//        supportingPane = {  },
-//        extraPane = {  },
-//    )
-
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -146,7 +143,16 @@ fun MainContainer(
                 ),
                 navigationIcon = {
                     if (navButtonEnabled) {
-                        IconButton(onClick = { nestedNavController.popBackStack() }) {
+                        IconButton(onClick = {
+                            if (isListDetailPaneShowingDetail && onListDetailPaneNavigateBack != null) {
+                                // If detail pane is showing in ListDetailPaneScaffold,
+                                // use its specific back action.
+                                onListDetailPaneNavigateBack?.invoke()
+                            } else {
+                                // Otherwise, use the standard NavHostController back action.
+                                nestedNavController.popBackStack()
+                            }
+                        }) {
                             Icon(
                                 imageVector = LineAwesomeIcons.ArrowLeftSolid,
                                 contentDescription = "Back"
@@ -198,18 +204,6 @@ fun MainContainer(
                 }
             }
         },
-//        floatingActionButton = {
-//            FloatingActionButton(
-//                onClick = {},
-//                modifier = Modifier.padding(16.dp),
-////            shape = TODO(),
-////            containerColor = TODO(),
-////            contentColor = TODO(),
-////            elevation = TODO(),
-////            interactionSource = TODO(),
-////            content = TODO(),
-//            ){}
-//        }
     ) { paddingValues: PaddingValues ->
 
         Row(Modifier.fillMaxSize()) { // Use Row for NavRail + Content
@@ -267,7 +261,8 @@ fun MainContainer(
                     onBottomScreenClick = { route, navBackStackEntry ->
                         nestedNavController.navigate(route)
                     },
-                    onSetTitle = onSetTitle
+                    onSetTitle = onSetTitle,
+                    updateListDetailPaneStatus = updateListDetailPaneStatus
                 )
             }
         }
@@ -280,7 +275,8 @@ private fun NavGraphBuilder.addMainNavigationGraph(
     snackBarHostState: SnackbarHostState,
     onGoToAuthScreen: (route: Any, navBackStackEntry: NavBackStackEntry) -> Unit,
     onBottomScreenClick: (route: Any, navBackStackEntry: NavBackStackEntry) -> Unit,
-    onSetTitle: (String) -> Unit
+    onSetTitle: (String) -> Unit,
+    updateListDetailPaneStatus: (Boolean, (() -> Unit)?) -> Unit
 ) {
 
     navigation<NavigationRoute.MainGraph>(
@@ -293,7 +289,8 @@ private fun NavGraphBuilder.addMainNavigationGraph(
 //                    nestedNavController.navigate(NavigationRoute.ChatDetailRoute(chat.id)) {
 //                    }
                 },
-                snackBarHostState = snackBarHostState
+                snackBarHostState = snackBarHostState,
+                updateListDetailPaneStatus = updateListDetailPaneStatus
             )
         }
 

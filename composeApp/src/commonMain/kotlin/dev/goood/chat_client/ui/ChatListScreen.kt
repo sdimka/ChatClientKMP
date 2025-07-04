@@ -24,6 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.layout.PaneExpansionState
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,6 +69,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChatListScreen(
     toChat: (chat: Chat) -> Unit,
     snackBarHostState: SnackbarHostState,
+    updateListDetailPaneStatus: (Boolean, (() -> Unit)?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -78,6 +81,20 @@ fun ChatListScreen(
     val scope = rememberCoroutineScope()
 
     val selectedChat = remember { mutableStateOf<Chat?>(null) }
+
+    LaunchedEffect(navigator.scaffoldValue) {
+        val isDetailShowing = navigator.canNavigateBack()
+        val navigateBackAction: (() -> Unit)? = if (isDetailShowing) {
+            {
+                scope.launch {
+                    navigator.navigateBack()
+                }
+            } // Action to navigate back within the ListDetailPaneScaffold
+        } else {
+            null
+        }
+        updateListDetailPaneStatus(isDetailShowing, navigateBackAction)
+    }
 
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
@@ -91,6 +108,7 @@ fun ChatListScreen(
                 onDelete = { chatToDel -> viewModel.deleteChatDialogState.value = chatToDel},
                 toChat = {
                     selectedChat.value = it
+                    toChat(it)
                     scope.launch {
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
                     }
