@@ -81,60 +81,66 @@ fun ChatScreen(
 
     LaunchedEffect(chatID) {
         if (chatID != null) {
+            viewModel.resetChatSpecificStates()
             viewModel.getMessages(chatID)
         }
     }
 
-    Column(
+    Box(
+        contentAlignment = Alignment.BottomEnd,
         modifier = modifier
             .fillMaxSize()
 //            .background(Color.Cyan)
     ) {
+        Column(
+            modifier = modifier.fillMaxSize()
+        ) {
+            MessageList(
+                viewModel = viewModel,
+                onDelete = { message: Message ->
+                    deleteDialogState.value = message
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            )
 
-        MessageList(
-            viewModel = viewModel,
-            onDelete = { message: Message ->
-                deleteDialogState.value = message
-            },
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-        )
-
-        MessageInput(
-            chatID = chatID,
-            viewModel = viewModel,
+            MessageInput(
+                chatID = chatID,
+                viewModel = viewModel,
 //            modifier = Modifier.fillMaxWidth()
-        )
-    }
-
-    when (state) {
-        is State.Error -> {
-            val error = (state as State.Error).message
-            LaunchedEffect(snackBarHostState) {
-                snackBarHostState.showSnackbar(
-                    error,
-                    actionLabel = "Close",
-                    withDismissAction = true,
-                    duration = SnackbarDuration.Long
-                )
-            }
+            )
         }
 
-        State.Loading -> {
-            Box(
-                modifier = modifier.fillMaxSize()
-                    .background(Color.LightGray.copy(alpha = 0.5f))
-            ) {
-                BallProgerssIndicator(
-                    modifier = modifier.align(Alignment.Center)
-                )
-            }
-        }
 
-        State.NewReply -> {}
-        State.Success -> {}
+        when (state) {
+            is State.Error -> {
+                val error = (state as State.Error).message
+                LaunchedEffect(snackBarHostState) {
+                    snackBarHostState.showSnackbar(
+                        error,
+                        actionLabel = "Close",
+                        withDismissAction = true,
+                        duration = SnackbarDuration.Long
+                    )
+                }
+            }
+
+            State.Loading -> {
+                Box(
+                    modifier = modifier.fillMaxSize()
+                        .background(Color.LightGray.copy(alpha = 0.5f))
+                ) {
+                    BallProgerssIndicator(
+                        modifier = modifier.align(Alignment.Center)
+                    )
+                }
+            }
+
+            State.NewReply -> {}
+            State.Success -> {}
+        }
     }
 
     deleteDialogState.value?.let { messageToDelete ->

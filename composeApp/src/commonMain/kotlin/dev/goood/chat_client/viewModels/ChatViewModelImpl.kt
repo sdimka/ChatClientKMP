@@ -178,6 +178,15 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         }
     }
 
+    override fun resetChatSpecificStates() {
+        _selectedSysMessage.value = null
+        _filesList.value = emptyList()
+        _inputValue.value = ""
+        _isPreviousMessagesEnabled.value = false
+        _newReply.value = ""
+        // _messages.value = emptyList() // Consider if messages should be cleared immediately or wait for new messages to load
+    }
+
     override fun onCleared() {
         super.onCleared()
         // clearInputValue()

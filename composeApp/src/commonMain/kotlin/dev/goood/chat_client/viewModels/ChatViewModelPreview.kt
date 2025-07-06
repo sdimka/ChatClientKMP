@@ -99,6 +99,10 @@ class ChatViewModelPreview: ChatViewModel() {
 
     }
 
+    override fun resetChatSpecificStates() {
+
+    }
+
     override fun updateFileList(file: MFile, operation: (List<MFile>, MFile) -> List<MFile>) {
 
     }

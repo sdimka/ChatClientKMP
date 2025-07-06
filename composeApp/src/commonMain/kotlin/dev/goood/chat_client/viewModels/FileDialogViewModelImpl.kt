@@ -52,6 +52,11 @@ class FileDialogViewModelImpl: FileDialogViewModel(), KoinComponent {
 
     override fun setCurrentChat(chatID: Int?) {
         currentChatID = chatID
+        _selectedFile.value = null
+        uploadState = UploadState()
+        if (chatID == null) {
+            _fileList.value = emptyList()
+        }
     }
 
     override fun updateFileList(chatID: Int) {

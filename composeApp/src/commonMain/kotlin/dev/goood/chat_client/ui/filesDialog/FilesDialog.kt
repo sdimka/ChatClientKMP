@@ -81,7 +81,7 @@ fun FilesDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewModel = koinViewModel<FileDialogViewModel>()
+    val viewModel = koinViewModel<FileDialogViewModel>() // Don't create a new instance
     val file by viewModel.selectedFile.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -96,7 +96,7 @@ fun FilesDialog(
 
 //    val selectedFiles = remember { mutableListOf<MFile>() }
 
-    LaunchedEffect(LocalLifecycleOwner.current) {
+    LaunchedEffect(LocalLifecycleOwner.current, chatID) { // Add chatID to LaunchedEffect
         viewModel.setCurrentChat(chatID)
     }
 
