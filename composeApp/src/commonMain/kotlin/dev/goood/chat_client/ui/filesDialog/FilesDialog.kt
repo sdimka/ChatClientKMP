@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +35,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -304,7 +308,7 @@ fun FileElement(
     onSelected: (Boolean) -> Unit = { _ -> },
     onDelete: (MFile) -> Unit = { _ -> },
     modifier: Modifier = Modifier
-){
+) {
     val checkedState = remember { mutableStateOf(isSelected) }
 
     SwipeableWithActions(
@@ -318,7 +322,7 @@ fun FileElement(
                     onClick = {
                         onDelete(file)
                     }
-                ){
+                ) {
                     Icon(
                         imageVector = LineAwesomeIcons.TrashAlt,
                         contentDescription = "Delete file icon",
@@ -330,7 +334,7 @@ fun FileElement(
     ) {
 
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
@@ -346,9 +350,16 @@ fun FileElement(
                 }
             )
 
-            Column {
+            Column(
+                modifier = Modifier
+                    .padding(end = 15.dp)
+                    .weight(1f)
+            ) {
                 Text(
-                    text = file.filename
+                    text = file.filename,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = "${file.bytes / 1024} KB",
@@ -356,27 +367,36 @@ fun FileElement(
                     color = Color.DarkGray
                 )
             }
-            Spacer(modifier = modifier.weight(1f))
-            Column {
-                Text(
-                    text = dateMillisToString(file.createdAt),
-                    fontSize = 8.sp,
-                    color = Color.DarkGray
-                )
-            }
 
+            Text(
+                text = dateMillisToString(file.createdAt),
+                fontSize = 8.sp,
+                color = Color.DarkGray,
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .wrapContentWidth(
+                        Alignment.End,
+                        unbounded = false
+                    ) // Shrink to fit content, aligned end
+                    .defaultMinSize(minWidth = 50.dp)
+            )
         }
     }
 }
 
 private fun dateMillisToString(epoch: Long): String {
-    val instant = Instant.fromEpochSeconds(epoch)
-    val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+    return try {
+        val instant = Instant.fromEpochSeconds(epoch)
+        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
 
-    val formatter = LocalDateTime.Format {
-        date(LocalDate.Formats.ISO)
-        char(' ')
-        time(LocalTime.Formats.ISO)
+        val formatter = LocalDateTime.Format {
+            date(LocalDate.Formats.ISO)
+            char(' ')
+            time(LocalTime.Formats.ISO)
+        }
+
+        dateTime.format(formatter)
+    } catch (e: Exception) {
+        "Invalid date"
     }
-    return dateTime.format(formatter)
 }

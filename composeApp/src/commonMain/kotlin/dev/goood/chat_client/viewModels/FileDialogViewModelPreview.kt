@@ -36,7 +36,7 @@ class FileDialogViewModelPreview : FileDialogViewModel() {
                 obj = "Obj",
                 bytes = 123456,
                 createdAt = 1613677385,
-                filename = "salesOverview1.pdf",
+                filename = "salesOverview1_some_very_long_file_name.pdf",
                 purpose = "assistants"
             ),
             MFile(
