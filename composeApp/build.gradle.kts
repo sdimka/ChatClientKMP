@@ -15,6 +15,10 @@ plugins {
     kotlin("plugin.serialization") version "2.1.21"
 }
 
+val appVersionName = "1.0.0"
+val appVersionCode = 1
+val appName = "PolyChat"
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -29,7 +33,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = appName
             isStatic = true
         }
     }
@@ -61,6 +65,7 @@ kotlin {
             implementation(libs.compose.adaptive)
             implementation(libs.compose.adaptive.layout)
             implementation(libs.compose.adaptive.navigation)
+            implementation(compose.components.resources)
             implementation("org.jetbrains.compose.material3:material3-window-size-class:1.8.2")
 
             implementation(libs.koin.core)
@@ -103,8 +108,8 @@ android {
         applicationId = "dev.goood.chat_client"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
     }
     packaging {
         resources {
@@ -140,8 +145,8 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "dev.goood.chat_client"
-            packageVersion = "1.0.0"
+            packageName = appName
+            packageVersion = appVersionName
 
             macOS {
                 iconFile.set(project.file("src/commonMain/composeResources/drawable/icon.icns"))
