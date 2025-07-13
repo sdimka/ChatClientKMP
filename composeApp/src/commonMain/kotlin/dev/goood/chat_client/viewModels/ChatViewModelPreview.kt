@@ -1,6 +1,7 @@
 package dev.goood.chat_client.viewModels
 
 
+import androidx.lifecycle.SavedStateHandle
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageList
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class ChatViewModelPreview: ChatViewModel() {
+class ChatViewModelPreview(handle: SavedStateHandle) : ChatViewModel(handle) {
 
     private val _state = MutableStateFlow<State>(State.Loading)
     override val state: StateFlow<State> = _state

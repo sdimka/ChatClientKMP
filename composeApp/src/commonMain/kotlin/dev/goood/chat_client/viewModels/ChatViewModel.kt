@@ -1,5 +1,6 @@
 package dev.goood.chat_client.viewModels
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
@@ -8,7 +9,7 @@ import dev.goood.chat_client.model.SystemMessage
 import dev.goood.chat_client.model.SystemMessageList
 import kotlinx.coroutines.flow.StateFlow
 
-abstract class ChatViewModel: ViewModel() {
+abstract class ChatViewModel(val handle: SavedStateHandle): ViewModel() {
 
     abstract val state: StateFlow<State>
     abstract val messages: StateFlow<MessageList>

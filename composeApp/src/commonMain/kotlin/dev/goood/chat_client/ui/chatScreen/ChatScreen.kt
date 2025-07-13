@@ -80,10 +80,13 @@ fun ChatScreen(
     val deleteDialogState = remember { mutableStateOf<Message?>(null) }
 
     LaunchedEffect(chatID) {
-        if (chatID != null) {
-            viewModel.resetChatSpecificStates()
-            viewModel.getMessages(chatID)
-        }
+        val id = chatID ?: return@LaunchedEffect
+        viewModel.resetChatSpecificStates()
+        viewModel.getMessages(id)
+//        if (chatID != null) {
+//            viewModel.resetChatSpecificStates()
+//            viewModel.getMessages(chatID)
+//        }
     }
 
     Box(
@@ -189,7 +192,7 @@ fun MessageList(
             }
         }
 
-        items(messagesList) { message ->
+        items(messagesList, key = { it.id }) { message ->
             MessageElement(
                 message = message,
                 onToClipboard = { copyContent(message.content) },

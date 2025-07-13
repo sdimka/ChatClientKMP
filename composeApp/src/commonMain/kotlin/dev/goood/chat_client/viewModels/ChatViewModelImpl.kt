@@ -1,5 +1,7 @@
 package dev.goood.chat_client.viewModels
 
+import androidx.compose.animation.core.copy
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
@@ -15,13 +17,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class ChatViewModelImpl: ChatViewModel(), KoinComponent {
+class ChatViewModelImpl(handle: SavedStateHandle) : ChatViewModel(handle), KoinComponent {
 
     private val api: Api by inject()
     private val systemMessagesService: SystemMessagesService by inject()
@@ -35,7 +38,12 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     private val _newReply = MutableStateFlow<String>("")
     override val newReply: StateFlow<String> = _newReply
 
-    private var currentChatId = 1
+//    private var currentChatId = 1
+
+//    private val savedStateHandle: SavedStateHandle by inject()
+    private var currentChatId: Int
+        get() = handle["chatId"] ?: -1
+        set(value) { handle["chatId"] = value }
 
     override val systemMessages: StateFlow<SystemMessageList> = systemMessagesService.messages
 
@@ -62,7 +70,7 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
     }
 
     override fun onPreviousMessagesEnabledChanged(checked: Boolean) {
-        _isPreviousMessagesEnabled.value = !_isPreviousMessagesEnabled.value
+        _isPreviousMessagesEnabled.value = checked
     }
 
     override fun selectSysMessage(sysMessage: SystemMessage?) {
@@ -85,17 +93,23 @@ class ChatViewModelImpl: ChatViewModel(), KoinComponent {
         _state.value = State.Loading
         currentChatId = chatId
         viewModelScope.launch {
-            api.chatApi.getMessages(chatId)
-                .catch {
 
-                    _state.value = State.Error(it.message ?: "Unknown error")
-                }
-                .collect { list ->
-                    // Save previously selected messages
-                    val currentSelectedIds = _messages.value.filter { it.isSelected }.map { it.id }.toSet()
-                    _messages.value = list.map {
-                            it.copy(isSelected = currentSelectedIds.contains(it.id))
+            val currentSelectedIds = _messages.value
+                .filter { it.isSelected }
+                .map { it.id }
+                .toSet()
+
+            api.chatApi.getMessages(chatId)
+                .map { apiList ->
+                    apiList.map { message ->
+                        message.copy(isSelected = currentSelectedIds.contains(message.id))
                     }.sortedByDescending { it.id }
+                }
+                .catch { e ->
+                    _state.value = State.Error(e.message ?: "Unknown error")
+                }
+                .collect { processedMessages ->
+                    _messages.value = processedMessages
                     _state.value = State.Success
                 }
         }

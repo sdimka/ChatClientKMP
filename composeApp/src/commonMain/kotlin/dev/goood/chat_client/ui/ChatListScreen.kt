@@ -25,8 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
-import androidx.compose.material3.adaptive.layout.PaneExpansionState
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,7 +48,6 @@ import dev.goood.chat_client.model.ChatList
 import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.composable.AddChatDialog
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
-import dev.goood.chat_client.ui.composable.CButton
 import dev.goood.chat_client.ui.composable.DeleteDialogImp
 import dev.goood.chat_client.ui.composable.SwipeableWithActions
 import dev.goood.chat_client.viewModels.MainViewModel
@@ -128,7 +125,7 @@ fun ChatListScreen(
         extraPane = {  },
     )
 
-    val dialogState by viewModel.addChatDialogState.collectAsState()
+    val dialogState by viewModel.addChatDialogState.collectAsStateWithLifecycle()
     if (dialogState) {
         AddChatDialog(
             onDismiss = { viewModel.addChatDialogState.value = false },
@@ -139,7 +136,7 @@ fun ChatListScreen(
         )
     }
 
-    val deleteDialogState by viewModel.deleteChatDialogState.collectAsState()
+    val deleteDialogState by viewModel.deleteChatDialogState.collectAsStateWithLifecycle()
     deleteDialogState?.let { chatToDelete ->
         DeleteDialogImp(
             item = chatToDelete,
@@ -176,7 +173,7 @@ fun ListScaffold(
                         .fillMaxSize()
                         .padding(top = 15.dp)
                 ) {
-                    items(chats) { chat ->
+                    items(chats, key = { it.id }) { chat ->
                         ChatElement(
                             chat = chat,
                             toChat = toChat,
@@ -239,14 +236,16 @@ fun ChatElement(
     toChat: (chat: Chat) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val  resource: DrawableResource = when (chat.source.id) {
-        1 -> Res.drawable.gemini
-        2 -> Res.drawable.openai_
-        4 -> Res.drawable.test
-        else -> {
-            Res.drawable.unknown
+
+    val resource = remember(chat.source.id) {
+        when (chat.source.id) {
+            1 -> Res.drawable.gemini
+            2 -> Res.drawable.openai_
+            4 -> Res.drawable.test
+            else -> Res.drawable.unknown
         }
     }
+
     SwipeableWithActions(
         isRevealed = false,
         actions = {
