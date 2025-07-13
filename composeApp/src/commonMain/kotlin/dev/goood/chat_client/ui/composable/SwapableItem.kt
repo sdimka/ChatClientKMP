@@ -20,10 +20,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -52,6 +55,7 @@ fun SwipeableWithActions(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
+            .clipToBounds()
     ) {
 
         Row(
@@ -69,7 +73,11 @@ fun SwipeableWithActions(
             color = Color.Transparent,
             modifier = Modifier
                 .fillMaxSize()
-                .offset { IntOffset(offset.value.roundToInt(), 0) }
+//                .offset { IntOffset(offset.value.roundToInt(), 0) }
+                .graphicsLayer { // Use graphicsLayer for translation and clipping
+                    translationX = offset.value
+                    clip = true // Clip the content to its bounds after translation
+                }
                 .pointerInput(contextMenuWidth) {
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { _, dragAmount ->

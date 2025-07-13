@@ -4,13 +4,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
@@ -53,6 +50,7 @@ import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessageDetailScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import dev.goood.chat_client.ui.composable.BottomNavBar
 import dev.goood.chat_client.ui.platformComposable.PlatformWindowSize
 
 
@@ -100,6 +98,13 @@ fun MainContainer(
         isListDetailPaneShowingDetail = showingDetail
         onListDetailPaneNavigateBack = navigateBackAction
     }
+
+    val currentSelectedItem = remember(currentDestination, items) {
+        items.find { item ->
+            currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
+        }
+    }
+
 
     LaunchedEffect(currentDestination) {
         val newTitle = when {
@@ -182,26 +187,17 @@ fun MainContainer(
         },
         bottomBar = {
             if (!useNavRail) {
-                NavigationBar(
-                    modifier = Modifier.height(56.dp),
-                    tonalElevation = 4.dp
-                ) {
-                    items.forEach { item ->
-                        val selected = currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                nestedNavController.navigate(route = item.route) {
-                                    popUpTo(nestedNavController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = { Icon(item.icon, contentDescription = item.title) },
-                            label = { Text(item.title) }
-                        )
+                BottomNavBar(
+                    navItems = items,
+                    currentSelectedItem = currentSelectedItem,
+                    onItemSelected = { item ->
+                        nestedNavController.navigate(route = item.route) {
+                            popUpTo(nestedNavController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
-                }
+                )
             }
         },
     ) { paddingValues: PaddingValues ->
@@ -240,7 +236,6 @@ fun MainContainer(
                     }
                 }
             }
-
 
             NavHost(
                 modifier = Modifier
