@@ -35,6 +35,8 @@ foundationAndroid = "1.8.3"
 uiGeometryAndroid = "1.8.3"
 composeIcons = "1.1.1"
 
+sql-delight = "2.1.0"
+
 [libraries]
 filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "filekitDialogs" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekitDialogs" }
@@ -85,6 +87,11 @@ androidx-ui-geometry-android = { group = "androidx.compose.ui", name = "ui-geome
 
 composeIcons-lineAwesome = { module = "br.com.devsrsouza.compose.icons:line-awesome", version.ref = "composeIcons" }
 
+sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sql-delight" }
+sqldelight-desktop-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sql-delight" }
+sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sql-delight" }
+sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sql-delight" }
+sqldelight-coroutines-ext = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sql-delight" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -94,3 +101,5 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 ktorfitPlugin = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfitVersion" }
 kspGradlePlugin = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sql-delight" }

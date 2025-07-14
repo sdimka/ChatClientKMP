@@ -44,7 +44,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.compose.Markdown
 import com.mikepenz.markdown.m3.markdownColor
@@ -60,7 +59,6 @@ import compose.icons.lineawesomeicons.UserNinjaSolid
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.DeleteDialogImp
-import dev.goood.chat_client.ui.platformComposable.PlatformContextMenu
 import dev.goood.chat_client.ui.theme.defaultMarkDownTypography
 import dev.goood.chat_client.ui.theme.defaultTextSize
 import dev.goood.chat_client.viewModels.ChatViewModel
@@ -83,10 +81,6 @@ fun ChatScreen(
         val id = chatID ?: return@LaunchedEffect
         viewModel.resetChatSpecificStates()
         viewModel.getMessages(id)
-//        if (chatID != null) {
-//            viewModel.resetChatSpecificStates()
-//            viewModel.getMessages(chatID)
-//        }
     }
 
     Box(
@@ -293,11 +287,11 @@ fun MessageElement(
                     }
                 }
             }
-        PlatformContextMenu(
-            selectedTextProvider = {
-                ""
-            }
-        ) {
+//        PlatformContextMenu(
+//            selectedTextProvider = {
+//                ""
+//            }
+//        ) {
             SelectionContainer(
 
             ) {
@@ -310,8 +304,7 @@ fun MessageElement(
                         .padding(vertical = 8.dp)
                 )
             }
-        }
-
+//        }
     }
 }
 

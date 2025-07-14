@@ -13,6 +13,8 @@ data class Message (
     @SerialName("system_message")
     val systemMessage: SystemMessage? = null,
     val files: List<AttachedFiles>? = null,
+    @SerialName("updated_at")
+    val updatedAt: String,
     val isSelected: Boolean = false
 )
 

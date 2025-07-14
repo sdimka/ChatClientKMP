@@ -1,0 +1,34 @@
+-- To generate:
+-- ./gradlew generateCommonMainAppDatabaseInterface
+
+CREATE TABLE Message (
+    id INTEGER NOT NULL PRIMARY KEY,
+    chatID INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    initiator INTEGER NOT NULL,
+    role TEXT NOT NULL,
+    systemMessage TEXT NOT NULL,
+    files TEXT NOT NULL,
+    updatedAt TEXT NOT NULL
+);
+
+selectMessages:
+SELECT * FROM Message
+WHERE chatID = ?
+ORDER BY id DESC;
+
+deleteMessage:
+DELETE FROM Message
+WHERE id = ?;
+
+insertOrReplaceMessage:
+INSERT OR REPLACE INTO Message(
+        id ,
+        chatID ,
+        content,
+        initiator,
+        role,
+        systemMessage,
+        files,
+        updatedAt
+) VALUES (?, ?,?,?,?,?,?,?);

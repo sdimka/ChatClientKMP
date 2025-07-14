@@ -38,16 +38,18 @@ class ChatViewModelPreview(handle: SavedStateHandle) : ChatViewModel(handle) {
             initiator = 0,
             role = "A",
             systemMessage = SystemMessage(
-                id =1,
+                id = 1,
                 title = "Sys message",
                 content = ""
-            )
+            ),
+            updatedAt = "",
         ),
         Message(
             id = 2,
             content = "Some reply content",
             initiator = 1,
-            role = "A"
+            role = "A",
+            updatedAt = "",
         )
     )
 

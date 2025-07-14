@@ -26,6 +26,7 @@ import dev.goood.chat_client.viewModels.SystemMessagesViewModel
 import dev.goood.chat_client.viewModels.SystemMessagesViewModelImpl
 import dev.goood.chat_client.viewModels.SystemMessagesViewModelPreview
 import dev.goood.chat_client.viewModels.TranslateViewModel
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModelOf

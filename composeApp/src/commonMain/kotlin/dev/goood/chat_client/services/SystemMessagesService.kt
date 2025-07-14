@@ -1,5 +1,6 @@
 package dev.goood.chat_client.services
 
+import dev.goood.chat_client.cache.DatabaseDriverFactory
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.model.SystemMessage
 import dev.goood.chat_client.model.SystemMessageList
@@ -17,9 +18,12 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class SystemMessagesService: KoinComponent {
+class SystemMessagesService(
+    private val api: Api,
+    databaseDriverFactory: DatabaseDriverFactory,
+): KoinComponent {
 
-    val api: Api by inject()
+//    val api: Api by inject()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     private val _state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
@@ -36,15 +40,12 @@ class SystemMessagesService: KoinComponent {
             emptyList()
         )
 
-//    private val _selectedMessage: MutableStateFlow<SystemMessage?> = MutableStateFlow(null)
-//    val selectedMessage = _selectedMessage.asStateFlow()
 
     private fun updateMessages(){
         scope.launch {
             _state.value = State.Loading
             api.chatApi.getSystemMessages()
                 .catch {
-                    print(it.message)
                     _state.value = State.Error(message = it.message ?: "Unknown error")
                 }
                 .collect {

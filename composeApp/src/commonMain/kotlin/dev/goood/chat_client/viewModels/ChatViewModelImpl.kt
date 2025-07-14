@@ -3,6 +3,7 @@ package dev.goood.chat_client.viewModels
 import androidx.compose.animation.core.copy
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import dev.goood.chat_client.cache.DatabaseDriverFactory
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
 import dev.goood.chat_client.model.AttachedFiles
@@ -24,9 +25,12 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class ChatViewModelImpl(handle: SavedStateHandle) : ChatViewModel(handle), KoinComponent {
+class ChatViewModelImpl(
+    handle: SavedStateHandle,
+    private val api: Api,
+    databaseDriverFactory: DatabaseDriverFactory,
+) : ChatViewModel(handle), KoinComponent {
 
-    private val api: Api by inject()
     private val systemMessagesService: SystemMessagesService by inject()
 
     private val _messages = MutableStateFlow<MessageList>(emptyList())
@@ -38,9 +42,6 @@ class ChatViewModelImpl(handle: SavedStateHandle) : ChatViewModel(handle), KoinC
     private val _newReply = MutableStateFlow<String>("")
     override val newReply: StateFlow<String> = _newReply
 
-//    private var currentChatId = 1
-
-//    private val savedStateHandle: SavedStateHandle by inject()
     private var currentChatId: Int
         get() = handle["chatId"] ?: -1
         set(value) { handle["chatId"] = value }

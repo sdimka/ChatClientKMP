@@ -13,6 +13,8 @@ plugins {
     alias(libs.plugins.ktorfitPlugin)
 
     kotlin("plugin.serialization") version "2.1.21"
+
+    alias(libs.plugins.sqldelight)
 }
 
 val appVersionName = "1.0.0"
@@ -49,6 +51,8 @@ kotlin {
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel.nav)
+
+            implementation(libs.sqldelight.android.driver)
         }
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)
@@ -92,10 +96,19 @@ kotlin {
             implementation(libs.filekit.dialogs)
             implementation(libs.filekit.dialogs.compose)
             implementation(libs.filekit.coil)
+
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines.ext)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+
+            implementation(libs.sqldelight.desktop.driver)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native.driver)
         }
     }
 }
@@ -151,6 +164,14 @@ compose.desktop {
             macOS {
                 iconFile.set(project.file("src/commonMain/composeResources/drawable/icon.icns"))
             }
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("AppDatabase") {
+            packageName.set("dev.goood.chat_client.cache")
         }
     }
 }
