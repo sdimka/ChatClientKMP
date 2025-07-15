@@ -105,25 +105,18 @@ class ChatViewModelImpl(
                 .toSet()
 
             _messages.value = database.getMessages(chatId).first()
-//                .collect {
-//                    _messages.value = it
-//                }
-
-            println("After collect")
 
             val timeStamp = database.getLastUpdateTime(chatId)?.let {
                 Instant.fromEpochMilliseconds(it).toString() }
-
-            println("Time stamp: $timeStamp")
 
             api.chatApi.getNewMessages(chatId, timeStamp?: "")
                 .map { apiList ->
                     println("Get Api list ${apiList.first()}")
                     database.updateMessages(chatId, apiList)
-                    apiList
-//                    apiList.map { message ->
-//                        message.copy(isSelected = currentSelectedIds.contains(message.id))
-//                    }.sortedByDescending { it.id }
+
+                    apiList.map { message ->
+                        message.copy(isSelected = currentSelectedIds.contains(message.id))
+                    }.sortedByDescending { it.id }
                 }
                 .catch { e ->
                     println(e.printStackTrace())
@@ -144,7 +137,11 @@ class ChatViewModelImpl(
                     _state.value = State.Error(it.message ?: "Unknown error")
                 }
                 .collect {
-                    getMessages(currentChatId)
+                    database.deleteMessage(message.id)
+                    _messages.update { currentList ->
+                        currentList.filter { it.id != message.id }
+                    }
+                    _state.value = State.Success
                 }
         }
     }
@@ -190,26 +187,28 @@ class ChatViewModelImpl(
                 .collect { event ->
                     when (event) {
                         is ReplyVariants.SavedRequest -> {
+                            database.updateMessages(currentChatId, listOf(event.content))
                             _messages.update { currentList ->
-                                (currentList + event.content).sortedByDescending { it.id }
-                        }
+                                (listOf(event.content) + currentList)//.sortedByDescending { it.id }
+                            }
                         }
 
                         is ReplyVariants.Chunks -> {
                             _newReply.value += event.content.data
                         }
+
                         is ReplyVariants.FinalReply -> {
+                            database.updateMessages(currentChatId, listOf(event.content))
                             _messages.update { currentList ->
-                                (currentList + event.content).sortedByDescending { it.id }
+                                (listOf(event.content) + currentList)//.sortedByDescending { it.id }
                             }
                         }
+
                         is ReplyVariants.Error -> {
                             _state.value = State.Error(event.message)
                         }
                     }
-
                 }
-
         }
     }
 

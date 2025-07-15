@@ -15,6 +15,8 @@ data class Message (
     val files: List<AttachedFiles>? = null,
     @SerialName("updated_at")
     val updatedAt: String,
+    @SerialName("deleted_at")
+    val deletedAt: String? = null,
     val isSelected: Boolean = false
 )
 

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -161,7 +162,7 @@ fun MessageList(
     onDelete: (Message) -> Unit,
 ) {
 
-    val scrollState = rememberScrollState()
+    val listState = rememberLazyListState()
     val state = viewModel.state.collectAsStateWithLifecycle()
     val newReply = viewModel.newReply.collectAsStateWithLifecycle()
     val isSelectedEnabled by viewModel.isPreviousMessagesEnabled.collectAsStateWithLifecycle()
@@ -173,12 +174,17 @@ fun MessageList(
         clipboardManager.setText(AnnotatedString(text))
     }
 
+    LaunchedEffect(messagesList, state) {
+        if (messagesList.isNotEmpty() || state.value is State.NewReply) {
+            listState.animateScrollToItem(index = 0)
+        }
+    }
+
     LazyColumn(
+        state = listState,
         reverseLayout = true,
         modifier = modifier
-//            .fillMaxWidth()
             .padding(5.dp)
-//            .padding(bottom = 60.dp)
     ) {
         if (state.value is State.NewReply) {
             item {

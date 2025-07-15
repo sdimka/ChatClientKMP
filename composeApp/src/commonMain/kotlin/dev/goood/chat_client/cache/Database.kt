@@ -18,8 +18,24 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
     @OptIn(ExperimentalTime::class)
     fun updateMessages(chatID: Int, messages: List<Message>) {
 
+        val messagesToDelete = mutableListOf<Message>()
+        val messagesToUpsert = mutableListOf<Message>()
+
+        for (message in messages) {
+            if (message.deletedAt != null) {
+                messagesToDelete.add(message)
+            } else {
+                messagesToUpsert.add(message)
+            }
+        }
+
         dbQueries.transaction {
-            messages.forEach { message ->
+
+            messagesToDelete.forEach { messageToDelete ->
+                deleteMessage(messageToDelete.id) // Assuming this is synchronous or handled correctly within the transaction
+            }
+
+            messagesToUpsert.forEach { message ->
 
                 val files: String? = message.files?.takeIf { it.isNotEmpty() }?.joinToString(",") { it.name }
 
@@ -38,13 +54,12 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
     }
 
     fun getLastUpdateTime(chatID: Int): Long? {
-        println("Chat id: $chatID")
         return dbQueries.getLastUpdateTime(chatID.toLong()).executeAsOne().highest_value
     }
 
     @OptIn(ExperimentalTime::class)
     fun getMessages(chatID: Int): Flow<List<Message>> {
-        return dbQueries.selectMessages(chatID.toLong()) { id, chatID, content, initiator, role, systemMessage, fNames, updatedAt ->
+        return dbQueries.selectMessages(chatID.toLong()) { id, chatID, content, initiator, role, systemMessage, fNames, updatedAtMillis ->
 
             val sm = systemMessage?.let{
                 SystemMessage(
@@ -65,8 +80,7 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
                 role = role,
                 systemMessage = sm,
                 files = files,
-                // Don't used anywhere, so we don't convert it
-                updatedAt = updatedAt.toString()
+                updatedAt = Instant.fromEpochMilliseconds(updatedAtMillis).toString()
             )
 
         }.asFlow().mapToList(Dispatchers.IO)
