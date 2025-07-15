@@ -7,6 +7,6 @@ import java.util.Properties
 
 class DesktopDatabaseDriverFactory: DatabaseDriverFactory {
     override fun createDriver(): SqlDriver {
-        return JdbcSqliteDriver("jdbc:sqlite:articles.db", Properties(), AppDatabase.Schema)
+        return JdbcSqliteDriver("jdbc:sqlite:messages.db", Properties(), AppDatabase.Schema)
     }
 }

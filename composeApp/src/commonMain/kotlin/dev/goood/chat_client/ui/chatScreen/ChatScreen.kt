@@ -262,6 +262,10 @@ fun MessageElement(
                             .size(18.dp),
                         tint = Color.DarkGray
                     )
+                    Text(
+                        text = "[${message.files.first().name}]",
+                        fontSize = defaultTextSize,
+                    )
                 }
 
                 Spacer(modifier.weight(1f))

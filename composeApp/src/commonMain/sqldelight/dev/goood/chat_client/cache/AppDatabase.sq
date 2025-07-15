@@ -7,9 +7,9 @@ CREATE TABLE Message (
     content TEXT NOT NULL,
     initiator INTEGER NOT NULL,
     role TEXT NOT NULL,
-    systemMessage TEXT NOT NULL,
-    files TEXT NOT NULL,
-    updatedAt TEXT NOT NULL
+    systemMessage TEXT,
+    files TEXT,
+    updatedAt INTEGER NOT NULL
 );
 
 selectMessages:
@@ -32,3 +32,8 @@ INSERT OR REPLACE INTO Message(
         files,
         updatedAt
 ) VALUES (?, ?,?,?,?,?,?,?);
+
+getLastUpdateTime:
+SELECT MAX(updatedAt) AS highest_value
+FROM Message
+WHERE chatID = ?;

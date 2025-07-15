@@ -3,6 +3,7 @@ package dev.goood.chat_client.viewModels
 import androidx.compose.animation.core.copy
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import dev.goood.chat_client.cache.Database
 import dev.goood.chat_client.cache.DatabaseDriverFactory
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.core.network.ReplyVariants
@@ -18,10 +19,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -32,6 +35,7 @@ class ChatViewModelImpl(
 ) : ChatViewModel(handle), KoinComponent {
 
     private val systemMessagesService: SystemMessagesService by inject()
+    private val database = Database(databaseDriverFactory)
 
     private val _messages = MutableStateFlow<MessageList>(emptyList())
     override val messages: StateFlow<MessageList> = _messages
@@ -100,17 +104,33 @@ class ChatViewModelImpl(
                 .map { it.id }
                 .toSet()
 
-            api.chatApi.getMessages(chatId)
+            _messages.value = database.getMessages(chatId).first()
+//                .collect {
+//                    _messages.value = it
+//                }
+
+            println("After collect")
+
+            val timeStamp = database.getLastUpdateTime(chatId)?.let {
+                Instant.fromEpochMilliseconds(it).toString() }
+
+            println("Time stamp: $timeStamp")
+
+            api.chatApi.getNewMessages(chatId, timeStamp?: "")
                 .map { apiList ->
-                    apiList.map { message ->
-                        message.copy(isSelected = currentSelectedIds.contains(message.id))
-                    }.sortedByDescending { it.id }
+                    println("Get Api list ${apiList.first()}")
+                    database.updateMessages(chatId, apiList)
+                    apiList
+//                    apiList.map { message ->
+//                        message.copy(isSelected = currentSelectedIds.contains(message.id))
+//                    }.sortedByDescending { it.id }
                 }
                 .catch { e ->
+                    println(e.printStackTrace())
                     _state.value = State.Error(e.message ?: "Unknown error")
                 }
                 .collect { processedMessages ->
-                    _messages.value = processedMessages
+                    _messages.value = _messages.value + processedMessages
                     _state.value = State.Success
                 }
         }
