@@ -1,5 +1,6 @@
 package dev.goood.chat_client.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -139,6 +140,7 @@ fun MainContainer(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        containerColor = Color(0xFFE7ECEF),
         snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             TopAppBar(
@@ -291,13 +293,13 @@ private fun NavGraphBuilder.addMainNavigationGraph(
             )
         }
 
-        composable<NavigationRoute.ChatDetailRoute> { from: NavBackStackEntry ->
-            val chatId = from.toRoute<NavigationRoute.ChatDetailRoute>().chatID
-            ChatScreen(
-                chatId,
-                snackBarHostState = snackBarHostState
-            )
-        }
+//        composable<NavigationRoute.ChatDetailRoute> { from: NavBackStackEntry ->
+//            val chatId = from.toRoute<NavigationRoute.ChatDetailRoute>().chatID
+//            ChatScreen(
+//                chatId,
+//                snackBarHostState = snackBarHostState
+//            )
+//        }
 
     }
 

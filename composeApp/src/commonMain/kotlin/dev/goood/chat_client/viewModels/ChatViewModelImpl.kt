@@ -1,6 +1,5 @@
 package dev.goood.chat_client.viewModels
 
-import androidx.compose.animation.core.copy
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.cache.Database
@@ -29,10 +28,10 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class ChatViewModelImpl(
-    handle: SavedStateHandle,
+    private val handle: SavedStateHandle,
     private val api: Api,
     databaseDriverFactory: DatabaseDriverFactory,
-) : ChatViewModel(handle), KoinComponent {
+) : ChatViewModel(), KoinComponent {
 
     private val systemMessagesService: SystemMessagesService by inject()
     private val database = Database(databaseDriverFactory)
@@ -57,8 +56,6 @@ class ChatViewModelImpl(
 
     private val _filesList = MutableStateFlow<List<MFile>>(emptyList())
     override val filesList: StateFlow<List<MFile>> = _filesList
-
-//    private val attachedMessages = mutableListOf<Int>()
 
     private val _inputValue = MutableStateFlow("")
     override val inputValue: StateFlow<String> = _inputValue.asStateFlow()
@@ -97,35 +94,62 @@ class ChatViewModelImpl(
     override fun getMessages(chatId: Int){
         _state.value = State.Loading
         currentChatId = chatId
+        if (currentChatId == -1) {
+            _state.value = State.Success
+            _messages.value = emptyList()
+            return
+        }
+
         viewModelScope.launch {
 
-            val currentSelectedIds = _messages.value
-                .filter { it.isSelected }
-                .map { it.id }
-                .toSet()
+            try {
+                // For restore selected messages
+                val currentSelectedIds = _messages.value
+                    .filter { it.isSelected }
+                    .map { it.id }
+                    .toSet()
 
-            _messages.value = database.getMessages(chatId).first()
+                val dbMessages = database.getMessages(chatId).first()
+                    .map { msg -> msg.copy(isSelected = currentSelectedIds.contains(msg.id)) }
+                    .sortedByDescending { it.id } // Ensure initial sort
 
-            val timeStamp = database.getLastUpdateTime(chatId)?.let {
-                Instant.fromEpochMilliseconds(it).toString() }
+                _messages.value = dbMessages
 
-            api.chatApi.getNewMessages(chatId, timeStamp?: "")
-                .map { apiList ->
-                    println("Get Api list ${apiList.first()}")
-                    database.updateMessages(chatId, apiList)
+            } catch (e: Exception) {
+                println("Error loading initial messages from DB: ${e.printStackTrace()}")
+                _state.value = State.Error(e.message ?: "Failed to get messages from db.")
+            }
 
-                    apiList.map { message ->
-                        message.copy(isSelected = currentSelectedIds.contains(message.id))
-                    }.sortedByDescending { it.id }
+            // --- Stage 2: Fetch from API & Update Database ---
+            try {
+                val timeStamp = database.getLastUpdateTime(chatId)?.let {
+                    Instant.fromEpochMilliseconds(it).toString()
                 }
-                .catch { e ->
-                    println(e.printStackTrace())
-                    _state.value = State.Error(e.message ?: "Unknown error")
+
+                val apiMessageList = api.chatApi.getNewMessages(chatId, timeStamp ?: "").first()
+
+                if (apiMessageList.isNotEmpty()) {
+                    database.updateMessages(chatId, apiMessageList)
                 }
-                .collect { processedMessages ->
-                    _messages.value = _messages.value + processedMessages
-                    _state.value = State.Success
-                }
+
+                // --- Stage 3: Reload from Database as Single Source of Truth for UI ---
+                val currentSelectedIds =
+                    _messages.value // Potentially updated selections if user interacted
+                        .filter { it.isSelected }
+                        .map { it.id }
+                        .toSet()
+
+                val finalMessagesFromDb = database.getMessages(chatId).first()
+                    .map { msg -> msg.copy(isSelected = currentSelectedIds.contains(msg.id)) }
+                    .sortedByDescending { it.id } // Ensure final sort
+
+                _messages.value = finalMessagesFromDb
+                _state.value = State.Success
+
+            } catch (e: Exception) {
+                println("Error fetching/processing API messages: ${e.printStackTrace()}")
+                _state.value = State.Error(e.message ?: "Failed to update messages.")
+            }
         }
     }
 
@@ -223,7 +247,7 @@ class ChatViewModelImpl(
 
     override fun onCleared() {
         super.onCleared()
-        // clearInputValue()
+//        println("ViwModel cleared")
     }
 
 }

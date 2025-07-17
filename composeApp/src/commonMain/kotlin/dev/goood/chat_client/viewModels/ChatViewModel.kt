@@ -9,7 +9,7 @@ import dev.goood.chat_client.model.SystemMessage
 import dev.goood.chat_client.model.SystemMessageList
 import kotlinx.coroutines.flow.StateFlow
 
-abstract class ChatViewModel(val handle: SavedStateHandle): ViewModel() {
+abstract class ChatViewModel(): ViewModel() {
 
     abstract val state: StateFlow<State>
     abstract val messages: StateFlow<MessageList>

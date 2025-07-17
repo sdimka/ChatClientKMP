@@ -28,11 +28,11 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,7 +58,6 @@ import kotlinproject.composeapp.generated.resources.openai_
 import kotlinproject.composeapp.generated.resources.test
 import kotlinproject.composeapp.generated.resources.unknown
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -78,7 +77,7 @@ fun ChatListScreen(
     val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>()
     val scope = rememberCoroutineScope()
 
-    val selectedChat = remember { mutableStateOf<Chat?>(null) }
+    val selectedChatID = rememberSaveable { mutableStateOf<Int>(-1) }
 
     LaunchedEffect(navigator.scaffoldValue) {
         val isDetailShowing = navigator.canNavigateBack()
@@ -105,7 +104,7 @@ fun ChatListScreen(
                 onEdit = {  },
                 onDelete = { chatToDel -> viewModel.deleteChatDialogState.value = chatToDel},
                 toChat = {
-                    selectedChat.value = it
+                    selectedChatID.value = it.id
                     toChat(it)
                     scope.launch {
                         navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
@@ -117,7 +116,7 @@ fun ChatListScreen(
         },
         detailPane = {
             ChatScreen(
-                chatID = selectedChat.value?.id ?: -1,
+                chatID = selectedChatID.value,
                 modifier = Modifier,
                 snackBarHostState = snackBarHostState
             )

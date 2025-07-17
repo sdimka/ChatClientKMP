@@ -88,7 +88,7 @@ fun ChatScreen(
         contentAlignment = Alignment.BottomEnd,
         modifier = modifier
             .fillMaxSize()
-//            .background(Color.Cyan)
+            .background(Color(0xFFE7ECEF))
     ) {
         Column(
             modifier = modifier.fillMaxSize()
