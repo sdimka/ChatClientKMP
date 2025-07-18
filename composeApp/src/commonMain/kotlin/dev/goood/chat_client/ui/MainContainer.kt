@@ -54,6 +54,7 @@ import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import dev.goood.chat_client.ui.composable.BottomNavBar
 import dev.goood.chat_client.ui.platformComposable.PlatformWindowSize
+import dev.goood.chat_client.ui.theme.mainBackgroundColor
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
@@ -140,7 +141,7 @@ fun MainContainer(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Color(0xFFE7ECEF),
+        containerColor = mainBackgroundColor,
         snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             TopAppBar(
@@ -148,7 +149,7 @@ fun MainContainer(
                     Text(topBarTitle)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
+                    containerColor = Color.Transparent
                 ),
                 navigationIcon = {
                     if (navButtonEnabled) {

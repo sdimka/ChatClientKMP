@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
@@ -56,7 +56,6 @@ import compose.icons.lineawesomeicons.InfoSolid
 import compose.icons.lineawesomeicons.Save
 import compose.icons.lineawesomeicons.TrashAlt
 import compose.icons.lineawesomeicons.User
-import compose.icons.lineawesomeicons.UserNinjaSolid
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.DeleteDialogImp
@@ -64,6 +63,9 @@ import dev.goood.chat_client.ui.theme.defaultMarkDownTypography
 import dev.goood.chat_client.ui.theme.defaultTextSize
 import dev.goood.chat_client.viewModels.ChatViewModel
 import dev.goood.chat_client.viewModels.ChatViewModel.State
+import kotlinproject.composeapp.generated.resources.Res
+import kotlinproject.composeapp.generated.resources.ai_icon
+import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -214,7 +216,7 @@ fun MessageElement(
     onSelect: (messageID: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val icon = if (message.initiator == 0) LineAwesomeIcons.User else LineAwesomeIcons.UserNinjaSolid
+    val icon = if (message.initiator == 0) LineAwesomeIcons.User else vectorResource(Res.drawable.ai_icon)
     val bColor = if (message.initiator == 0) Color(0xFF6096BA) else Color(0xFFA3CEF1)
     val text = if (message.initiator == 0) "User" else "Assistant"
 
@@ -233,17 +235,24 @@ fun MessageElement(
                     .padding(horizontal = 16.dp)
 //                    .padding(vertical = 3.dp)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = "User icon",
-                    modifier = modifier.size(22.dp),
-                    tint = Color.Black
-                )
+                Box(
+                    modifier = Modifier
+                        .size(26.dp) // Set the size of the background container
+                        .background(Color(0xFFF1DE81), CircleShape) // Apply blue background with CircleShape
+                        .padding(1.dp) // Add padding around the icon
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "User icon",
+//                        modifier = modifier.size(22.dp),
+                        tint = Color.Black
+                    )
+                }
 
-                Text(
-                    text = text,
-                    modifier = modifier.padding(start = 5.dp).padding(end = 10.dp)
-                )
+//                Text(
+//                    text = text,
+//                    modifier = modifier.padding(start = 5.dp).padding(end = 10.dp)
+//                )
 
                 if (message.systemMessage != null) {
                     Icon(

@@ -52,7 +52,7 @@ fun BottomNavBar(
     selectedItemTint: Color = Color.White,
     backgroundTint: Color = Color.Transparent,
     selectedBackgroundTint: Color = Color(0xFF4C6DED),
-    selectedItemOffset: Dp = 12.dp
+    selectedItemOffset: Dp = 5.dp
 ) {
 
     Box(
@@ -143,7 +143,7 @@ private fun BottomNavBarItem(
                     text = item.title,
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Visible,
-                    modifier = Modifier.padding(top = 4.dp),
+//                    modifier = Modifier.padding(top = 4.dp),
                     color = itemTint,
                     fontSize = fontSize
                 )
