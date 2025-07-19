@@ -1,6 +1,5 @@
 package dev.goood.chat_client.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -48,7 +47,6 @@ import compose.icons.lineawesomeicons.HeadsetSolid
 import compose.icons.lineawesomeicons.HourglassEndSolid
 import compose.icons.lineawesomeicons.ListSolid
 import dev.goood.chat_client.NavigationRoute
-import dev.goood.chat_client.ui.chatScreen.ChatScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessageDetailScreen
 import dev.goood.chat_client.ui.systemMessages.SystemMessagesScreen
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
