@@ -22,9 +22,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class ChatViewModelImpl(
     private val handle: SavedStateHandle,
@@ -90,6 +92,7 @@ class ChatViewModelImpl(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     override fun getMessages(chatId: Int){
         _state.value = State.Loading
         currentChatId = chatId

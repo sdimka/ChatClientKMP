@@ -66,7 +66,7 @@ import io.github.vinceglb.filekit.readBytes
 import io.github.vinceglb.filekit.size
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -75,6 +75,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.ExperimentalTime
 
 
 @Composable
@@ -384,6 +385,8 @@ fun FileElement(
     }
 }
 
+
+@OptIn(ExperimentalTime::class)
 private fun dateMillisToString(epoch: Long): String {
     return try {
         val instant = Instant.fromEpochSeconds(epoch)

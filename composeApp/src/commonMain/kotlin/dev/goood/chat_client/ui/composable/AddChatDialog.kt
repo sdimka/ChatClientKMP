@@ -1,16 +1,23 @@
 package dev.goood.chat_client.ui.composable
 
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,10 +25,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,7 +35,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.goood.chat_client.ui.theme.buttonBackground
+import dev.goood.chat_client.ui.theme.grayBackground
 import dev.goood.chat_client.viewModels.AddChatViewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -56,74 +65,156 @@ internal fun AddChatDialog(
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = onDismiss,
-
-    ){
+    ) {
         Surface(
-            shape = RoundedCornerShape(16.dp),
-            modifier = modifier.fillMaxSize()
-                .padding(20.dp)
+            shape = RoundedCornerShape(24.dp),
+            modifier = modifier
+                .wrapContentSize()
+                .widthIn(max = 500.dp)
+                .shadow(elevation = 8.dp, shape = RoundedCornerShape(24.dp))
+                .background(Color.White, RoundedCornerShape(24.dp))
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top,
+                verticalArrangement = Arrangement.spacedBy(0.dp),
                 modifier = modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .background(Color.White, RoundedCornerShape(24.dp))
             ) {
-                Text(
-                    text = "Add new chat",
-                    fontSize = 25.sp,
+                // Header section with title
+                Box(
                     modifier = modifier
-                        .height(50.dp)
-                        .padding(vertical = 10.dp)
-                )
-
-                MTextFiled(
-                    value = chatName,
-                    onValueChange = { viewModel.setChatName(it) },
-//                    label = { Text("Chat name") },
-                    modifier = modifier.padding(bottom = 10.dp)
-
-                )
-
-                SegmentedButtons(
-                    choiceList = sourceList,
-                    onSelected = {
-                        viewModel.setSelectedSource(it)
-                    },
-                    modifier = modifier
-                        .padding(vertical = 20.dp)
-                        .padding(horizontal = 10.dp),
-                )
-
-                DropDownMenu(
-                    itemList = modelList,
-                    selectedItem = selectedModel,
-                    onSelected = {  viewModel.setSelectedModel(it) },
-                    itemLabel = { it.displayName },
-                    modifier = modifier.padding(bottom = 10.dp)
-                )
-
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier.padding(top = 15.dp)
+                        .fillMaxWidth()
+                        .background(
+                            buttonBackground.copy(alpha = 0.1f),
+                            RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                        )
+                        .padding(vertical = 24.dp, horizontal = 24.dp),
+                    contentAlignment = Alignment.Center
                 ) {
+                    Text(
+                        text = "Create New Chat",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = buttonBackground
+                    )
+                }
+
+                HorizontalDivider(
+                    color = Color.LightGray.copy(alpha = 0.3f),
+                    thickness = 1.dp
+                )
+
+                // Content section
+                Column(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Chat name field
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Chat Name",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.DarkGray,
+                            modifier = modifier.padding(start = 4.dp)
+                        )
+                        MTextFiled(
+                            value = chatName,
+                            onValueChange = { viewModel.setChatName(it) },
+                            modifier = modifier.fillMaxWidth()
+                        )
+                    }
+
+                    // Source selection
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Source",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.DarkGray,
+                            modifier = modifier.padding(start = 4.dp)
+                        )
+                        SegmentedButtons(
+                            choiceList = sourceList,
+                            onSelected = {
+                                viewModel.setSelectedSource(it)
+                            },
+                            modifier = modifier.fillMaxWidth()
+                        )
+                    }
+
+                    // Model selection
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Model",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.DarkGray,
+                            modifier = modifier.padding(start = 4.dp)
+                        )
+                        DropDownMenu(
+                            itemList = modelList,
+                            selectedItem = selectedModel,
+                            onSelected = { viewModel.setSelectedModel(it) },
+                            itemLabel = { it.displayName },
+                            modifier = modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                HorizontalDivider(
+                    color = Color.LightGray.copy(alpha = 0.3f),
+                    thickness = 1.dp
+                )
+
+                // Action buttons section
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = modifier
+                            .weight(1f)
+                            .height(44.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.DarkGray
+                        ),
+                        border = BorderStroke(
+                            1.5.dp,
+                            Color.LightGray
+                        )
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
                     CButton(
-                        text = "Ok",
+                        text = "Create",
                         onClick = {
                             viewModel.createNewChat()
                             onSaved()
-                                  },
+                        },
                         enabled = state.value is AddChatViewModel.State.FormValid,
-                        modifier = modifier.padding(bottom = 10.dp)
-
-                    )
-                    CButton(
-                        text = "Cancel",
-                        onClick = onDismiss,
-                        modifier = modifier.padding(bottom = 10.dp)
-
+                        modifier = modifier
+                            .weight(1f)
+                            .height(44.dp)
                     )
                 }
             }
@@ -135,53 +226,44 @@ internal fun AddChatDialog(
 fun MTextFiled(
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp)
-            .clip(RoundedCornerShape(5.dp))
-            .background(Color.LightGray)
-    ) {
-        Text(
-            text = "Title:",
-            modifier = modifier.padding(start = 5.dp)
-        )
-
-        BasicTextField(
-            value = value,
-            singleLine = true,
-            textStyle = TextStyle(
-                color = Color.DarkGray,
-                fontFamily = FontFamily.Companion.Monospace,
-                fontWeight = FontWeight.Medium,
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        placeholder = {
+            Text(
+                text = "Enter chat name...",
+                color = Color.Gray.copy(alpha = 0.6f),
                 fontSize = 15.sp
-            ),
+            )
+        },
+        textStyle = TextStyle(
+            color = Color.DarkGray,
+            fontWeight = FontWeight.Normal,
+            fontSize = 15.sp
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = grayBackground,
+            focusedBorderColor = buttonBackground,
+            unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
+            focusedTextColor = Color.DarkGray,
+            unfocusedTextColor = Color.DarkGray,
+            cursorColor = buttonBackground
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.fillMaxWidth()
+    )
+}
 
-//        keyboardOptions = KeyboardOptions(
-//            keyboardType = KeyboardType.Text,
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrect = false,
-//            imeAction = ImeAction.Search
-//        ),
+@Preview
+@Composable
+fun AddChatDialogPreview(){
+    AddChatDialog(
+        onDismiss = {},
+        onSaved = {},
 
-//        keyboardActions = KeyboardActions(
-//            onSearch = {
-//                onExecuteSearch()
-//            }
-//        ),
-
-            onValueChange = {
-                onValueChange(it)
-            },
-
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(all = 5.dp)
-//                .height(30.dp)
-        )
-    }
+    )
 }
