@@ -11,8 +11,7 @@ plugins {
 
     alias(libs.plugins.kspGradlePlugin)
     alias(libs.plugins.ktorfitPlugin)
-
-    kotlin("plugin.serialization") version "2.1.21"
+    alias(libs.plugins.kotlinSerialization)
 
     alias(libs.plugins.sqldelight)
 }
@@ -30,7 +29,6 @@ kotlin {
     }
     
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -62,6 +60,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(compose.preview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
 
