@@ -1,5 +1,7 @@
 package dev.goood.chat_client.viewModels
 
+import dev.goood.chat_client.core.network.toUserMessage
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
@@ -40,7 +42,7 @@ class TranslateViewModel: ViewModel(), KoinComponent {
             _state.value = TranslateState.Loading
             api.translateApi.translate(message)
                 .catch {
-                    _state.value = TranslateState.Error(it.message?: "Unknown error")
+                    _state.value = TranslateState.Error(it.toUserMessage())
                 }
                 .collect { res ->
                     resultString.value = res.translatedText

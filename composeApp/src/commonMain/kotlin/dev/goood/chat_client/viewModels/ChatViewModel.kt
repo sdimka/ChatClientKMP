@@ -19,6 +19,7 @@ abstract class ChatViewModel(): ViewModel() {
     abstract val filesList: StateFlow<List<MFile>>
     abstract val inputValue: StateFlow<String>
     abstract val isPreviousMessagesEnabled: StateFlow<Boolean>
+    abstract val failedReply: StateFlow<FailedReply?>
 
 
     abstract fun selectSysMessage(sysMessage: SystemMessage?)
@@ -31,8 +32,13 @@ abstract class ChatViewModel(): ViewModel() {
     abstract fun onPreviousMessagesEnabledChanged(checked: Boolean)
     abstract fun onSelectedMessagesListUpdate(messageID: Int)
     abstract fun resetChatSpecificStates()
+    abstract fun retryFailedReply()
+    abstract fun dismissFailedReply()
 
 
+
+    /** A streamed reply that failed; [partialText] is whatever was generated before the error. */
+    data class FailedReply(val partialText: String, val error: String)
 
     sealed interface State {
         data object Success: State

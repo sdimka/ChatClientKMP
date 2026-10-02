@@ -3,23 +3,25 @@ package dev.goood.chat_client.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-//"id": "file-abc123",
-//"object": "file",
-//"bytes": 175,
-//"created_at": 1613677385,
-//"filename": "salesOverview.pdf",
-//"purpose": "assistants",
-
+// Normalized toward OpenAI-style file metadata. Providers may leave any field except `id` empty,
+// so everything else is optional.
 @Serializable
 data class MFile (
     val id: String,
     @SerialName("object")
-    val obj: String,
-    val bytes: Int,
+    val obj: String? = null,
+    val bytes: Long? = null,
     @SerialName("created_at")
-    val createdAt: Long,
-    val filename: String,
-    val purpose: String,
-)
+    val createdAt: Long? = null,
+    val filename: String? = null,
+    val purpose: String? = null,
+    val status: String? = null,
+) {
+    val displayName: String get() = filename?.takeIf { it.isNotBlank() } ?: id
+
+    /** True while the provider is still processing the file (unknown statuses count as ready). */
+    val isProcessing: Boolean
+        get() = status?.lowercase() in setOf("processing", "pending", "uploaded", "in_progress")
+}
 
 typealias FileList = List<MFile>

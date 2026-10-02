@@ -7,101 +7,92 @@ import dev.goood.chat_client.Const
 import dev.goood.chat_client.model.TokenReply
 import dev.goood.chat_client.services.AuthService
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.bearer
-import io.ktor.client.request.post
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import io.ktor.client.plugins.auth.providers.BearerTokens
-import io.ktor.client.plugins.sse.SSE
-import io.ktor.client.request.setBody
-import io.ktor.http.contentType
 
 
 class Api: KoinComponent {
 
     private val authService: AuthService by inject()
 
+    private val tokenManager = TokenManager(authService) { user ->
+        httpClient.post(Const.Network.REFRESH_TOKEN_ENDPOINT) {
+            contentType(ContentType.Application.Json)
+            setBody(user)
+        }.body<TokenReply>().token
+    }
+
+    private val httpClient: HttpClient = HttpClient {
+        install(Logging) {
+            logger = Logger.SIMPLE
+            level = LogLevel.HEADERS
+            sanitizeHeader { header -> header == HttpHeaders.Authorization }
+        }
+        install(ContentNegotiation) {
+            json(
+                Json {
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                }
+            )
+        }
+        defaultRequest {
+            header("Content-Type", "application/json")
+        }
+        installApiAuthAndErrors(tokenManager)
+        install(SSE)
+    }
+
     private val ktorfit =
         ktorfit {
             baseUrl(Const.Network.API_ENDPOINT)
-            httpClient(
-                HttpClient {
-                    expectSuccess = true
-
-                    install(Logging) {
-                        logger = Logger.SIMPLE
-                        level = LogLevel.HEADERS
-                        sanitizeHeader { header -> header == HttpHeaders.Authorization }
-                    }
-                    install(ContentNegotiation) {
-                        json(
-                            Json {
-                                isLenient = true
-                                ignoreUnknownKeys = true
-                            }
-                        )
-                    }
-                    defaultRequest {
-                        header("Content-Type", "application/json")
-                    }
-                    install(Auth) {
-                        bearer {
-                            loadTokens {
-                                val accessToken = authService.getBearerToken()
-                                val refreshToken = "" // userManager.get().refreshToken
-
-                                if (accessToken != null) {
-                                    return@loadTokens BearerTokens(accessToken,refreshToken)
-                                }
-                                return@loadTokens null
-                            }
-
-                            refreshTokens {
-                                val token = client.post(Const.Network.REFRESH_TOKEN_ENDPOINT) {
-                                    markAsRefreshTokenRequest()
-                                    contentType(ContentType.Application.Json)
-                                    setBody(authService.getUser())
-                                }.body<TokenReply>()
-
-                                token.token?.let {
-                                    authService.setBearerToken(it)
-                                    BearerTokens(
-                                        accessToken = it,
-                                        refreshToken = ""
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    install(SSE)
-                }
-            )
+            httpClient(httpClient)
             converterFactories(
                 FlowConverterFactory(),
                 CallConverterFactory()
             )
-
         }
 
     val authApi = ktorfit.createAuthApi()
-    val testApi = ktorfit.createTestApi()
-    val streamApi = StreamApi(ktorfit.httpClient, Const.Network.API_ENDPOINT)
+    val streamApi = StreamApi(httpClient, Const.Network.API_ENDPOINT)
 
     val chatApi = ktorfit.createChatApi()
     val filesApi = ktorfit.createFilesApi()
     val translateApi = ktorfit.createTranslateApi()
 
+}
+
+/** Bearer auth with token refresh, and non-2xx responses mapped to [ApiException]. */
+internal fun HttpClientConfig<*>.installApiAuthAndErrors(tokenManager: TokenManager) {
+    // Non-2xx responses are turned into ApiException (with a readable message) instead.
+    expectSuccess = false
+    HttpResponseValidator {
+        validateResponse { response ->
+            if (!response.status.isSuccess()) {
+                val body = runCatching { response.bodyAsText() }.getOrDefault("")
+                throw ApiException(response.status.value, parseServerMessage(body))
+            }
+        }
+    }
+    install(tokenAuthPlugin(tokenManager))
 }

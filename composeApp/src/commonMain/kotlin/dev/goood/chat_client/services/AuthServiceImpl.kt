@@ -4,6 +4,9 @@ import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.model.TokenReply
 import dev.goood.chat_client.model.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -12,6 +15,9 @@ class AuthServiceImpl: AuthService, KoinComponent {
     private val api: Api by inject()
     private val localStorage: LocalStorage by inject()
 
+    private val _sessionExpired = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override val sessionExpired: SharedFlow<Unit> = _sessionExpired.asSharedFlow()
+
     override fun login(user: User): Flow<TokenReply> {
         return api.authApi.login(user)
     }
@@ -19,6 +25,11 @@ class AuthServiceImpl: AuthService, KoinComponent {
     override fun logout() {
         localStorage.user = null
         localStorage.bearerToken = null
+    }
+
+    override fun expireSession() {
+        logout()
+        _sessionExpired.tryEmit(Unit)
     }
 
     override fun isAuthorized(): Boolean {

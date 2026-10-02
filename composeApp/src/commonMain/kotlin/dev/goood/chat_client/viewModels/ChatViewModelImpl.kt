@@ -1,5 +1,7 @@
 package dev.goood.chat_client.viewModels
 
+import dev.goood.chat_client.core.network.toUserMessage
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.cache.Database
@@ -119,7 +121,7 @@ class ChatViewModelImpl(
 
             } catch (e: Exception) {
                 println("Error loading initial messages from DB: ${e.printStackTrace()}")
-                _state.value = State.Error(e.message ?: "Failed to get messages from db.")
+                _state.value = State.Error(e.toUserMessage())
             }
 
             // --- Stage 2: Fetch from API & Update Database ---
@@ -150,7 +152,7 @@ class ChatViewModelImpl(
 
             } catch (e: Exception) {
                 println("Error fetching/processing API messages: ${e.printStackTrace()}")
-                _state.value = State.Error(e.message ?: "Failed to update messages.")
+                _state.value = State.Error(e.toUserMessage())
             }
         }
     }
@@ -160,7 +162,7 @@ class ChatViewModelImpl(
         viewModelScope.launch {
             api.chatApi.deleteMessage(message.id)
                 .catch {
-                    _state.value = State.Error(it.message ?: "Unknown error")
+                    _state.value = State.Error(it.toUserMessage())
                 }
                 .collect {
                     database.deleteMessage(message.id)
@@ -175,6 +177,11 @@ class ChatViewModelImpl(
     override fun updateFileList(file: MFile, operation: (List<MFile>, MFile) -> List<MFile>) {
         _filesList.update { currentList -> operation(currentList, file) }
     }
+
+    private val _failedReply = MutableStateFlow<FailedReply?>(null)
+    override val failedReply: StateFlow<FailedReply?> = _failedReply.asStateFlow()
+
+    private var lastRequest: MessageRequest? = null
 
     override fun sendMessage(messageText: String) {
 
@@ -196,19 +203,37 @@ class ChatViewModelImpl(
                 _messages.value.filter { it.isSelected }.map { it.id })
         }
 
+        clearInputValue()
+        streamReply(message)
+    }
+
+    override fun retryFailedReply() {
+        lastRequest?.let(::streamReply)
+    }
+
+    override fun dismissFailedReply() {
+        _failedReply.value = null
+    }
+
+    private fun streamReply(message: MessageRequest) {
+        lastRequest = message
+        _failedReply.value = null
         _newReply.value = ""
         _state.value = State.NewReply
 
-        clearInputValue()
+        fun fail(error: String, partialText: String = _newReply.value) {
+            _failedReply.value = FailedReply(partialText = partialText, error = error)
+            _state.value = State.Success
+        }
 
         viewModelScope.launch {
             api.streamApi.streamRequestWithType(message)
                 .onCompletion {
-                    _state.value = State.Success
+                    if (_state.value is State.NewReply) _state.value = State.Success
                 }
                 .catch {
                     println(it.message)
-                    _state.value = State.Error(it.message ?: "Unknown error")
+                    fail(it.toUserMessage())
                 }
                 .collect { event ->
                     when (event) {
@@ -231,7 +256,10 @@ class ChatViewModelImpl(
                         }
 
                         is ReplyVariants.Error -> {
-                            _state.value = State.Error(event.message)
+                            fail(
+                                error = event.message,
+                                partialText = event.partialResponse?.takeIf { it.isNotBlank() } ?: _newReply.value,
+                            )
                         }
                     }
                 }
@@ -244,6 +272,8 @@ class ChatViewModelImpl(
         _inputValue.value = ""
         _isPreviousMessagesEnabled.value = false
         _newReply.value = ""
+        _failedReply.value = null
+        lastRequest = null
         // _messages.value = emptyList() // Consider if messages should be cleared immediately or wait for new messages to load
     }
 

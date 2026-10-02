@@ -32,6 +32,10 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import dev.goood.chat_client.ui.theme.buttonBackground
+import compose.icons.lineawesomeicons.ExclamationCircleSolid
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -167,6 +171,7 @@ fun MessageList(
     val listState = rememberLazyListState()
     val state = viewModel.state.collectAsStateWithLifecycle()
     val newReply = viewModel.newReply.collectAsStateWithLifecycle()
+    val failedReply by viewModel.failedReply.collectAsStateWithLifecycle()
     val isSelectedEnabled by viewModel.isPreviousMessagesEnabled.collectAsStateWithLifecycle()
 
     val messagesList by viewModel.messages.collectAsStateWithLifecycle()
@@ -176,8 +181,8 @@ fun MessageList(
         clipboardManager.setText(AnnotatedString(text))
     }
 
-    LaunchedEffect(messagesList, state) {
-        if (messagesList.isNotEmpty() || state.value is State.NewReply) {
+    LaunchedEffect(messagesList, state, failedReply) {
+        if (messagesList.isNotEmpty() || state.value is State.NewReply || failedReply != null) {
             listState.animateScrollToItem(index = 0)
         }
     }
@@ -191,6 +196,18 @@ fun MessageList(
         if (state.value is State.NewReply) {
             item {
                 NewMessageElement(newReply.value)
+            }
+        }
+
+        failedReply?.let { failed ->
+            if (state.value !is State.NewReply) {
+                item(key = "failed-reply") {
+                    FailedReplyElement(
+                        failedReply = failed,
+                        onRetry = viewModel::retryFailedReply,
+                        onDismiss = viewModel::dismissFailedReply,
+                    )
+                }
             }
         }
 
@@ -453,6 +470,79 @@ fun DropDownMenuButton(
                     }
                 )
 
+            }
+        }
+    }
+}
+
+@Composable
+fun FailedReplyElement(
+    failedReply: ChatViewModel.FailedReply,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val errorColor = Color(0xFFB3261E)
+
+    Card(
+        border = BorderStroke(1.dp, errorColor),
+        colors = CardDefaults.cardColors().copy(containerColor = Color.White),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(errorColor.copy(alpha = 0.08f))
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Icon(
+                imageVector = LineAwesomeIcons.ExclamationCircleSolid,
+                contentDescription = null,
+                tint = errorColor,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = if (failedReply.partialText.isBlank()) "Reply failed" else "Reply interrupted",
+                fontWeight = FontWeight.Medium,
+                color = errorColor,
+            )
+        }
+
+        if (failedReply.partialText.isNotBlank()) {
+            SelectionContainer {
+                Markdown(
+                    content = failedReply.partialText,
+                    colors = markdownColor(text = Color.Black),
+                    typography = defaultMarkDownTypography(),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                )
+            }
+            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+        }
+
+        Text(
+            text = failedReply.error,
+            fontSize = defaultTextSize,
+            color = Color.DarkGray,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 4.dp)
+        ) {
+            TextButton(onClick = onDismiss) {
+                Text("Dismiss", color = Color.DarkGray)
+            }
+            TextButton(onClick = onRetry) {
+                Text("Retry", color = buttonBackground)
             }
         }
     }

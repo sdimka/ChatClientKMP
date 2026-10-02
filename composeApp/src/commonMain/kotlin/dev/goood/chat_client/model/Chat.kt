@@ -15,6 +15,11 @@ data class Chat (
 typealias ChatList = List<Chat>
 
 @Serializable
+data class ChatIdRequest(
+    val id: Int,
+)
+
+@Serializable
 data class NewChat (
     val id: Int,
     val name: String,

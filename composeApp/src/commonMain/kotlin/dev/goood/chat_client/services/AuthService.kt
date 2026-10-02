@@ -3,6 +3,7 @@ package dev.goood.chat_client.services
 import dev.goood.chat_client.model.TokenReply
 import dev.goood.chat_client.model.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface AuthService {
 
@@ -19,4 +20,9 @@ interface AuthService {
     fun logout()
 
     fun isAuthorized(): Boolean
+
+    /** Emits when stored credentials stop working and the user has been logged out. */
+    val sessionExpired: SharedFlow<Unit>
+
+    fun expireSession()
 }

@@ -4,11 +4,13 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -26,6 +28,19 @@ fun AppScreen(
 
     val viewModel: AppViewModel = koinViewModel()
     val authState by viewModel.authState.collectAsState()
+
+    // Stored credentials were rejected while refreshing the token: send the user back to login.
+    LaunchedEffect(viewModel, navController) {
+        viewModel.sessionExpired.collect {
+            viewModel.logout()
+            if (navController.currentDestination?.hasRoute<NavigationRoute.AuthGraph>() != true) {
+                navController.navigate(NavigationRoute.AuthGraph) {
+                    popUpTo<NavigationRoute.MainGraph> { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+        }
+    }
 
     NavHost(
         modifier = Modifier.fillMaxSize(),

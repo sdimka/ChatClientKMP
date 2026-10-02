@@ -1,8 +1,11 @@
 package dev.goood.chat_client.viewModels
 
+import dev.goood.chat_client.core.network.toUserMessage
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
+import dev.goood.chat_client.core.network.ApiException
 import dev.goood.chat_client.model.AddModelRequest
 import dev.goood.chat_client.model.ChatModel
 import dev.goood.chat_client.model.ChatModelList
@@ -67,7 +70,7 @@ class ModelPickerViewModel : ViewModel(), KoinComponent {
                 savedModels.value = api.chatApi.getModels().first()
                 _state.value = State.Ready
             } catch (error: Throwable) {
-                _state.value = State.LoadError(error.message ?: "Unable to load provider models")
+                _state.value = State.LoadError(error.toUserMessage())
             }
         }
     }
@@ -99,7 +102,7 @@ class ModelPickerViewModel : ViewModel(), KoinComponent {
             } catch (error: Throwable) {
                 if (_selectedSource.value?.id == source.id) {
                     _state.value = State.ModelLoadError(
-                        error.message ?: "Unable to load provider models",
+                        error.toUserMessage(),
                     )
                 }
             }
@@ -158,8 +161,19 @@ class ModelPickerViewModel : ViewModel(), KoinComponent {
                 ).first()
                 savedModels.value = savedModels.value + addedModel
                 _state.value = State.Success(addedModel)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: ApiException) {
+                if (error.status == 409) {
+                    // Added elsewhere meanwhile: refresh so the model is shown as "Added".
+                    _selectedModel.value = null
+                    runCatching { savedModels.value = api.chatApi.getModels().first() }
+                    _state.value = State.SaveError("“${model.displayName}” is already added.")
+                } else {
+                    _state.value = State.SaveError(error.toUserMessage())
+                }
             } catch (error: Throwable) {
-                _state.value = State.SaveError(error.message ?: "Unable to add model")
+                _state.value = State.SaveError(error.toUserMessage())
             }
         }
     }

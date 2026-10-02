@@ -61,6 +61,11 @@ internal fun AddChatDialog(
         viewModel.upDate()
     }
 
+    // Close only once the chat has actually been created.
+    LaunchedEffect(state.value) {
+        if (state.value is AddChatViewModel.State.Success) onSaved()
+    }
+
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -169,6 +174,27 @@ internal fun AddChatDialog(
                             modifier = modifier.fillMaxWidth()
                         )
                     }
+
+                    when (val currentState = state.value) {
+                        is AddChatViewModel.State.LoadError -> Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text(
+                                text = currentState.message,
+                                color = Color(0xFFB3261E),
+                                fontSize = 14.sp,
+                                modifier = Modifier.weight(1f)
+                            )
+                            CButton(text = "Retry", onClick = viewModel::upDate)
+                        }
+                        is AddChatViewModel.State.Error -> Text(
+                            text = currentState.message,
+                            color = Color(0xFFB3261E),
+                            fontSize = 14.sp,
+                        )
+                        else -> Unit
+                    }
                 }
 
                 HorizontalDivider(
@@ -206,12 +232,10 @@ internal fun AddChatDialog(
                     }
 
                     CButton(
-                        text = "Create",
-                        onClick = {
-                            viewModel.createNewChat()
-                            onSaved()
-                        },
-                        enabled = state.value is AddChatViewModel.State.FormValid,
+                        text = if (state.value is AddChatViewModel.State.Saving) "Creating…" else "Create",
+                        onClick = viewModel::createNewChat,
+                        enabled = state.value is AddChatViewModel.State.FormValid ||
+                            state.value is AddChatViewModel.State.Error,
                         modifier = modifier
                             .weight(1f)
                             .height(44.dp)

@@ -1,8 +1,11 @@
 package dev.goood.chat_client.viewModels
 
+import dev.goood.chat_client.core.network.toUserMessage
+
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.model.Chat
+import dev.goood.chat_client.model.ChatIdRequest
 import dev.goood.chat_client.model.ChatList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,7 +41,7 @@ class MainViewModelImpl: MainViewModel(), KoinComponent {
             api.chatApi.getChats()
                 .catch {
                     println(it)
-                    _state.value = State.Error(it.message ?: "Unknown error")
+                    _state.value = State.Error(it.toUserMessage())
                 }
                 .collect { chatList ->
                     chats.value = chatList.sortedByDescending { it.source.id }
@@ -54,9 +57,9 @@ class MainViewModelImpl: MainViewModel(), KoinComponent {
 
     override fun deleteChat(chat: Chat) {
         viewModelScope.launch {
-            api.chatApi.deleteChat(chat)
+            api.chatApi.deleteChat(ChatIdRequest(chat.id))
                 .catch {
-                    println(it)
+                    _state.value = State.Error(it.toUserMessage())
                 }
                 .collect { result ->
                     println(result)

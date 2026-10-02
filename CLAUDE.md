@@ -35,4 +35,7 @@ Thin client for a separate backend that proxies LLM providers.
 ## Gotchas
 - API base URL is hard-coded in `Const.kt`.
 - SQLDelight caches only messages (`AppDatabase.sq`); no migrations exist yet.
-- Unused leftovers: `AppScreen_old.kt`, `Greeting.kt`, `TestApi`, `ChatDetailRoute`, `RegisterRoute`.
+- Unused leftovers: `AppScreen_old.kt`, `Greeting.kt`, `ChatDetailRoute`, `RegisterRoute`.
+- Non-2xx responses throw `ApiException` with a user-facing message; show errors via `Throwable.toUserMessage()`.
+- Auth is the custom `TokenAuth` plugin (not Ktor's `Auth`); it must stay installed after `HttpResponseValidator`
+  so it sees raw 401s. Backend contract: `docs/api_endpoints.md`.

@@ -8,6 +8,7 @@ import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 import dev.goood.chat_client.model.Chat
+import dev.goood.chat_client.model.ChatIdRequest
 import dev.goood.chat_client.model.ChatList
 import dev.goood.chat_client.model.AddModelRequest
 import dev.goood.chat_client.model.ChatModel
@@ -29,7 +30,7 @@ interface ChatApi {
     fun addChat(@Body chat: NewChat): Flow<Chat>
 
     @POST("/api/DeleteChat")
-    fun deleteChat(@Body chat: Chat): Flow<ResultMessage>
+    fun deleteChat(@Body chat: ChatIdRequest): Flow<ResultMessage>
 
     @GET("/api/Model/GetSources")
     fun getSources(): Flow<ChatSourceList>

@@ -1,9 +1,11 @@
 package dev.goood.chat_client.viewModels
 
 
-import dev.goood.chat_client.core.other.ShareFileModel
 import dev.goood.chat_client.model.MFile
+import io.github.vinceglb.filekit.PlatformFile
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class FileDialogViewModelPreview : FileDialogViewModel() {
@@ -18,8 +20,12 @@ class FileDialogViewModelPreview : FileDialogViewModel() {
         errorMessage = null
     )
 
-    override val selectedFile: StateFlow<ShareFileModel?> =
+    override val selectedFileName: StateFlow<String?> =
         MutableStateFlow(null)
+
+    override val acceptedExtensions: StateFlow<Set<String>?> = MutableStateFlow(null)
+
+    override val uploadedFiles: SharedFlow<MFile> = MutableSharedFlow()
 
     override val fileList: StateFlow<List<MFile>> = MutableStateFlow(
         listOf(
@@ -106,7 +112,7 @@ class FileDialogViewModelPreview : FileDialogViewModel() {
 
     }
 
-    override fun uploadFile(sharedFile: ShareFileModel) {
+    override fun uploadFile(file: PlatformFile) {
 
     }
 

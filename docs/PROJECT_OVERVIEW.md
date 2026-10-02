@@ -169,16 +169,24 @@ AppScreen NavHost
 ### Networking & auth
 
 - Base URL: `Const.Network.API_ENDPOINT` (`<common>/Const.kt`).
-- `Api` builds one `HttpClient` (logging, JSON lenient/ignoreUnknownKeys, Bearer auth, SSE) and exposes:
-  `authApi`, `chatApi`, `filesApi`, `translateApi`, `testApi`, `streamApi`.
-- **Auth flow:** `LoginViewModel` → `AuthService.login(User)` → `POST api/get-auth-token` → token stored in
-  `LocalStorage`. On 401 Ktor's `refreshTokens` re-posts the stored user credentials to the same endpoint.
-  `AuthService.isAuthorized()` = "stored user exists".
+- `Api` builds one `HttpClient` (logging, JSON lenient/ignoreUnknownKeys, token auth, SSE) and exposes:
+  `authApi`, `chatApi`, `filesApi`, `translateApi`, `streamApi`.
+- **Errors:** every non-2xx response is thrown as `ApiException(status, serverMessage)` whose `message` is
+  already user-facing (`core/network/ApiException.kt`). In `catch` blocks use `Throwable.toUserMessage()`,
+  which also covers SSE and connection errors.
+- **Auth flow:** `LoginViewModel` → `AuthService.login(User)` → `POST api/get-auth-token` (JWT, valid 60 min) →
+  token stored in `LocalStorage`. The custom `TokenAuth` plugin (`core/network/TokenAuth.kt`) adds the bearer
+  header, re-logs in with the stored credentials ~60 s **before** the JWT's `exp`, and once more on a 401.
+  If the credentials are rejected (login returns 400) it calls `AuthService.expireSession()`, and `AppScreen`
+  navigates back to login. `AuthService.isAuthorized()` = "stored user exists".
 - **Streaming (`StreamApi.streamRequestWithType`)**: `POST /api/streamMessage` as SSE. Event types:
   - `message` → user's request as saved by server → `ReplyVariants.SavedRequest`
   - `chunk` → partial text → `ReplyVariants.Chunks` (appended to `ChatViewModel.newReply`)
   - `finalMessage` → full assistant message → `ReplyVariants.FinalReply`
-- File upload: `StreamApi.uploadFile` (multipart `/api/file`, emits `ProgressUpdate`).
+  - `error` → `ReplyVariants.Error` (with `partial_response`) → shown as a "Reply failed" card with Retry
+- File upload: `StreamApi.uploadFile` (multipart `/api/file`) emits `UploadEvent.Progress` and finally
+  `UploadEvent.Completed(MFile)`. Size (20 MB) and per-provider extensions are checked client-side first
+  (`core/other/UploadRules.kt`; the provider is guessed from the source name).
 
 Main endpoints (see `ChatApi.kt`, `FilesApi.kt`, `TranslateApi.kt`):
 `/api/GetChats`, `/api/NewChat`, `/api/DeleteChat`, `/api/Model/{GetSources,GetAvailableModels,GetProviderModels,AddModel}`,
@@ -253,9 +261,10 @@ Useful to know before changing things:
 - `Const.API_ENDPOINT` is a hard-coded plain-HTTP IP; there is no build-flavor/env config.
 - `LocalStorage` stores the user's **password in plain text** (multiplatform-settings) to support token refresh.
 - `ChatViewModelImpl` creates its own `Database` instance (not provided via DI).
+- Accepted upload types are inferred from the source *name* (`acceptedUploadExtensions`); unknown names
+  skip client-side filtering. The backend exposing accepted types per source would remove the guesswork.
 - `SystemMessagesService` owns a never-cancelled `CoroutineScope` on `Dispatchers.Main`.
-- Leftover/unused code: `AppScreen_old.kt`, `Greeting.kt`, `TestApi`, `StreamApi.myOtherDataStream`,
-  `StreamApi.streamRequest`, `NavigationRoute.ChatDetailRoute` / `RegisterRoute`.
+- Leftover/unused code: `AppScreen_old.kt`, `Greeting.kt`, `NavigationRoute.ChatDetailRoute` / `RegisterRoute`.
 - Errors are often logged with `println`; there is no logging abstraction.
 - `composeApp/messages.db` is committed to the repo (stray local DB file).
 - Android `platformModule` resolves `Context` via Koin `get()`; `MainApplication` does not start Koin itself —

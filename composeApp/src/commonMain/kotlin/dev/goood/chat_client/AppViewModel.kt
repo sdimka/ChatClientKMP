@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.services.AuthService
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -27,6 +28,8 @@ class AppViewModel: ViewModel(), KoinComponent {
     fun setCurrentChat(chat: Chat?) {
         _selectedChat.value = chat
     }
+
+    val sessionExpired: SharedFlow<Unit> = authService.sessionExpired
 
     fun logout() {
         authService.logout()

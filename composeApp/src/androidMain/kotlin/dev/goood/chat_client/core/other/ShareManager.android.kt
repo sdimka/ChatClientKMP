@@ -2,6 +2,7 @@ package dev.goood.chat_client.core.other
 
 import android.content.Context
 import android.content.Intent
+import android.webkit.MimeTypeMap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +41,7 @@ actual class ShareManager(
                         putExtra(Intent.EXTRA_STREAM, uri)
                         flags += Intent.FLAG_ACTIVITY_NEW_TASK
                         flags += Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        type = file.mime.toAndroidMimeType()
+                        type = mimeTypeFor(file.fileName)
                     }
                     val choicer = Intent.createChooser(intent, null)
                     context.startActivity(choicer)
@@ -68,11 +69,10 @@ actual class ShareManager(
 
 }
 
-private fun MimeType.toAndroidMimeType(): String = when (this) {
-    MimeType.PDF -> "application/pdf"
-    MimeType.TEXT -> "text/plain"
-    MimeType.IMAGE -> "image/*"
-}
+private fun mimeTypeFor(fileName: String): String =
+    MimeTypeMap.getSingleton()
+        .getMimeTypeFromExtension(fileName.substringAfterLast('.', "").lowercase())
+        ?: "*/*"
 
 @Composable
 actual fun rememberShareManager(): ShareManager {

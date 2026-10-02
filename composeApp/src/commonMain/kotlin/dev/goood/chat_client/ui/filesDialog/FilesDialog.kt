@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -48,7 +49,6 @@ import compose.icons.lineawesomeicons.PlusSquareSolid
 import compose.icons.lineawesomeicons.QuestionCircle
 import compose.icons.lineawesomeicons.TrashAlt
 import compose.icons.lineawesomeicons.WindowClose
-import dev.goood.chat_client.core.other.ShareFileModel
 import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.ui.composable.BallProgerssIndicator
 import dev.goood.chat_client.ui.composable.CButton
@@ -59,6 +59,7 @@ import dev.goood.chat_client.viewModels.FileDialogViewModel
 import dev.goood.chat_client.viewModels.FileDialogViewModel.State
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openFilePicker
 import io.github.vinceglb.filekit.filesDir
 import io.github.vinceglb.filekit.name
@@ -87,7 +88,9 @@ fun FilesDialog(
     modifier: Modifier = Modifier
 ) {
     val viewModel = koinViewModel<FileDialogViewModel>() // Don't create a new instance
-    val file by viewModel.selectedFile.collectAsState()
+    val selectedFileName by viewModel.selectedFileName.collectAsState()
+    val acceptedExtensions by viewModel.acceptedExtensions.collectAsStateWithLifecycle()
+    val uploadsSupported = acceptedExtensions?.isNotEmpty() != false
     val scope = rememberCoroutineScope()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -105,37 +108,34 @@ fun FilesDialog(
         viewModel.setCurrentChat(chatID)
     }
 
+    // Newly uploaded files are attached to the next message right away.
+    LaunchedEffect(viewModel) {
+        viewModel.uploadedFiles.collect { uploaded ->
+            selectedFilesListUpdate(uploaded) { list, f -> if (f in list) list else list + f }
+        }
+    }
+
     val isEnabled by remember {
         derivedStateOf {
-            !uploadState.isUploading && state is State.Success
+            !uploadState.isUploading && state is State.Success && uploadsSupported
         }
     }
 
     fun sendFile() {
         scope.launch {
-            val nFile = FileKit.openFilePicker()
+            // Only offer the file types the chat's provider accepts (all files when unknown).
+            val type = acceptedExtensions?.takeIf { it.isNotEmpty() }
+                ?.let { FileKitType.File(it) }
+                ?: FileKitType.File()
+            val nFile = FileKit.openFilePicker(type = type)
             if (nFile != null) {
-                viewModel.uploadFile(
-                    ShareFileModel(
-                        fileName = nFile.name,
-                        bytes = nFile.readBytes(),
-                    )
-                )
+                viewModel.uploadFile(nFile)
             }
         }
     }
 
     fun sendFile(file: String) {
-        scope.launch {
-            println("File: $file")
-            val nFile = PlatformFile(file)
-            viewModel.uploadFile(
-                ShareFileModel(
-                    fileName = nFile.name,
-                    bytes = nFile.readBytes(),
-                )
-            )
-        }
+        viewModel.uploadFile(PlatformFile(file))
     }
 
     Dialog(
@@ -168,16 +168,26 @@ fun FilesDialog(
                     state = state,
                     selectedFiles = selectedFilesList,
                     selectedFilesUpdate = selectedFilesListUpdate,
+                    onRetry = { viewModel.setCurrentChat(chatID) },
                     modifier = modifier
                         .weight(1f)
                         .fillMaxHeight()
                 )
 
+                val statusText = when {
+                    !uploadsSupported -> "File attachments aren't supported by this chat's provider."
+                    uploadState.errorMessage != null -> uploadState.errorMessage
+                    else -> selectedFileName ?: ""
+                }
                 Text(
-                    text = file?.fileName ?: "",
+                    text = statusText,
                     fontSize = 14.sp,
+                    color = if (uploadState.errorMessage != null || !uploadsSupported) Color(0xFFB3261E) else Color.Unspecified,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = modifier
-                        .height(50.dp)
+                        .heightIn(min = 50.dp)
                         .padding(vertical = 5.dp)
                 )
 
@@ -240,7 +250,7 @@ fun FilesDialog(
         DeleteDialogImp(
             item = fileToDelete,
             title = "Delete file",
-            getItemName = { it.filename },
+            getItemName = { it.displayName },
             onDismiss = { viewModel.setFileDialogState( null ) },
             onDelete = { file ->
                 viewModel.deleteFile(file.id)
@@ -256,17 +266,25 @@ fun FileList(
     state: State,
     selectedFiles: StateFlow<List<MFile>>,
     selectedFilesUpdate: (file: MFile, operation: (List<MFile>, MFile) -> List<MFile>) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ){
     val fileList by viewModel.fileList.collectAsStateWithLifecycle()
 
-    fun isSelected(file: MFile): Boolean {
-        return selectedFiles.value.contains(file)
-    }
+    val selected by selectedFiles.collectAsStateWithLifecycle()
+
+    fun isSelected(file: MFile): Boolean = file in selected
 
     when (state) {
         is State.Error -> {
-
+            Column(
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(state.message, color = Color.DarkGray, textAlign = TextAlign.Center)
+                CButton(text = "Retry", onClick = onRetry)
+            }
         }
         State.Loading -> {
             Column(
@@ -283,7 +301,7 @@ fun FileList(
                     .fillMaxSize()
                     .padding(top = 15.dp)
             ) {
-                items(fileList) { file ->
+                items(fileList, key = { it.id }) { file ->
                     FileElement(
                         file = file,
                         isSelected = isSelected(file),
@@ -310,7 +328,7 @@ fun FileElement(
     onDelete: (MFile) -> Unit = { _ -> },
     modifier: Modifier = Modifier
 ) {
-    val checkedState = remember { mutableStateOf(isSelected) }
+    val checkedState = remember(isSelected) { mutableStateOf(isSelected) }
 
     SwipeableWithActions(
         isRevealed = false,
@@ -357,20 +375,26 @@ fun FileElement(
                     .weight(1f)
             ) {
                 Text(
-                    text = file.filename,
+                    text = file.displayName,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Text(
-                    text = "${file.bytes / 1024} KB",
-                    fontSize = 10.sp,
-                    color = Color.DarkGray
-                )
+                val details = listOfNotNull(
+                    file.bytes?.let { "${it / 1024} KB" },
+                    "Processing…".takeIf { file.isProcessing },
+                ).joinToString(" · ")
+                if (details.isNotEmpty()) {
+                    Text(
+                        text = details,
+                        fontSize = 10.sp,
+                        color = Color.DarkGray
+                    )
+                }
             }
 
             Text(
-                text = dateMillisToString(file.createdAt),
+                text = file.createdAt?.let(::dateMillisToString) ?: "",
                 fontSize = 8.sp,
                 color = Color.DarkGray,
                 textAlign = TextAlign.End,

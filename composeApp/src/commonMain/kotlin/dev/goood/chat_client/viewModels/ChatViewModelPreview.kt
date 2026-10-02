@@ -101,6 +101,12 @@ class ChatViewModelPreview() : ChatViewModel() {
 
     }
 
+    override val failedReply: StateFlow<FailedReply?> = MutableStateFlow(null)
+
+    override fun retryFailedReply() {}
+
+    override fun dismissFailedReply() {}
+
     override fun resetChatSpecificStates() {
 
     }

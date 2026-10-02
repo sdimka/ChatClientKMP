@@ -1,5 +1,6 @@
 package dev.goood.chat_client.viewModels
 
+import dev.goood.chat_client.core.network.toUserMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.goood.chat_client.model.User
@@ -25,12 +26,17 @@ class LoginViewModel: ViewModel(), KoinComponent {
             state.value = LoginState.Loading
             authService.login(user)
                 .catch { e ->
-                    state.value = e.message?.let { LoginState.Error(it) }
+                    state.value = LoginState.Error(e.toUserMessage())
                 }
                 .collect {
-                    authService.setBearerToken(it.token!!)
+                    val token = it.token
+                    if (token == null) {
+                        state.value = LoginState.Error("Login failed: the server returned no token.")
+                        return@collect
+                    }
+                    authService.setBearerToken(token)
                     authService.setUser(user)
-                    state.value = it.token.let { it1 -> LoginState.Success(it1) }
+                    state.value = LoginState.Success(token)
                 }
         }
     }

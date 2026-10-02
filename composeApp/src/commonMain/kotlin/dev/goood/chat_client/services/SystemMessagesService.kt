@@ -1,5 +1,7 @@
 package dev.goood.chat_client.services
 
+import dev.goood.chat_client.core.network.toUserMessage
+
 import dev.goood.chat_client.cache.DatabaseDriverFactory
 import dev.goood.chat_client.core.network.Api
 import dev.goood.chat_client.model.SystemMessage
@@ -46,7 +48,7 @@ class SystemMessagesService(
             _state.value = State.Loading
             api.chatApi.getSystemMessages()
                 .catch {
-                    _state.value = State.Error(message = it.message ?: "Unknown error")
+                    _state.value = State.Error(message = it.toUserMessage())
                 }
                 .collect {
                    _messages.value = it
@@ -65,7 +67,7 @@ class SystemMessagesService(
             api.chatApi.updateSystemMessage(message)
                 .catch {
                     print(it.message)
-                    _state.value = State.Error(message = it.message ?: "Unknown error")
+                    _state.value = State.Error(message = it.toUserMessage())
                 }
                 .collect {
                     _state.value = State.Success
@@ -80,7 +82,7 @@ class SystemMessagesService(
             api.chatApi.createSystemMessage(message)
                 .catch {
                     print(it.message)
-                    _state.value = State.Error(message = it.message ?: "Unknown error")
+                    _state.value = State.Error(message = it.toUserMessage())
                 }
                 .collect { savedMessage ->
                     param(savedMessage)
@@ -95,7 +97,7 @@ class SystemMessagesService(
             api.chatApi.deleteSystemMessage(messageID)
                 .catch {
                     print(it.message)
-                    _state.value = State.Error(message = it.message ?: "Unknown error")
+                    _state.value = State.Error(message = it.toUserMessage())
                 }
                 .collect{
                     updateMessages()

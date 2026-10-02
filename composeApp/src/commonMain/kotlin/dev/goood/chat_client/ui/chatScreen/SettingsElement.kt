@@ -129,7 +129,7 @@ fun SettingsElement(
                         .padding(vertical = 3.dp, horizontal = 5.dp)
                 ) {
                     Text(
-                        file.filename,
+                        file.displayName,
                         fontSize = 12.sp,
                         modifier = modifier.padding(horizontal = 3.dp)
                     )

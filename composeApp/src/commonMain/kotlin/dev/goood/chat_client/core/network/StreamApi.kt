@@ -3,10 +3,12 @@ package dev.goood.chat_client.core.network
 
 import dev.goood.chat_client.core.other.ShareFileModel
 import dev.goood.chat_client.model.Chunk
+import dev.goood.chat_client.model.MFile
 import dev.goood.chat_client.model.Message
 import dev.goood.chat_client.model.MessageRequest
-import dev.goood.chat_client.model.MyOtherData
+import dev.goood.chat_client.model.StreamError
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.plugins.sse.sse
 import io.ktor.client.request.forms.formData
@@ -18,66 +20,17 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import io.ktor.http.contentType
-import io.ktor.sse.TypedServerSentEvent
-import io.ktor.util.reflect.TypeInfo
+import io.ktor.http.defaultForFileExtension
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 
 
 class StreamApi(private val client: HttpClient, baseUrl: String) {
 
     private val url = Url(baseUrl)
-
-    fun myOtherDataStream(): Flow<MyOtherData> {
-        return flow {
-            client.sse(
-                scheme = url.protocol.name,
-                host = url.host,
-                port = url.port,
-                path = "/api/streamRequest")
-            {
-                incoming.collect { event ->
-                    val deserializedData = event.data?.let {
-                        Json.decodeFromString<MyOtherData>(it)
-                    }
-                    if (deserializedData != null) {
-                        emit(deserializedData)
-                    }
-                }
-
-            }
-        }
-    }
-
-    fun streamRequest(message: MessageRequest): Flow<Chunk> {
-        return flow {
-
-            client.sse(
-                scheme = url.protocol.name,
-                host = url.host,
-                port = url.port,
-                path = "/api/streamMessage",
-                {
-                    method = HttpMethod.Post
-                    contentType(ContentType.Application.Json)
-                    setBody(Json.encodeToString(message))
-                })
-            {
-                incoming.collect { event ->
-                    val deserializedData = event.data?.let {
-                        Json.decodeFromString<Chunk>(it)
-                    }
-                    if (deserializedData != null) {
-                        emit(deserializedData)
-                    }
-                }
-
-            }
-        }
-    }
+    private val fileUploadUrl = "${baseUrl.trimEnd('/')}/api/file"
 
     private val jsonConverter = Json { ignoreUnknownKeys = true }
 
@@ -93,93 +46,76 @@ class StreamApi(private val client: HttpClient, baseUrl: String) {
                     contentType(ContentType.Application.Json)
                     setBody(Json.encodeToString(message))
                 },
-                deserialize = { typeInfo: TypeInfo, jsonString: String ->
-                    val serializer =
-                        Json.serializersModule.serializer(typeInfo.kotlinType!!)
-                    Json.decodeFromString(serializer, jsonString)!!
-                },
-                )
+            )
             {
-                incoming.collect { event: TypedServerSentEvent<String> ->
+                incoming.collect { event ->
+                    val data = event.data ?: return@collect
                     when (event.event) {
-                        "message" -> {
-                            val msg: Message? = event.data?.let {
-                                jsonConverter.decodeFromString<Message>(
-                                    it
+                        "message" -> emit(
+                            ReplyVariants.SavedRequest(jsonConverter.decodeFromString<Message>(data))
+                        )
+
+                        "chunk" -> emit(
+                            ReplyVariants.Chunks(jsonConverter.decodeFromString<Chunk>(data))
+                        )
+
+                        "finalMessage" -> emit(
+                            ReplyVariants.FinalReply(jsonConverter.decodeFromString<Message>(data))
+                        )
+
+                        "error" -> {
+                            val error = runCatching { jsonConverter.decodeFromString<StreamError>(data) }
+                                .getOrDefault(StreamError(details = data))
+                            emit(
+                                ReplyVariants.Error(
+                                    message = error.userMessage(),
+                                    partialResponse = error.partialResponse,
                                 )
-                            }
-                            if (msg != null) {
-                                emit(ReplyVariants.SavedRequest(msg))
-                            }
+                            )
                         }
 
-                        "chunk" -> {
-                            val chk: Chunk? =
-                                event.data?.let {
-                                    Json.decodeFromString<Chunk>(it)
-                                }
-                            if (chk != null) {
-                                emit(ReplyVariants.Chunks(chk))
-                            }
-                        }
-
-                        "finalMessage" -> {
-                            val msg: Message? = event.data?.let {
-                                jsonConverter.decodeFromString<Message>(
-                                    it
-                                )
-                            }
-                            if (msg != null) {
-                                emit(ReplyVariants.FinalReply(msg))
-                            }
-                        }
-
-                        else -> {
-                            println(event)
-                            println(event.event)
-                        }
+                        else -> println("Unknown SSE event: ${event.event}")
                     }
                 }
             }
         }
     }
 
-    fun uploadFile(content: ShareFileModel, chatID: Int): Flow<ProgressUpdate> = channelFlow {
-//        val info = fileReader.uriToFileInfo(contentUri)
-
-        client.submitFormWithBinaryData(
-            url = "$url/api/file",
+    fun uploadFile(content: ShareFileModel, chatID: Int): Flow<UploadEvent> = channelFlow {
+        val response = client.submitFormWithBinaryData(
+            url = fileUploadUrl,
             formData = formData {
-                append("description", "Test")
                 append("chat_id", chatID)
                 append("file", content.bytes, Headers.build {
-                    append(HttpHeaders.ContentType, content.mime.toString())
                     append(
-                        HttpHeaders.ContentDisposition,
-                        "filename=${content.fileName}"
+                        HttpHeaders.ContentType,
+                        ContentType.defaultForFileExtension(content.fileName.substringAfterLast('.', "")).toString()
                     )
+                    append(HttpHeaders.ContentDisposition, "filename=${quoteHeaderValue(content.fileName)}")
                 })
             }
         ) {
             onUpload { bytesSentTotal, totalBytes ->
-                if (totalBytes != null) {
-                    if(totalBytes > 0L) {
-                        send(ProgressUpdate(bytesSentTotal, totalBytes))
-                    }
+                if (totalBytes != null && totalBytes > 0L) {
+                    send(UploadEvent.Progress(bytesSentTotal, totalBytes))
                 }
             }
         }
+        send(UploadEvent.Completed(response.body<MFile>()))
     }
 }
+
+internal fun quoteHeaderValue(value: String): String =
+    "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
 sealed interface ReplyVariants {
     data class SavedRequest(val content: Message) : ReplyVariants
     data class Chunks(val content: Chunk) : ReplyVariants
     data class FinalReply(val content: Message) : ReplyVariants
-    data class Error(val message: String) : ReplyVariants
+    data class Error(val message: String, val partialResponse: String? = null) : ReplyVariants
 }
 
-data class ProgressUpdate(
-    val bytesSent: Long,
-    val totalBytes: Long
-)
+sealed interface UploadEvent {
+    data class Progress(val bytesSent: Long, val totalBytes: Long) : UploadEvent
+    data class Completed(val file: MFile) : UploadEvent
+}
