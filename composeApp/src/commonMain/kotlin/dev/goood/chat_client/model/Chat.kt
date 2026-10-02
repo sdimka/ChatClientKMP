@@ -34,7 +34,7 @@ typealias ChatSourceList = List<ChatSource>
 
 @Serializable
 data class ChatModel (
-    val id: Int,
+    val id: Int? = null,
     val name: String,
     @SerialName("display_name")
     val displayName: String,
@@ -44,3 +44,10 @@ data class ChatModel (
 )
 
 typealias ChatModelList = List<ChatModel>
+
+@Serializable
+data class AddModelRequest(
+    @SerialName("source_id")
+    val sourceID: Int,
+    val name: String,
+)

@@ -63,7 +63,7 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
 
                 }
                 .collect{
-                    allModels = it
+                    allModels = it.filter { model -> model.id != null }
                 }
 
         }
@@ -75,6 +75,7 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
 
     fun setSelectedSource(source: ChatSource) {
         selectedSource.value = source
+        _selectedModel.value = null
         _modelList.value = allModels.filter { it.sourceID == source.id }
         validateForm()
     }
@@ -90,7 +91,11 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
     }
 
     private fun validateForm() {
-        if (chatName.value.isNotEmpty() && selectedSource.value != null && _selectedModel.value != null) {
+        if (
+            chatName.value.isNotEmpty() &&
+            selectedSource.value != null &&
+            _selectedModel.value?.id != null
+        ) {
             _state.value = State.FormValid
         } else {
             _state.value = State.Error("Fill all fields")
@@ -98,13 +103,20 @@ class AddChatViewModel: ViewModel(), KoinComponent  {
     }
 
     fun createNewChat() {
+        val source = selectedSource.value
+        val modelID = _selectedModel.value?.id
+        if (source == null || modelID == null) {
+            _state.value = State.Error("Select a registered model")
+            return
+        }
+
         _state.value = State.Loading
         viewModelScope.launch {
             val chat = NewChat(
                 id = 1,
                 name = chatName.value,
-                sourceID = selectedSource.value!!.id,
-                modelID = _selectedModel.value!!.id,
+                sourceID = source.id,
+                modelID = modelID,
             )
             api.chatApi.addChat(chat)
                 .catch {

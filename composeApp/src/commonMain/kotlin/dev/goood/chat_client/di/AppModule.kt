@@ -12,6 +12,7 @@ import dev.goood.chat_client.viewModels.LoginViewModel
 import dev.goood.chat_client.viewModels.MainViewModel
 import dev.goood.chat_client.viewModels.MainViewModelImpl
 import dev.goood.chat_client.viewModels.MainViewModelPreview
+import dev.goood.chat_client.viewModels.ModelPickerViewModel
 import dev.goood.chat_client.viewModels.AddChatViewModel
 import dev.goood.chat_client.viewModels.ChatViewModel
 import dev.goood.chat_client.viewModels.ChatViewModelImpl
@@ -45,6 +46,7 @@ val appModule = module {
     viewModelOf(::MainViewModelImpl) { bind<MainViewModel>() }
     viewModelOf(::LoginViewModel)
     viewModelOf(::AddChatViewModel)
+    viewModelOf(::ModelPickerViewModel)
     viewModelOf(::ChatViewModelImpl) { bind<ChatViewModel>()}
     viewModelOf(::SystemMessagesViewModelImpl) { bind<SystemMessagesViewModel>() }
     viewModelOf(::SMDetailViewModelImpl) { bind<SMDetailViewModel>() }
@@ -67,6 +69,7 @@ val appModulePreview = module {
     viewModelOf(::MainViewModelPreview) { bind<MainViewModel>() }
     viewModelOf(::LoginViewModel)
     viewModelOf(::AddChatViewModel)
+    viewModelOf(::ModelPickerViewModel)
     viewModelOf(::ChatViewModelPreview) { bind<ChatViewModel>()}
     viewModelOf(::SystemMessagesViewModelPreview) { bind<SystemMessagesViewModel>() }
     viewModelOf(::SMDetailViewModelPreview) { bind<SMDetailViewModel>() }

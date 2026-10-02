@@ -4,7 +4,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import compose.icons.LineAwesomeIcons
@@ -67,6 +67,8 @@ fun <T> DropDownMenu(
     selectedItem: T?,
     onSelected: (T) -> Unit,
     itemLabel: (T) -> String,
+    itemSupportingText: (T) -> String? = { null },
+    itemEnabled: (T) -> Boolean = { true },
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -101,22 +103,28 @@ fun <T> DropDownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
                 ) {
-                    itemList.forEachIndexed { index, item ->
+                    itemList.forEach { item ->
                         DropdownMenuItem(
                             text = {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(5.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                                    modifier = Modifier.fillMaxWidth(),
                                 ) {
                                     Text(
                                         text = itemLabel(item),
-                                        modifier = Modifier.fillMaxWidth()
+                                        fontWeight = FontWeight.Medium,
                                     )
+                                    itemSupportingText(item)?.takeIf { it.isNotBlank() }?.let {
+                                        Text(text = it)
+                                    }
                                 }
                             },
+                            enabled = itemEnabled(item),
                             onClick = {
-                                onSelected(item)
-                                expanded = false
+                                if (itemEnabled(item)) {
+                                    onSelected(item)
+                                    expanded = false
+                                }
                             }
                         )
                     }

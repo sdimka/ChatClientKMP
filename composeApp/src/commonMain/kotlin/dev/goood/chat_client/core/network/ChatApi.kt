@@ -9,6 +9,8 @@ import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 import dev.goood.chat_client.model.Chat
 import dev.goood.chat_client.model.ChatList
+import dev.goood.chat_client.model.AddModelRequest
+import dev.goood.chat_client.model.ChatModel
 import dev.goood.chat_client.model.ChatModelList
 import dev.goood.chat_client.model.ChatSourceList
 import dev.goood.chat_client.model.MessageList
@@ -34,6 +36,12 @@ interface ChatApi {
 
     @GET("/api/Model/GetAvailableModels")
     fun getModels(): Flow<ChatModelList>
+
+    @GET("/api/Model/GetProviderModels")
+    fun getProviderModels(@Query("source_id") sourceID: Int): Flow<ChatModelList>
+
+    @POST("/api/Model/AddModel")
+    fun addModel(@Body model: AddModelRequest): Flow<ChatModel>
 
     @GET("/api/Messages")
     fun getMessages(@Query("chat_id") chatId: Int): Flow<MessageList>

@@ -23,6 +23,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
@@ -97,31 +98,34 @@ fun ChatListScreen(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         listPane = {
-            ListScaffold(
-                state = state,
-                chats = chats,
-                onNewChat = { viewModel.addChatDialogState.value = true },
-                onEdit = {  },
-                onDelete = { chatToDel -> viewModel.deleteChatDialogState.value = chatToDel},
-                toChat = {
-                    selectedChatID.value = it.id
-                    toChat(it)
-                    scope.launch {
-                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
-                    }
-                },
+            AnimatedPane {
+                ListScaffold(
+                    state = state,
+                    chats = chats,
+                    onNewChat = { viewModel.addChatDialogState.value = true },
+                    onEdit = {  },
+                    onDelete = { chatToDel -> viewModel.deleteChatDialogState.value = chatToDel},
+                    toChat = {
+                        selectedChatID.value = it.id
+                        toChat(it)
+                        scope.launch {
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+                        }
+                    },
 
-                snackBarHostState = snackBarHostState,
-            )
+                    snackBarHostState = snackBarHostState,
+                )
+            }
         },
         detailPane = {
-            ChatScreen(
-                chatID = selectedChatID.value,
-                modifier = Modifier,
-                snackBarHostState = snackBarHostState
-            )
+            AnimatedPane {
+                ChatScreen(
+                    chatID = selectedChatID.value,
+                    modifier = Modifier,
+                    snackBarHostState = snackBarHostState
+                )
+            }
         },
-        extraPane = {  },
     )
 
     val dialogState by viewModel.addChatDialogState.collectAsStateWithLifecycle()

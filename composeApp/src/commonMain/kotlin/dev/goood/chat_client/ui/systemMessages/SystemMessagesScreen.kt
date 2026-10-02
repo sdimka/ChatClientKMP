@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ import dev.goood.chat_client.ui.composable.DeleteDialogImp
 import dev.goood.chat_client.ui.composable.SwipeableWithActions
 import dev.goood.chat_client.ui.theme.grayBackground
 import org.koin.compose.viewmodel.koinViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SystemMessagesScreen(
@@ -47,6 +49,8 @@ fun SystemMessagesScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val messages by viewModel.messages.collectAsStateWithLifecycle()
     val deleteDialogState = remember { mutableStateOf<SystemMessage?>(null) }
+    val addModelDialogState = remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -56,15 +60,21 @@ fun SystemMessagesScreen(
             .background(grayBackground)
     ) {
 
-        CButton(
-            icon = LineAwesomeIcons.PlusSquareSolid,
-            onClick = {
-                toNew()
-            },
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = modifier
-                .padding(top = 10.dp).padding(end = 10.dp)
-                .align(Alignment.End)
-        )
+                .padding(top = 10.dp, end = 10.dp)
+                .align(Alignment.End),
+        ) {
+            CButton(
+                text = "Add model",
+                onClick = { addModelDialogState.value = true },
+            )
+            CButton(
+                icon = LineAwesomeIcons.PlusSquareSolid,
+                onClick = toNew,
+            )
+        }
 
         when (state) {
             is State.Error -> {
@@ -112,6 +122,19 @@ fun SystemMessagesScreen(
                 viewModel.deleteMessage(message.id)
                 deleteDialogState.value = null
             }
+        )
+    }
+
+    if (addModelDialogState.value) {
+        AddModelDialog(
+            snackBarHostState = snackBarHostState,
+            onDismiss = { addModelDialogState.value = false },
+            onSaved = { model ->
+                addModelDialogState.value = false
+                scope.launch {
+                    snackBarHostState.showSnackbar("${model.displayName} added")
+                }
+            },
         )
     }
 }
